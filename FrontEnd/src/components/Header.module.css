@@ -1,0 +1,124 @@
+.header {
+  height: 58px;
+  width: 100%;
+  left: 80px;
+  top: 50px;
+  border-radius: 0px;
+  position: absolute;
+  width: 1352px;
+  height: 58px;
+  left: 80px;
+  top: 50px;
+}
+
+.logo {
+  height: 58px;
+  width: 107px;
+  left: 0px;
+  top: 0px;
+  border-radius: 0px;
+  position: absolute;
+  left: 0%;
+  right: 92.09%;
+  top: 0%;
+  bottom: 0%;
+}
+
+.input {
+  height: 50px;
+  width: 800px;
+  left: 155px;
+  top: 4px;
+  border-radius: 25px;
+  position: absolute;
+  left: 11.46%;
+  right: 29.36%;
+  top: 6.9%;
+  bottom: 6.9%;
+  background: #ffffff;
+  /* light shadow */
+  box-shadow: 0px 10px 30px rgba(240, 249, 255, 0.6);
+  border-radius: 25px;
+  font-size: 180%;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  border-color: #ffffff;
+  border-width: 0.001ch;
+}
+
+.search_button {
+  height: 35px;
+  width: 50px;
+  left: 895px;
+  top: 12px;
+  border-radius: 25px;
+  position: absolute;
+  left: 66.2%;
+  right: 30.1%;
+  top: 20.69%;
+  bottom: 18.97%;
+  /* blue gradian 400-500 */
+  background: linear-gradient(
+    180deg,
+    rgba(14, 165, 233, 0.7) 0%,
+    rgba(56, 189, 248, 0.6) 100%
+  );
+  /* light shadow */
+  box-shadow: 0px 10px 30px rgba(240, 249, 255, 0.6);
+  border-radius: 25px;
+  border-width: 0.001ch;
+}
+
+.search_icon {
+  height: 20px;
+  width: 20px;
+  left: 911px;
+  top: 20px;
+  border-radius: 0px;
+  position: absolute;
+  left: 30.38%;
+  right: 31.14%;
+  top: 20.48%;
+  bottom: 31.03%;
+}
+
+.sign_up {
+  height: 50px;
+  width: 100px;
+  left: 1127px;
+  top: 4px;
+  border-radius: 25px;
+  position: absolute;
+  left: 83.36%;
+  right: 9.25%;
+  top: 6.9%;
+  bottom: 6.9%;
+  background-color: white;
+  color: grey;
+  border-width: 0.001ch;
+  filter: drop-shadow(0px 10px 30px rgba(240, 249, 255, 0.6));
+}
+
+.login_button {
+  height: 50px;
+  width: 100px;
+  left: 1252px;
+  top: 4px;
+  border-radius: 0px;
+  position: absolute;
+  left: 92.6%;
+  right: 0%;
+  top: 6.9%;
+  bottom: 6.9%;
+  /* blue gradian 400-500 */
+  background: linear-gradient(
+    180deg,
+    rgba(14, 165, 233, 0.7) 0%,
+    rgba(56, 189, 248, 0.6) 100%
+  );
+  /* light shadow */
+  box-shadow: 0px 10px 30px rgba(240, 249, 255, 0.6);
+  border-radius: 25px;
+  color: #ffffff;
+  border-width: 0.001ch;
+}
