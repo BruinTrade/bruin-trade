@@ -3,16 +3,16 @@ import { Routes, Route, useParams } from 'react-router-dom';
 
 function Post() {
     return <Routes>
-            <Route path="/" element={<MyPosts />}/>
-            <Route path=":id" element={<PostPage />}/>
+            <Route path="/" element={<PagePosts />}/>
+            <Route path=":id" element={<PagePost />}/>
         </Routes>;
 }
 
-function MyPosts() {
-    return <div>My Post</div>
+function PagePosts() {
+    return <div>Posts Gallery</div>
 }
 
-function PostPage() {
+function PagePost() {
     let { id } = useParams();
     return <div>Post: {id}</div>
 }

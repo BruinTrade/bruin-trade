@@ -1,10 +1,9 @@
 import React from "react";
-import NavBar from "../components/navbar";
-function Home(props) {
+
+function Home() {
     return (
-        <div>
-            <NavBar />
-            <div>Home</div>
+        <div className="flex flex-row justify-center">
+            <div className="text-2xl">Home</div>
         </div>
     );
 }
