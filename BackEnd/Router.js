@@ -1,8 +1,8 @@
 import express from "express";
-import ItemListController from "./ItemListController.js";
-import UserController from "./UserController.js";
-import CommentsController from "./CommentsController.js";
-import FollowController from "./FollowController.js";
+import ItemListController from "./controllers/ItemListController.js";
+import UserController from "./controllers/UserController.js";
+import CommentsController from "./controllers/CommentsController.js";
+import FollowController from "./controllers/FollowController.js";
 
 
 const BackEndRouter = express.Router()

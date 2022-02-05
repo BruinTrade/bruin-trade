@@ -1,7 +1,6 @@
 import express from "express";
-import BackEndRouter from "./API/Router.js";
+import BackEndRouter from "./Router.js";
 
-//import session from "express-session"
 
 const app = express()
 
