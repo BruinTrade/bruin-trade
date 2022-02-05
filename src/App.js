@@ -6,7 +6,7 @@ import About from './pages/About.js'
 import Post from './pages/Post.js'
 
 const App = () => (
-  <div>
+  <div className='bg-bg_blue'>
     <Router>
       <NavBar />
       <Suspense fallback={<div>Loading...</div>}>
