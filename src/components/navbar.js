@@ -13,9 +13,8 @@ function NavBar(props) {
             {get_icon(Icons.logo)}
         </div>
         <div className="flex items-center justify-between rounded-25px bg-white h-50px w-800px text-gray-200">
-            <div id="input" className="pl-21px text-grey-200 text-14px leading-none border-0 w-full">
-            </div>
-            <button onClick={() => {}} className="flex justify-center items-center rounded-25px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 w-50px h-35px mr-10px">
+            <input id="search term" className="w-full border-0 px-3 py-2 rounded-lg focus:outline-none text-blue-600"/>
+            <button onClick={() => {}} className="flex justify-center items-center rounded-25px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 w-50px h-35px mr-10px ">
                 <div  className="w-20px h-20px">
                     {get_icon(Icons.search_icon)}
                 </div>
@@ -30,5 +29,8 @@ function NavBar(props) {
     </div>
     );
 }
+
+//<div id="input" className="pl-21px text-grey-200 text-14px leading-none border-0 w-full">
+//</div>
 
 export default NavBar;
