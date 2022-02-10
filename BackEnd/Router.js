@@ -16,9 +16,11 @@ BackEndRouter.post("/logout", UserController.logout);
 
 //About posted items
 BackEndRouter.get("/items/:item_id", ItemListController.getItemById);
+BackEndRouter.get("/items", ItemListController.getItems);
 BackEndRouter.post("/:username/createItem", ItemListController.createItem);
-BackEndRouter.post("/items/:item_id/edit", ItemListController.editItem);
-BackEndRouter.post("/items/:item_id/delete", ItemListController.deleteItem);
+BackEndRouter.get("/:username/:item_id/edit", ItemListController.viewEditItemPage);
+BackEndRouter.post("/:username/:item_id/edit", ItemListController.editItem);
+BackEndRouter.post("/:username/:item_id/delete", ItemListController.deleteItem);
 
 //About comments
 
