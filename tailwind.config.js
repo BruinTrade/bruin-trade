@@ -68,6 +68,9 @@ module.exports = {
 		},
 
 		extend: {
+			fontFamily: {
+				'avenir': ['"Avenir Next"'],
+			},
 			spacing: {
 				'2xlscreen': '1549px',
 				xlscreen: '1280px',
@@ -145,6 +148,7 @@ module.exports = {
 				'32px': '32px',
 				'31px': '31px',
 				'30px': '30px',
+				'29px': '29px',
 				'28px': '28px',
 				'26px': '26px',
 				'25px': '25px',
