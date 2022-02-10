@@ -12,19 +12,19 @@ function SignUp(props) {
             <div>
                 Email
                 <form className='font-regular text-gray-300 rounded-12px bg-gray-100'>
-                    No more than 20 characters
+                    Please enter a valid email address
                 </form>
             </div>
             <div>
                 Password
                 <form className='font-regular text-gray-300 rounded-12px bg-gray-100'>
-                    No more than 20 characters
+                    At least 8 characters
                 </form>
             </div>
             <div>
                 Location
                 <form className='font-regular text-gray-300 rounded-12px bg-gray-100'>
-                    No more than 20 characters
+                    Default location
                 </form>
             </div>
             <button>
