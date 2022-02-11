@@ -40,12 +40,12 @@ class SignUp extends React.Component {
     render() {
         return(
         <div>
-        <form onSubmit = {this.handleSubmit} className='text-avenir-reg text-14px drop-shadow w-350px h-494px bg-white rounded-25px item-center flex flex-col px-25px pt-29px justify-between'>
+        <form onSubmit = {this.handleSubmit} className='font-avenir-reg text-14px drop-shadow w-350px h-494px bg-white rounded-25px item-center flex flex-col px-25px pt-29px justify-between'>
             <Form label="Username" placeholder="No more than 20 characters" value={this.state.username} onChange={this.handleChange} type="text" maxlength={20} minlength={false}/>
             <Form label="Email" placeholder="Please enter a valid email address" value={this.state.email} onChange={this.handleChange} type="email" maxlength={false} minlength={false} />
             <Form label="Password" placeholder="At least 8 characters" value={this.state.password} onChange={this.handleChange} type="password" maxlength={false} minlength={8} />
             <Form label="Location" placeholder="Default location" value={this.state.location} onChange={this.handleChange} type="text" maxlength={false} minlength={false}/>
-        <input className="mb-30px mt-61px text-white text-16px rounded-25px drop-shadow h-40px bg-gradient-to-r from-blue-400 to-blue-500 hover:cursor-pointer hover:drop-shadow-md" type="submit" value="Sign Up"/>
+        <input className="font-avenir-med mb-30px mt-61px text-white text-16px rounded-25px drop-shadow h-40px bg-gradient-to-r from-blue-400 to-blue-500 hover:cursor-pointer hover:drop-shadow-md" type="submit" value="Sign Up"/>
         </form>
         </div>
     );
