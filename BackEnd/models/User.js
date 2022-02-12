@@ -56,7 +56,7 @@ class User {
       if (user_info && bcrypt.compareSync(this.data.password, user_info.password))
       {
         this.data = user_info
-        resolve("successful login")
+        resolve(user_info)
       }
       else
       {

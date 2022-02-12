@@ -11,6 +11,7 @@ BackEndRouter.get("/", ItemListController.getItems);
 //About users
 BackEndRouter.post("/register", UserController.register);
 BackEndRouter.post("/login", UserController.login);
+BackEndRouter.get("/login", UserController.checkLogin);
 BackEndRouter.post("/logout", UserController.logout);
 //maybe add let users input some descriptions of themselves
 

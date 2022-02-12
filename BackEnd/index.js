@@ -15,16 +15,16 @@ const port = process.env.BACKENDPORT || 8000;
 client.connect(process.env.CONNECTSTRING).then(async (client) => {
   await User.getUserCollection(client);
   await Item.getItemCollection(client);
+  
+  // let sessionSetup = session({
+  //   secret: "KennyOmega",
+  //   store: MongoStore.create({ client: client }),
+  //   saveUninitialized: false,
+  //   resave: false,
+  //   cookie: { maxAge: 1000 * 60 * 60 * 24, httpOnly: true },
+  // });
 
-  let sessionSetup = session({
-    secret: "KennyOmega",
-    store: MongoStore.create({ client: client }),
-    saveUninitialized: false,
-    resave: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24, httpOnly: true },
-  });
-
-  app.use(sessionSetup);
+  // app.use(sessionSetup);
 
   app.listen(port);
 });
