@@ -1,6 +1,18 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Avenir Next Medium";
+    src: url('./fonts/AvenirNextLTPro-Demi.otf')
+  }
+  @font-face {
+    font-family: "Avenir Next Regular";
+    src: url('./fonts/AvenirNextLTPro-Regular.otf')
+  }
+}
 
 /* body {
   margin: 0;

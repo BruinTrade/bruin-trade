@@ -68,6 +68,10 @@ module.exports = {
 		},
 
 		extend: {
+			fontFamily: {
+				'avenir-med': ['"Avenir Next Medium"'],
+				'avenir-reg': ['"Avenir Next Regular"'],
+			},
 			spacing: {
 				'2xlscreen': '1549px',
 				xlscreen: '1280px',
@@ -91,8 +95,10 @@ module.exports = {
 				'580px': '580px',
 				'550px': '550px',
 				'504px': '504px',
+				'494px': '494px',
 				'388px': '388px',
 				'366px': '366px',
+				'350px': '350px',
 				'324px': '324px',
 				'220px': '220px',
 				'265px': '265px',
@@ -100,6 +106,7 @@ module.exports = {
 				'236px': '236px',
 				'139px': '139px',
 				'420px': '420px',
+				'298px': '298px',
 				'297px': '297px',
 				'288px': '288px',
 				'254px': '254px',
@@ -129,6 +136,7 @@ module.exports = {
 				'68px': '68px',
 				'66px': '66px',
 				'64px': '64px',
+				'61px': '61px',
 				'60px': '60px',
 				'57px': '57px',
 				'54px': '54px',
@@ -147,6 +155,7 @@ module.exports = {
 				'32px': '32px',
 				'31px': '31px',
 				'30px': '30px',
+				'29px': '29px',
 				'28px': '28px',
 				'26px': '26px',
 				'25px': '25px',
@@ -161,6 +170,7 @@ module.exports = {
 				'12px': '12px',
 				'11px': '11px',
 				'10px': '10px',
+				'2px': '2px',
 				'1px': '1px',
 				'0.7px': '0.7px',
 				'0.5px': '0.5px',
