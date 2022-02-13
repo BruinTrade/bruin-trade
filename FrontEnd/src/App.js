@@ -8,7 +8,7 @@ import Post from './pages/Post.js'
 const App = () => (
   <div className='bg-bg_blue'>
     <Router>
-      <NavBar />
+      <NavBar location="UCLA" numCartItem={3} />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home/>} />

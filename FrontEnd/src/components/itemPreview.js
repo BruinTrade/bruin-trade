@@ -21,7 +21,7 @@ function ItemPreview({ props }) {
                 </div>
                 
                 <button>
-                    <image src="./icons/Like.svg"/>
+                    <img src="./icons/Like.svg"/>
                 </button>
             </div>
         </div>

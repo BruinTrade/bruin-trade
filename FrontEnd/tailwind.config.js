@@ -176,6 +176,9 @@ module.exports = {
 				'0.5px': '0.5px',
 				'0.3px': '0.3px',
 			},
+			width: {
+				'fit-content': 'fit-content'
+			},
 			borderRadius: {
 				'43px': '43px',
 				'25px': '25px',
@@ -218,6 +221,7 @@ module.exports = {
 				'14px': '14px',
 				'12px': '12px',
 				'10px': '10px',
+				'9px': '9px',
 				'8px': '8px',
 				'2xs': '.65rem',
 			},

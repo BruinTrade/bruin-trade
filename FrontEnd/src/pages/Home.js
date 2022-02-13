@@ -13,7 +13,7 @@ function Home() {
             
             <SignUp/>
             <SignIn/>
-            <CategoryItem label="Books" />
+            <CategoryItem label="Books" imgUrl="https://media.wired.com/photos/5be4cd03db23f3775e466767/master/w_120" />
         </div>
     );
 }
