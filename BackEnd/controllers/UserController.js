@@ -41,6 +41,14 @@ export default class UserController {
     })
   }
 
+  static async addItemToCart(req, res, next) {
+    User.addItemToCart(req.params.username, req.params.item_id).then((message)=>{
+      res.json({ status: message });
+    }).catch((error_message)=>{
+      res.json({ error: error_message });
+    })
+  }
+
   static async findUserById(req, res, next) {}
 
   static async getPostedItems(req, res, next) {}

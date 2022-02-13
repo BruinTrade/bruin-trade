@@ -22,6 +22,7 @@ BackEndRouter.post("/:username/createItem", ItemListController.createItem);
 BackEndRouter.get("/:username/:item_id/edit", ItemListController.viewEditItemPage);
 BackEndRouter.post("/:username/:item_id/edit", ItemListController.editItem);
 BackEndRouter.post("/:username/:item_id/delete", ItemListController.deleteItem);
+BackEndRouter.post("/:username/:item_id/addToCart", UserController.addItemToCart);
 
 //About comments
 
