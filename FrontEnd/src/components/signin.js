@@ -11,16 +11,17 @@ class SignIn extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         /* TO DO */
         event.preventDefault();
         console.log("lgoin");
-        UserServices.login(this.state.username, this.state.password).then((res) => {
-            console.log(res)
-            UserServices.checkLogin().then((res) => {
-                console.log(res)
-            })
-        });
+        let res = await UserServices.login(this.state.username, this.state.password)
+        console.log(res)
+    }
+
+    async getLoginStatus() {
+        let loginStatus = await UserServices.checkLogin()
+        console.log(loginStatus)
     }
 
     handleChange(event) {
@@ -33,6 +34,7 @@ class SignIn extends React.Component {
     }
 
     render() {
+        this.getLoginStatus();
         return(
         <div>
         <form onSubmit = {this.handleSubmit} className='font-avenir-reg text-14px drop-shadow w-350px h-298px bg-white rounded-25px item-center flex flex-col px-25px pt-29px justify-between'>

@@ -16,18 +16,22 @@ export default class UserController {
 
   static async login(req, res, next) {
     let temp_user = new User(req.body);
+    var temp
     temp_user
       .login()
       .then((user_info) => {
         //maybe add to session?
-        req.session.user = user_info
+        temp = user_info
         res.json({ status: "successfully logged in" });
       })
       .catch((error_message) => {
         res.json({ errors: error_message });
+      }).then(() => {
+        req.session.user = temp
       });
   }
   static async checkLogin(req, res, next) {
+    console.log(req.session)
     if (req.session.user) {
       res.json({ isLoggedIn: true, user: req.session.user });
     } else {
