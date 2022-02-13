@@ -1,8 +1,8 @@
 import app from "./server.js";
 import mongodb from "mongodb";
 import dotenv from "dotenv";
-import session from "express-session";
-import MongoStore from "connect-mongo";
+//import session from "express-session";
+//import MongoStore from "connect-mongo";
 import User from "./models/User.js";
 import Item from "./models/Item.js"
 
