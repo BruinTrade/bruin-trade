@@ -12,10 +12,22 @@ class ItemDetails extends React.Component {
         //this.handleClick = this.handleClick.bind(this)
     }
 
+    header (label) {
+        return (
+            <h2 className='text-12px text-gray-400 font-roboto-reg mb-3px'>{label}</h2>
+        );
+    };
+
     render() {
         return (
             <div className='w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px'>
-                <img src={this.props.src} className='w-600px h-500px border-gray-100 border-2'/>
+                <div classname='flex-col'>
+                    <img src={this.props.src} className='w-600px h-500px border-gray-100 border-2'/>
+                    <div className='flex-row'>
+                    {/* Item Image State */}
+                    </div>
+                </div>
+                
                 <div className='flex-col'>
                     <h1 className='w-638px h-81px text-32px font-roboto-reg leading-none break-words overflow-hidden'>
                         {this.props.text}
@@ -29,22 +41,22 @@ class ItemDetails extends React.Component {
 
                             <div className='h-52px w-105px flex-col'>
                                 
-                                <h2 className='text-12px text-gray-400 font-roboto-reg'>Price</h2>
+                                {this.header('Price')}
                                 <div className='text-28px mb-20px font-avenir-reg text-gold'>
                                     {this.props.price}
                                 </div>
 
-                                <h2 className='text-12px text-gray-400 font-roboto-reg'>Condition</h2>
+                                {this.header('Condition')}
                                 <div className='text-14px mb-20px font-avenir-reg text-gray-500'>
                                     {this.props.cond}
                                 </div>
 
-                                <h2 className='text-12px text-gray-400 font-roboto-reg'>Location</h2>
+                                {this.header('Location')}
                                 <div className='text-14px mb-20px font-avenir-reg text-gray-500'>
                                     {this.props.loc}
                                 </div>
 
-                                <h2 className='text-12px text-gray-400 font-roboto-reg'>Description</h2>
+                                {this.header('Description')}
                                 <p className="w-400px h-196px text-12px font-avenir-reg text-gray-500 leading-none overflow-hidden">
                                     {this.props.desc}
                                 </p>
