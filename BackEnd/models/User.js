@@ -105,6 +105,17 @@ class User {
     })
   }
 
+  static async getItemsInCart(input_username)
+  {
+    return new Promise(async (resolve, reject) => {
+      this.findUserByName(input_username).then((result)=>{
+        resolve(result.cart)
+      }).catch(()=>{
+        reject("failed to find user")
+      })
+    })
+  }
+
 
   static async findUserByName(input_username) {
     return new Promise(async (resolve, reject) => {
