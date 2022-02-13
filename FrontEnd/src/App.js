@@ -5,7 +5,7 @@ import Home from './pages/Home.js'
 import About from './pages/About.js'
 import Post from './pages/Post.js'
 import PageSignup from './pages/Signup.js'
-
+import PageLogin from './pages/Login.js'
 
 const App = () => (
   <div className='flex flex-row justify-center bg-bg_blue h-screen'>
@@ -18,12 +18,12 @@ const App = () => (
             <Route path="/post/*" element={<Post/>} />
             <Route path="/about" element={<About/>} />
             <Route path="/signup" element={<PageSignup/>} />
+            <Route path="/login" element={<PageLogin/>} />
           </Routes>
         </Suspense>
       </Router>
     </div>
   </div>
-  
 );
 
 export default App;
