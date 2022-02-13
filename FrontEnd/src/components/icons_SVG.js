@@ -16,9 +16,3 @@ export const Icons = {
 }
 
 export default get_icon;
-
-
-export function LogoIcon() {
-    return ;
-    
-}
