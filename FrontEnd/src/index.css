@@ -12,6 +12,10 @@
     font-family: "Avenir Next Regular";
     src: url('./fonts/AvenirNextLTPro-Regular.otf')
   }
+  @font-face {
+    font-family: "Roboto Regular";
+    src: url('./fonts/Roboto-Regular.ttf')
+  }
 }
 
 /* body {
