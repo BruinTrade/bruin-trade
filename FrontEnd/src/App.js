@@ -8,8 +8,8 @@ import PageSignup from './pages/Signup.js'
 import PageLogin from './pages/Login.js'
 
 const App = () => (
-  <div className='flex flex-row justify-center bg-bg_blue h-screen'>
-    <div className='w-1512px'>
+  <div className='flex flex-row justify-center bg-bg_blue min-h-screen h-max'>
+    <div className='w-1512px pb-100px'>
       <Router>
         <NavBar />
         <Suspense fallback={<div>Loading...</div>}>
