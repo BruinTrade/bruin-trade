@@ -4,7 +4,7 @@ let userCollection;
 
 class User {
   constructor(input_data) {
-    this.data = input_data;
+    this.data = {...input_data, username: input_data.username}
     this.errors = [];
   }
 
@@ -53,12 +53,17 @@ class User {
       let user_info = await userCollection.findOne({
         username: this.data.username,
       })
+      if (!user_info)
+      {
+        reject("User does not exist")
+        return
+      }
       if (user_info && bcrypt.compareSync(this.data.password, user_info.password)) {
         this.data = user_info
         resolve(user_info)
       }
       else {
-        reject("invalid password")
+        reject("Invalid password")
       }
     })
   }

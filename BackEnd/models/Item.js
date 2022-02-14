@@ -38,9 +38,7 @@ class Item {
     //can have more filters
     if (input_query.title) {
       query = { $text: { $search: input_query.title } };
-    }
-    else if (input_query.owner)
-    {
+    } else if (input_query.owner) {
       query = { $text: { $search: input_query.owner } };
     }
 
@@ -80,54 +78,97 @@ class Item {
     });
   }
 
-  async findItemById() {}
+  static async findItemById(item_id) {
+    return new Promise(async (resolve, reject) => {
+      let result;
+      try {
+        result = await itemCollection.findOne({ _id: new ObjectId(item_id) });
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 
   //add check if the user is the owner of the item
   //title
   //price
   //description
   async update() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       // const temp_item = itemCollection.find({ "_id": { $eq: objectId(this.data.id_to_edit) } })
       // if (!temp_item)
       // {
       //   reject("item does not exist");
       //   return
       // }
+      let item_info;
 
-      itemCollection
-        .findOneAndUpdate(
-          { _id: new ObjectId(this.data.id_to_edit) },
-          {
-            $set: {
-              title: this.data.title,
-              price: this.data.price,
-              description: this.data.description,
-            },
+      Item.findItemById(this.data.id_to_edit)
+        .then((result) => {
+          item_info = result;
+          if (!item_info) {
+            reject("item does not exist");
+            return;
           }
-        )
-        .then(() => {
-          resolve("successfully edited item");
+          if (item_info.owner != this.data.owner) {
+            reject("item does not belong to current user");
+            return;
+          }
+          itemCollection
+            .findOneAndUpdate(
+              { _id: new ObjectId(this.data.id_to_edit) },
+              {
+                $set: {
+                  title: this.data.title,
+                  price: this.data.price,
+                  description: this.data.description,
+                },
+              }
+            )
+            .then(() => {
+              resolve("successfully edited item");
+            })
+            .catch(() => {
+              reject("failed to edit item");
+            });
         })
         .catch(() => {
-          reject("failed to edit item");
+          reject("invalid item id");
+          return;
         });
     });
   }
 
   async delete() {
-    return new Promise((resolve, reject) => {
-      itemCollection
-        .deleteOne({
-          _id: ObjectId(this.data.id_to_edit),
-        })
-        .then(() => {
-          resolve("successfully deleted item");
+    return new Promise(async (resolve, reject) => {
+      let item_info;
+      Item.findItemById(this.data.id_to_edit)
+        .then((result) => {
+          item_info = result;
+          if (!item_info) {
+            reject("item does not exist");
+            return;
+          }
+          if (item_info.owner != this.data.owner) {
+            reject("item does not belong to current user");
+            return;
+          }
+          itemCollection
+            .deleteOne({
+              _id: ObjectId(this.data.id_to_edit),
+            })
+            .then(() => {
+              resolve("successfully deleted item");
+            })
+            .catch(() => {
+              reject("failed to delete item");
+            });
         })
         .catch(() => {
-          reject("failed to delete item");
+          reject("invalid item id");
+          return;
         });
-      console.log(" exist");
     });
   }
 }

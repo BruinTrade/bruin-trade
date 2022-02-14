@@ -1,8 +1,9 @@
-import express from "express";
+import express, { Router } from "express";
 import ItemListController from "./controllers/ItemListController.js";
 import UserController from "./controllers/UserController.js";
 import CommentsController from "./controllers/CommentsController.js";
 import FollowController from "./controllers/FollowController.js";
+import check_auth from "./middleware/check-login.js";
 
 const BackEndRouter = express.Router();
 
@@ -18,6 +19,9 @@ BackEndRouter.post("/logout", UserController.logout);
 //About posted items
 BackEndRouter.get("/items/:item_id", ItemListController.getItemById);
 BackEndRouter.get("/items", ItemListController.getItems);
+
+BackEndRouter.use(check_auth)
+
 BackEndRouter.post("/:username/createItem", ItemListController.createItem);
 BackEndRouter.get("/:username/:item_id/edit", ItemListController.viewEditItemPage);
 BackEndRouter.post("/:username/:item_id/edit", ItemListController.editItem);
