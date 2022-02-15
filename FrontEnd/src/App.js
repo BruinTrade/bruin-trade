@@ -4,6 +4,7 @@ import NavBar from "./components/navbar.js";
 import Home from './pages/Home.js'
 import About from './pages/About.js'
 import Post from './pages/Post.js'
+import createPost from './components/icons_js/createPost.jsx';
 
 const App = () => (
   <div className='bg-bg_blue'>
