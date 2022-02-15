@@ -34,29 +34,102 @@ class Item {
   }
 
   static async getItems(input_query) {
-    let query;
-    //can have more filters
-    if (input_query.title) {
-      query = { $text: { $search: input_query.title } };
-    } else if (input_query.owner) {
-      query = { $text: { $search: input_query.owner } };
-    }
+    return new Promise(async (resolve, reject) => {
+      let query;
+      //can have more filters
+      if (input_query.title) {
+        query = { $text: { $search: input_query.title } };
+      } else if (input_query.owner) {
+        query = { $text: { $search: input_query.owner } };
+      }
 
-    let matching_items;
-    try {
-      matching_items = await itemCollection.find(query);
-    } catch {
-      console.log("error when finding items");
-      return [];
-    }
+      let matching_items;
+      try {
+        matching_items = await itemCollection.find(query);
+      } catch {
+        reject("error when finding items");
+      }
 
-    try {
-      const item_list = await matching_items.toArray();
-      return item_list;
-    } catch {
-      console.log("error when converting to array");
-      return [];
-    }
+      try {
+        const item_list = await matching_items.toArray();
+        resolve(item_list);
+      } catch {
+        reject("error when converting to array");
+      }
+    });
+  }
+
+  static async getItemDetailsById(item_id, current_user) {
+    return new Promise(async (resolve, reject) => {
+      let temp_item_info;
+      try {
+        temp_item_info = await Item.findItemById(item_id);
+      } catch {
+        reject("invalid item id");
+        return;
+      }
+      if (!temp_item_info) {
+        reject("item does not exist");
+        return;
+      }
+
+      let pipeline = [
+        {
+          $match: {
+            _id: new ObjectId(item_id),
+          },
+        },
+        { $addFields: { string_id: { $toString: "$_id" } } },
+        {
+          $lookup: {
+            from: "comments",
+            localField: "string_id",
+            foreignField: "item_id",
+            as: "relatedComments",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            price: 1,
+            description: 1,
+            owner: 1,
+            relatedComments: "$relatedComments",
+          },
+        },
+      ];
+
+      let item_details
+      try{
+        item_details = await itemCollection
+        .aggregate(pipeline)
+        .toArray();
+        item_details = item_details[0]
+      }
+      catch
+      {
+        reject("failed to get item details")
+      }
+
+      const related_comments = item_details.relatedComments
+      const filtered_comments = []
+      if (current_user != temp_item_info.owner)
+      {
+        related_comments.forEach(comment => {
+          if (comment.author === current_user || comment.target_user === current_user || !comment.target_user)
+          {
+            filtered_comments.push(comment)
+          }
+        });
+        item_details = {...item_details, relatedComments : filtered_comments}
+        resolve(item_details)
+      }
+      else
+      {
+        resolve(item_details)
+      }
+    });
   }
 
   clean() {}
@@ -94,11 +167,9 @@ class Item {
     return new Promise(async (resolve, reject) => {
       let ObjectId_array = [];
       item_id_array.forEach((element) => {
-        try{
+        try {
           ObjectId_array.push(new ObjectId(element));
-        }
-        catch{
-        }
+        } catch {}
       });
       try {
         const result = await itemCollection

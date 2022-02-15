@@ -8,30 +8,35 @@ import check_auth from "./middleware/check-login.js";
 
 const BackEndRouter = express.Router();
 
-BackEndRouter.get("/", ItemListController.getItems);
+
 
 //About users
 BackEndRouter.post("/register", UserController.register);
 BackEndRouter.post("/login", UserController.login);
 BackEndRouter.get("/login", UserController.checkLogin);
 BackEndRouter.post("/logout", UserController.logout);
-
 //maybe add let users input some descriptions of themselves
 
 //About posted items
 BackEndRouter.get("/items/:item_id", ItemListController.getItemById);
 BackEndRouter.get("/items", ItemListController.getItems);
 
+//Check user login
 BackEndRouter.use(check_auth)
 
+//About logged in users
 BackEndRouter.post("/:username/createItem", ItemListController.createItem);
 BackEndRouter.get("/:username/:item_id/edit", ItemListController.viewEditItemPage);
 BackEndRouter.post("/:username/:item_id/edit", ItemListController.editItem);
 BackEndRouter.post("/:username/:item_id/delete", ItemListController.deleteItem);
+BackEndRouter.get("/:username/:item_id/details", ItemListController.getItemDetails);
 BackEndRouter.post("/:username/:item_id/addToCart", UserController.addItemToCart);
 BackEndRouter.post("/:username/:item_id/removeFromCart", UserController.removeItemFromCart);
 BackEndRouter.get("/:username/cart", UserController.getItemsInCart);
+
 //About comments
+BackEndRouter.post("/post_comment/:item_id", CommentsController.postComment);
+BackEndRouter.post("/delete_comment/:comment_id", CommentsController.deleteComment);
 
 //About following other users
 BackEndRouter.post("/follow/:followed_username", FollowController.follow);
