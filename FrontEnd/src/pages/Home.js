@@ -3,7 +3,7 @@ import SignUp from "../components/signup.js"
 import SignIn from "../components/signin.js"
 import ItemDetails from "../components/itemDetails.js";
 import ItemPreview from "../components/itemPreview";
-import CreatePost from "../components/icons_js/createPost.jsx";
+import CreatePost from "../components/createPost.jsx";
 
 function Home() {
     return (
