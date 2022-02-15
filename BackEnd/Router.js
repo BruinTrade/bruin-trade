@@ -4,6 +4,7 @@ import UserController from "./controllers/UserController.js";
 import CommentsController from "./controllers/CommentsController.js";
 import FollowController from "./controllers/FollowController.js";
 import check_auth from "./middleware/check-login.js";
+//import image_upload from "./middleware/image-upload.js";
 
 const BackEndRouter = express.Router();
 
@@ -31,7 +32,8 @@ BackEndRouter.post("/:username/:item_id/addToCart", UserController.addItemToCart
 //About comments
 
 //About following other users
-BackEndRouter.post("/follow/:username", FollowController.follow);
-BackEndRouter.post("/unfollow/:username", FollowController.unfollow);
+BackEndRouter.post("/follow/:followed_username", FollowController.follow);
+BackEndRouter.post("/unfollow/:followed_username", FollowController.unfollow);
+BackEndRouter.get("/followings", FollowController.getAllFollowings)
 
 export default BackEndRouter;

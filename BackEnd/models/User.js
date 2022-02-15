@@ -122,7 +122,8 @@ class User {
             username: temp_user.data.username,
             email: temp_user.data.email,
             location: temp_user.data.location,
-            cart: temp_user.data.cart
+            cart: temp_user.data.cart,
+            followings: temp_user.data.followings
             //more info here
           };
           resolve(temp_user);
@@ -132,6 +133,122 @@ class User {
       });
     });
   }
+
+
+  static async follow(following_username, followed_username) {
+    return new Promise(async (resolve, reject) => {
+      let current_user_info
+      try{
+        current_user_info = await this.findUserByName(following_username)
+        if (!current_user_info.followings)
+        {
+          current_user_info.followings = []
+        }
+      }
+      catch
+      {
+        reject("failed to find current user")
+        return
+      }
+
+      let followed_user_info
+      try{
+        followed_user_info = await this.findUserByName(followed_username)
+      }
+      catch
+      {
+        reject("failed to find the user to follow")
+        return
+      }
+
+      //console.log(current_user_info.followings)
+      if (current_user_info.followings.includes(followed_username))
+      {
+        reject("already followed this user")
+        return
+      }
+
+      const new_followings = [...current_user_info.followings, followed_username]
+      userCollection.findOneAndUpdate(
+        { username: following_username },
+        {
+          $set: {
+            followings: new_followings
+          },
+        }
+      ).then(() => {
+        resolve("successfully followed user")
+      }).catch(() => {
+        reject("failed to follow user")
+      })
+    })
+  }
+
+  static async unfollow(following_username, followed_username){
+    return new Promise(async (resolve, reject) => {
+      let current_user_info
+      try{
+        current_user_info = await this.findUserByName(following_username)
+        if (!current_user_info.followings)
+        {
+          current_user_info.followings = []
+        }
+      }
+      catch
+      {
+        reject("failed to find current user")
+        return
+      }
+
+      //console.log(current_user_info.followings)
+
+      const new_followings = current_user_info.followings
+      const index = new_followings.indexOf(followed_username);
+      if (index > -1) {
+        new_followings.splice(index, 1);
+      }
+      else
+      {
+        reject("already unfollowed or user does not exist")
+        return
+      }
+
+      userCollection.findOneAndUpdate(
+        { username: following_username },
+        {
+          $set: {
+            followings: new_followings
+          },
+        }
+      ).then(() => {
+        resolve("successfully unfollowed user")
+      }).catch(() => {
+        reject("failed to unfollow user")
+      })
+    })
+  }
+
+  static async getAllFollowings(following_username){
+    return new Promise(async (resolve, reject) => {
+      let current_user_info
+      try{
+        current_user_info = await this.findUserByName(following_username)
+        if (!current_user_info.followings)
+        {
+          current_user_info.followings = []
+        }
+
+        resolve(current_user_info.followings)
+      }
+      catch
+      {
+        reject("failed to find current user")
+        return
+      }
+    })
+  }
 }
+
+
 
 export default User;

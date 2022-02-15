@@ -65,6 +65,7 @@ export default class UserController {
           email: user_info.email,
           location: user_info.location,
           cart: user_info.cart,
+          followings: user_info.followings,
           token: token,
         });
       })
@@ -100,9 +101,11 @@ export default class UserController {
       });
   }
 
-  static async findUserById(req, res, next) {}
 
-  static async getPostedItems(req, res, next) {}
 
-  static async getFavorites(req, res, next) {}
+  //static async findUserById(req, res, next) {}
+
+  //static async getPostedItems(req, res, next) {}
+
+  //static async getFavorites(req, res, next) {}
 }
