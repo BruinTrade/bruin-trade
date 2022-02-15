@@ -1,5 +1,5 @@
 import mongodb from "mongodb";
-const ObjectId = mongodb.ObjectID;
+import { ObjectId } from "mongodb";
 
 let itemCollection;
 
@@ -87,6 +87,54 @@ class Item {
       } catch (error) {
         reject(error);
       }
+    });
+  }
+
+  static async findItemsById(item_id_array) {
+    return new Promise(async (resolve, reject) => {
+      let ObjectId_array = [];
+      item_id_array.forEach((element) => {
+        try{
+          ObjectId_array.push(new ObjectId(element));
+        }
+        catch{
+        }
+      });
+      try {
+        const result = await itemCollection
+          .find({
+            _id: {
+              $in: [...ObjectId_array],
+            },
+          })
+          .toArray();
+        resolve(result);
+      } catch {
+        reject("failed to find items");
+      }
+
+      // .then(async (result) => {
+      //   item_id_array = await result.toArray();
+      //   target_object.items_array = item_id_array;
+      //   resolve();
+      // });
+
+      // try {
+      //   for (let item_id of item_id_array) {
+      //     itemCollection
+      //       .findOne({ _id: new ObjectId(item_id) })
+      //       .then((result) => {
+      //         if (result) {
+      //           target_object.items_array.push(result);
+
+      //           //console.log(target_object.items_array)
+      //         }
+      //       })
+      //       .catch((error) => { console.log(error);});
+      //   }
+      // } catch (error) {
+      //   reject(error);
+      // }
     });
   }
 

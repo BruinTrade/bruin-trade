@@ -104,15 +104,26 @@ export default class UserController {
   }
 
   static async getItemsInCart(req, res, next) {
-    User.getItemsInCart(req.user_info.username).then((cart)=>{
-      res.json({cart: cart})
-    }).catch((error_message)=>{
-      res.json({error: error_message})
-    })
+    User.getItemsInCart(req.user_info.username)
+      .then((cart) => {
+        res.json({ cart: cart });
+      })
+      .catch((error_message) => {
+        res.json({ error: error_message });
+      });
+  }
+
+  static async removeItemFromCart(req, res, next) {
+    User.removeItemFromCart(req.user_info.username, req.params.item_id)
+      .then((message) => {
+        res.json({ status: message });
+      })
+      .catch((error_message) => {
+        res.json({ error: error_message });
+      });
   }
 
   static async findUserById(req, res, next) {}
-
 
   //static async findUserById(req, res, next) {}
 
