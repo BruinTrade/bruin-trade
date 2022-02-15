@@ -1,11 +1,14 @@
 import React from "react";
 import get_icon, { Icons } from "./icons_SVG.js"
+import { useSelector } from 'react-redux'
+import { Link } from "react-router-dom";
 
+function NavBar() {
 
-function NavBar(props) {
-
-    const login = props.login ?? false
-
+    const login = useSelector((state) => state.loginStatus.login)
+    const location = useSelector((state) => state.userInfo.location)
+    const numCartItem = 0;
+    
     return (
     <div className="flex flex-row justify-center items-center pt-50px">
         {/* Logo Icon */}
@@ -31,7 +34,7 @@ function NavBar(props) {
                                     {get_icon(Icons.location)}
                                 </div>
                                 <div className="text-9px text-gray-400 align-middle leading-none">
-                                    <div>{props.location ?? "No Location"}</div>
+                                    <div>{location ?? "No Location"}</div>
                                 </div>
                             </div>
                         </NavbarLable>
@@ -42,26 +45,26 @@ function NavBar(props) {
                                     {get_icon(Icons.cart)}
                                 </div>
                                 <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold">
-                                    {props.numCartItem ?? 0}
+                                    {numCartItem ?? 0}
                                 </div>
                             </div>
                         </NavbarLable>
                     </div>
                     
 
-                    <NavbarProfile username="The Guy" imgUrl="https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"/>
+                    <NavbarProfile />
                     
                 
 
                 </div>
             ) : (
                 <div id="not logged in" className="h-full w-auto flex flex-row items-center justify-end">
-                    <div>
-                        <button className="ml-172px w-100px h-50px text-gray-400 border-solid border-2 border-gray-400 rounded-25px" onClick={() => {}} >Sign Up</button>
-                    </div>
-                    <div>
-                        <button className="ml-25px space-x-4px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 rounded-25px w-100px h-50px text-white" onClick={() => {}} >Login</button>
-                    </div>
+                    <Link to="/singup">
+                        <button className="ml-172px w-100px h-50px text-gray-400 border-solid border-2 border-gray-400 rounded-25px" >Sign Up</button>
+                    </Link>
+                    <Link to="/login">
+                        <button className="ml-25px space-x-4px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 rounded-25px w-100px h-50px text-white" >Login</button>
+                    </Link>
                 </div>
             )
         }
@@ -83,15 +86,19 @@ function NavbarLable(props) {
     );
 }
 
-function NavbarProfile(props) {
+function NavbarProfile() {
+
+    const username = useSelector((state) => state.userInfo.username)
+    const profileImage = useSelector((state) => state.userInfo.profileImage)
+
     return (
         <div className="flex flex-row justify-between items-center hover:cursor-pointer">
             <div id="image" className="w-50px h-50px rounded-25px overflow-hidden">
-                <img src={props.imgUrl} className="w-full h-full object-cover" />
+                <img src={profileImage ?? "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"} className="w-full h-full object-cover" />
             </div>
             <div id="text" className="flex flex-col text-gray-500 font-semibold text-10px mx-1">
                 <div>Hello,</div>
-                <div>{props.username}</div>
+                <div>{username}</div>
             </div>
             {get_icon(Icons.dropdown)}
         </div>

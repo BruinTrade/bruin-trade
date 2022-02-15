@@ -32,12 +32,3 @@ export const { login, logout } = loginStatus.actions;
 
 //reducer
 export default loginStatus.reducer;
-
-//listener hooks 
-export const loginStatusState = (state) => {
-    return state.loginStatus.login;
-}
-
-export const loginTokenState = (state) => {
-    return state.loginStatus.token;
-}

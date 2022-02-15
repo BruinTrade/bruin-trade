@@ -8,7 +8,7 @@ export default class ItemListController {
   static async getItemById(req, res, next) {}
 
   static async createItem(req, res, next) {
-    let temp_item = new Item(req.body, req.params.username);
+    let temp_item = new Item(req.body, req.user_info.username);
     temp_item
       .create()
       .then((message) => {
@@ -20,7 +20,7 @@ export default class ItemListController {
   }
 
   static async editItem(req, res, next) {
-    let temp_item = new Item(req.body, req.params.username, req.params.item_id);
+    let temp_item = new Item(req.body, req.user_info.username, req.params.item_id);
     temp_item
       .update()
       .then((message) => {
@@ -32,7 +32,7 @@ export default class ItemListController {
   }
 
   static async deleteItem(req, res, next) {
-    let temp_item = new Item(req.body, req.params.username, req.params.item_id);
+    let temp_item = new Item(req.body, req.user_info.username, req.params.item_id);
     temp_item
       .delete()
       .then((message) => {
