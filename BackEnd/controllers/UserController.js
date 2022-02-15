@@ -51,6 +51,7 @@ export default class UserController {
               email: user_info.email,
               location: user_info.location,
               cart: user_info.cart,
+              followings: user_info.followings,
             },
             "scretekeygeneratedbyajshawn",
             { expiresIn: "1h" }
@@ -76,23 +77,24 @@ export default class UserController {
     //req.session.user = temp
     //});
   }
+
   static async checkLogin(req, res, next) {
-    console.log(req.session);
-    if (req.session.user) {
-      res.json({ isLoggedIn: true, user: req.session.user });
-    } else {
-      res.json({ isLoggedIn: false });
-    }
+    // console.log(req.session);
+    // if (req.session.user) {
+    //   res.json({ isLoggedIn: true, user: req.session.user });
+    // } else {
+    //   res.json({ isLoggedIn: false });
+    // }
   }
 
   static async logout(req, res, next) {
-    req.session.destroy(() => {
-      res.json({ status: "successfully logged out" });
-    });
+    // req.session.destroy(() => {
+    //   res.json({ status: "successfully logged out" });
+    // });
   }
 
   static async addItemToCart(req, res, next) {
-    User.addItemToCart(req.params.username, req.params.item_id)
+    User.addItemToCart(req.user_info.username, req.params.item_id)
       .then((message) => {
         res.json({ status: message });
       })
@@ -101,9 +103,8 @@ export default class UserController {
       });
   }
 
-<<<<<<< HEAD
   static async getItemsInCart(req, res, next) {
-    User.getItemsInCart(req.params.username).then((cart)=>{
+    User.getItemsInCart(req.user_info.username).then((cart)=>{
       res.json({cart: cart})
     }).catch((error_message)=>{
       res.json({error: error_message})
@@ -111,8 +112,6 @@ export default class UserController {
   }
 
   static async findUserById(req, res, next) {}
-=======
->>>>>>> follow_feature
 
 
   //static async findUserById(req, res, next) {}
