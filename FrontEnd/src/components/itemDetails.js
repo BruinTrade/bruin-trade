@@ -14,60 +14,63 @@ function header(label) {
 // for testing purposes /////////
 ItemDetails.defaultProps = {
     // for testing purposes
-    images: {total: 3, images: [
-    'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/220px-SpongeBob_SquarePants_character.svg.png',
-    'https://static.wikia.nocookie.net/fairlyoddparents/images/d/d7/SpongeBob_stock_art.png/revision/latest?cb=20210119031630&path-prefix=en',
-    'https://cdn.shopify.com/s/files/1/0054/4371/5170/products/Spongebob_464pin.png?v=1627414161',
-    ]},
+    images: [
+        'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/220px-SpongeBob_SquarePants_character.svg.png',
+        'https://target.scene7.com/is/image/Target/GUEST_de8bdd84-76da-442e-8d80-40f0e86eaefd?wid=488&hei=488&fmt=pjpeg',
+        'https://cdn.shopify.com/s/files/1/0054/4371/5170/products/Spongebob_464pin.png?v=1627414161',
+    ],
     name: 'Warning: This text will not overflow but will appear cutoff if there are too many words.',
     price: '$999.99',
     cond: 'Great',
     loc: `[icon to be added] Westwood`,
     desc: 'Warning: This text will not overflow but will be truncated and appear cut off if there are too many words.',
-    imgs: 3,
 };
 
 /////////////////////////////////
 
 function ItemDetails(props) {
+    // imgState keeps track of which image to show
+    // on the big tile
+    // default: 0
+    // note: expects an array to be passed in as a prop
     const [imgState, setImgState] = useState(0);
-    const totImgs = props.imgs
-
-    function handleClick(e) {
-        e.preventDefault();
-        if (e.target.id === "contact"){
-            /* contact the seller function*/
-        } 
-        else if (e.target.id === 'watch') {
-            /* add to cart function */
-        }
-        else {
-
-        }
-    }
-
-    // image state component
-    function ImageTile(props) {
-        return (
-            <button onClick={handleClick} className='w-80px h-80px rounded-12px border-blue-400 mr-10px border'>
-            <img src={props.img} alt='Oops, something went wrong.' />
-            </button>
-        )
-    }
+    const totImgs = props.images.length
 
     // initialize all images into the tiles
     function init() {
         let out = [];
         for (let k = 0; k < totImgs; k++) {
-            out.push(<ImageTile img={props.images.images[k]} key={k} />);
+            out.push(<ImageTile img={props.images[k]} key={k.toString()} id={k} />);
         }
         return (out)
+    }
+
+    // handles the two buttons being clicked
+    function handleClick(e) {
+        e.preventDefault();
+        if (e.target.id === "contact"){
+            /* contact seller function */
+        } 
+        else if (e.target.id === 'watch') {
+            /* add to cart function */
+        }
+    }
+
+    // image tile component
+    // img => source of the image file to be rendered
+    // id => unique id to set the img state to
+    function ImageTile(props) {
+        return (
+            <button onClick={() => setImgState(props.id)} className='w-80px h-80px rounded-12px border-blue-400 mr-10px border overflow-hidden'>
+                <img className='h-full w-auto m-auto' src={props.img} alt='Oops, something went wrong.' />
+            </button>
+        )
     }
 
     return (
         <div className='w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md'>
             <div className='flex-col'>
-                <img src={props.images[imgState]} alt='Oops, something went wrong.' className='w-600px h-500px border-gray-100 border-2 mb-15px'/>
+                <img src={props.images[imgState]} alt='Oops, something went wrong.' className='w-600px h-500px border-gray-100 border-2 mb-15px overflow-hidden'/>
                 <div className='flex flex-row'>
                     {init()}
                 </div>
