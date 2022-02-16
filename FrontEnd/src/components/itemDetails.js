@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 
+// TO-DO
+// - implement tag component
+// - align with backend
+
 // !!! IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
 // will appear cutoff and may or may not overflow.
 
@@ -17,6 +21,7 @@ function header(label) {
 
 // for testing purposes
 //------------------------ -----------------------------------
+
 ItemDetails.defaultProps = {
   images: [
     "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/220px-SpongeBob_SquarePants_character.svg.png",
