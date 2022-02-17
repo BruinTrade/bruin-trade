@@ -81,6 +81,7 @@ module.exports = {
 				mobilescreen: '100%',
 				'1549px': '1549px',
 				'1512px': '1512px',
+				'1352px': '1352px',
 				'1048px': '1048px',
 				'1029px': '1029px',
 				'1024px': '1024px',

@@ -10,66 +10,68 @@ function NavBar() {
     const numCartItem = 0;
     
     return (
-    <div className="flex flex-row justify-center items-center pt-50px">
-        {/* Logo Icon */}
-        <div onClick={() => {}} className="mr-50px cursor-pointer">
-            {get_icon(Icons.logo)}
-        </div>
-        <div className="flex items-center justify-between rounded-25px bg-white h-50px w-800px text-gray-200">
-            <input id="search term" className="w-full border-0 mx-5 py-2 rounded-lg focus:outline-none text-14px text-gray-500 placeholder-gray-200" placeholder="Search for used goods around you"/>
-            <button onClick={() => {}} className="flex justify-center items-center rounded-25px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 w-50px h-35px mr-10px hover:cursor-pointer">
-                <div className="w-20px h-20px">
-                    {get_icon(Icons.search_icon)}
+        <div className="w-full flex flex-row justify-center">
+            <div className="flex flex-row justify-between items-center pt-50px w-1352px">
+                {/* Logo Icon */}
+                <div onClick={() => {}} className="mr-50px cursor-pointer">
+                    {get_icon(Icons.logo)}
                 </div>
-            </button>
-        </div>
-       
-        {
-            login ? (
-                <div id="logged in" className="flex flex-row justify-end items-center space-x-45px h-full w-298px">
-                    <div className="flex flex-row justify-between items-center space-x-30px">
-                        <NavbarLable label="Location">
-                            <div className="flex flex-row justify-start items-center space-x-1">
-                                <div className="w-20px h-20px">
-                                    {get_icon(Icons.location)}
-                                </div>
-                                <div className="text-9px text-gray-400 align-middle leading-none">
-                                    <div>{location ?? "No Location"}</div>
-                                </div>
+                <div className="flex items-center justify-between rounded-25px bg-white h-50px w-800px text-gray-200">
+                    <input id="search term" className="w-full border-0 mx-5 py-2 rounded-lg focus:outline-none text-14px text-gray-500 placeholder-gray-200" placeholder="Search for used goods around you"/>
+                    <button onClick={() => {}} className="flex justify-center items-center rounded-25px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 w-50px h-35px mr-10px hover:cursor-pointer">
+                        <div className="w-20px h-20px">
+                            {get_icon(Icons.search_icon)}
+                        </div>
+                    </button>
+                </div>
+            
+                {
+                    login ? (
+                        <div id="logged in" className="w-auto h-full flex flex-row justify-end items-center space-x-45px">
+                            <div className="flex flex-row justify-between items-center space-x-30px">
+                                <NavbarLable label="Location">
+                                    <div className="flex flex-row justify-start items-center space-x-1">
+                                        <div className="w-20px h-20px">
+                                            {get_icon(Icons.location)}
+                                        </div>
+                                        <div className="text-9px text-gray-400 align-middle leading-none">
+                                            <div>{location ?? "No Location"}</div>
+                                        </div>
+                                    </div>
+                                </NavbarLable>
+
+                                <NavbarLable label="Cart">
+                                    <div className="static h-full">
+                                        <div className="absolute w-45px h-45px">
+                                            {get_icon(Icons.cart)}
+                                        </div>
+                                        <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold">
+                                            {numCartItem ?? 0}
+                                        </div>
+                                    </div>
+                                </NavbarLable>
                             </div>
-                        </NavbarLable>
+                            
 
-                        <NavbarLable label="Cart">
-                            <div className="static h-full">
-                                <div className="absolute w-45px h-45px">
-                                    {get_icon(Icons.cart)}
-                                </div>
-                                <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold">
-                                    {numCartItem ?? 0}
-                                </div>
-                            </div>
-                        </NavbarLable>
-                    </div>
-                    
+                            <NavbarProfile />
+                            
+                        
 
-                    <NavbarProfile />
-                    
-                
+                        </div>
+                    ) : (
+                        <div id="not logged in" className="h-full w-auto flex flex-row items-center justify-end">
+                            <Link to="/singup">
+                                <button className="ml-172px w-100px h-50px text-gray-400 border-solid border-2 border-gray-400 rounded-25px" >Sign Up</button>
+                            </Link>
+                            <Link to="/login">
+                                <button className="ml-25px space-x-4px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 rounded-25px w-100px h-50px text-white" >Login</button>
+                            </Link>
+                        </div>
+                    )
+                }
+            </div>
 
-                </div>
-            ) : (
-                <div id="not logged in" className="h-full w-auto flex flex-row items-center justify-end">
-                    <Link to="/singup">
-                        <button className="ml-172px w-100px h-50px text-gray-400 border-solid border-2 border-gray-400 rounded-25px" >Sign Up</button>
-                    </Link>
-                    <Link to="/login">
-                        <button className="ml-25px space-x-4px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 rounded-25px w-100px h-50px text-white" >Login</button>
-                    </Link>
-                </div>
-            )
-        }
-
-    </div>
+        </div>
     );
 }
 
