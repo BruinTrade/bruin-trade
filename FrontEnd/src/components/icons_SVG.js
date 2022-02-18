@@ -12,13 +12,8 @@ export const Icons = {
     logo: "Logo.svg",
     search_icon: "Search.svg",
     location: "Location.svg",
-    cart: "Cart.svg"
+    cart: "Cart.svg",
+    dropdown: "Dropdown.svg"
 }
 
 export default get_icon;
-
-
-export function LogoIcon() {
-    return ;
-    
-}

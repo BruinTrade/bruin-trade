@@ -82,7 +82,9 @@ module.exports = {
 				smscreen: '640px',
 				mobilescreen: '100%',
 				'1549px': '1549px',
+				'1512px': '1512px',
 				'1354px': '1354px',
+				'1352px': '1352px',
 				'1048px': '1048px',
 				'1029px': '1029px',
 				'1024px': '1024px',
@@ -141,6 +143,7 @@ module.exports = {
 				'139px': '139px',
 				'137px': '137px',
 				'128px': '128px',
+				'125px': '125px',
 				'123px': '123px',
 				'120px': '120px',
 				'119px': '119px',
@@ -202,6 +205,9 @@ module.exports = {
 				'0.5px': '0.5px',
 				'0.3px': '0.3px',
 			},
+			width: {
+				'fit-content': 'fit-content'
+			},
 			borderRadius: {
 				'43px': '43px',
 				'25px': '25px',
@@ -244,12 +250,11 @@ module.exports = {
 				'14px': '14px',
 				'12px': '12px',
 				'10px': '10px',
+				'9px': '9px',
 				'8px': '8px',
 				'2xs': '.65rem',
 			},
 		},
 	},
-  plugins: [
-	require('@tailwindcss/line-clamp'),
-  ],
+  plugins: [],
 };
