@@ -124,17 +124,32 @@ function NavbarProfile() {
                                 <Menu.Item>
                                     {({ active }) => (
                                     <button
-                                    className={`${
-                                    active ? 'bg-blue-50' : ''
-                                    } group flex rounded-md items-center w-full text-14px text-gray-500'`}
-                                >
-                                    <div className="h-40px">
-                                        <div className="w-full h-full flex items-center px-12px">
-                                            Logout
+                                        className={`${
+                                        active ? 'bg-blue-50' : ''
+                                        } group flex rounded-md items-center w-full text-14px text-gray-500'`}
+                                    >
+                                        <div className="h-40px">
+                                            <div className="w-full h-full flex items-center px-12px">
+                                                Logout
+                                            </div>
                                         </div>
-                                    </div>
-                                </button>
-                                )}
+                                    </button>
+                                    )}
+                                </Menu.Item>
+                                <Menu.Item>
+                                    {({ active }) => (
+                                    <button
+                                        className={`${
+                                        active ? 'bg-blue-50' : ''
+                                        } group flex rounded-md items-center w-full text-14px text-gray-500'`}
+                                    >
+                                        <div className="h-40px">
+                                            <div className="w-full h-full flex items-center px-12px">
+                                                Logout
+                                            </div>
+                                        </div>
+                                    </button>
+                                    )}
                                 </Menu.Item>
                     </Menu.Items>
                 </Transition>

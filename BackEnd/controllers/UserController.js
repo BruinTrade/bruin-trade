@@ -51,6 +51,7 @@ export default class UserController {
               email: user_info.email,
               location: user_info.location,
               cart: user_info.cart,
+              followings: user_info.followings,
             },
             "scretekeygeneratedbyajshawn",
             { expiresIn: "1h" }
@@ -65,6 +66,7 @@ export default class UserController {
           email: user_info.email,
           location: user_info.location,
           cart: user_info.cart,
+          followings: user_info.followings,
           token: token,
         });
       })
@@ -77,23 +79,44 @@ export default class UserController {
     //req.session.user = temp
     //});
   }
+
   static async checkLogin(req, res, next) {
-    console.log(req);
-    if (req.session.user) {
-      res.json({ isLoggedIn: true, user: req.session.user });
-    } else {
-      res.json({ isLoggedIn: false });
-    }
+    // console.log(req.session);
+    // if (req.session.user) {
+    //   res.json({ isLoggedIn: true, user: req.session.user });
+    // } else {
+    //   res.json({ isLoggedIn: false });
+    // }
   }
 
   static async logout(req, res, next) {
-    req.session.destroy(() => {
-      res.json({ status: "successfully logged out" });
-    });
+    // req.session.destroy(() => {
+    //   res.json({ status: "successfully logged out" });
+    // });
   }
 
   static async addItemToCart(req, res, next) {
-    User.addItemToCart(req.params.username, req.params.item_id)
+    User.addItemToCart(req.user_info.username, req.params.item_id)
+      .then((message) => {
+        res.json({ status: message });
+      })
+      .catch((error_message) => {
+        res.json({ error: error_message });
+      });
+  }
+
+  static async getItemsInCart(req, res, next) {
+    User.getItemsInCart(req.user_info.username)
+      .then((cart) => {
+        res.json({ cart: cart });
+      })
+      .catch((error_message) => {
+        res.json({ error: error_message });
+      });
+  }
+
+  static async removeItemFromCart(req, res, next) {
+    User.removeItemFromCart(req.user_info.username, req.params.item_id)
       .then((message) => {
         res.json({ status: message });
       })
@@ -104,7 +127,9 @@ export default class UserController {
 
   static async findUserById(req, res, next) {}
 
-  static async getPostedItems(req, res, next) {}
+  //static async findUserById(req, res, next) {}
 
-  static async getFavorites(req, res, next) {}
+  //static async getPostedItems(req, res, next) {}
+
+  //static async getFavorites(req, res, next) {}
 }
