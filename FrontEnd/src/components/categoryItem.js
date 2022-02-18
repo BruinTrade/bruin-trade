@@ -10,8 +10,6 @@ function CategoryItem(props) {
                 {props.label}
             </div>
         </div>
-
-
     );
 }
 
