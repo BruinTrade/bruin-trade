@@ -111,7 +111,7 @@ function ItemDetails(props) {
 
   function Tag(props) {
     return (
-      <button onClick={() => console.log("WIP")} className='hover:bg-blue-500 w-auto px-9px py-4px mr-10px bg-blue-400 text-gray-100 font-avenir-med text-10px rounded-8px'>
+      <button onClick={() => console.log(props.tag.toString())} className='hover:bg-blue-500 w-auto px-9px py-4px mr-10px bg-blue-400 text-gray-100 font-avenir-med text-10px rounded-8px'>
         {props.tag}
       </button>
     )
