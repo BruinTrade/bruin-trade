@@ -101,7 +101,7 @@ function NavbarProfile() {
                     <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-white rounded-md bg-opacity-20 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                         <div className="flex flex-row justify-between items-center hover:cursor-pointer">
                             <div id="image" className="w-50px h-50px rounded-25px overflow-hidden">
-                                <img src={profileImage ?? "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"} className="w-full h-full object-cover" />
+                                <img src={profileImage} className="w-full h-full object-cover" />
                             </div>
                             <div id="text" className="flex flex-col text-gray-500 font-semibold text-10px mx-1">
                                 <div>Hello,</div>

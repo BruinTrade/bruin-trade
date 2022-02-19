@@ -3,7 +3,9 @@ import Cookies from 'js-cookie'
 
 const initialState = {
     username: Cookies.get('username') === undefined ? null : Cookies.get('username'),
-    location: Cookies.get('location') === undefined ? null : Cookies.get('location')
+    location: Cookies.get('location') === undefined ? null : Cookies.get('location'),
+    profileImage: Cookies.get('profileImg') === undefined ? "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" : Cookies.get('profileImg'),
+    rating: Cookies.get("rating") === undefined ? 5 : Cookies.get("rating") 
 }
 
 export const userInfo = createSlice({
