@@ -22,11 +22,22 @@ function header(label) {
 // for testing purposes
 //------------------------ -----------------------------------
 
+// (!) .defaultProps is deprecated
 ItemDetails.defaultProps = {
   images: [
     "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/SpongeBob_SquarePants_character.svg/220px-SpongeBob_SquarePants_character.svg.png",
     "https://target.scene7.com/is/image/Target/GUEST_de8bdd84-76da-442e-8d80-40f0e86eaefd?wid=488&hei=488&fmt=pjpeg",
     "https://cdn.shopify.com/s/files/1/0054/4371/5170/products/Spongebob_464pin.png?v=1627414161",
+    "https://m.media-amazon.com/images/I/81NBnyMyDGL._AC_SL1500_.jpg",
+    "https://paisano-online.com/wp-content/uploads/2020/02/File_001-900x733.jpg",
+    "https://upload.wikimedia.org/wikipedia/en/thumb/3/33/Patrick_Star.svg/1200px-Patrick_Star.svg.png",
+  ],
+  tags: [
+    "spongebob",
+    "funny",
+    "comedy",
+    "family",
+    "fun",
   ],
   name: "Warning: This text will not overflow but will appear cutoff if there are too many words.",
   price: "$999.99",
@@ -53,12 +64,19 @@ function ItemDetails(props) {
   // note: expects an array to be passed in as a prop (for now)
   const [imgState, setImgState] = useState(0);
   const totImgs = props.images.length;
+  const totTags = props.tags.length;
 
-  // initialize all images into the tiles
-  function init() {
+  // initialization function for tags and images
+  function init(what) {
     let out = [];
-    for (let k = 0; k < totImgs; k++) {
-      out.push(<ImageTile img={props.images[k]} key={k.toString()} id={k} />);
+    let totItems = what === 'tags' ? totTags : totImgs;
+    for (let k = 0; k < totItems; k++) {
+      if (what === 'tags') {
+        out.push(<Tag tag={props.tags[k]} key={k.toString()} id={k} />);
+      }
+      else {
+        out.push(<ImageTile img={props.images[k]} key={k.toString()} id={k} />);
+      }
     }
     return out;
   }
@@ -80,7 +98,7 @@ function ItemDetails(props) {
     return (
       <button
         onClick={() => setImgState(props.id)}
-        className="w-80px h-80px rounded-12px border-blue-400 mr-10px border overflow-hidden"
+        className="w-80px h-80px rounded-12px border-blue-400 mr-10px border hover:border-2 hover:shadow-lightBlue hover:shadow-inner overflow-hidden"
       >
         <img
           className="h-full w-auto m-auto"
@@ -91,6 +109,14 @@ function ItemDetails(props) {
     );
   }
 
+  function Tag(props) {
+    return (
+      <button onClick={() => console.log("WIP")} className='hover:bg-blue-500 w-auto px-9px py-4px mr-10px bg-blue-400 text-gray-100 font-avenir-med text-10px rounded-8px'>
+        {props.tag}
+      </button>
+    )
+  }
+
   return (
     <div className="w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md">
       <div className="flex-col">
@@ -99,14 +125,15 @@ function ItemDetails(props) {
           alt="Oops, something went wrong."
           className="w-600px h-500px border-gray-100 border-2 mb-15px overflow-hidden"
         />
-        <div className="flex flex-row">{init()}</div>
+        {/* Initialize the tiles*/}
+        <div className="overflow-hidden flex justify-center w-600px">{init('imgTiles')}</div>
       </div>
 
       <div className="flex-col">
         <h1 className="w-638px h-81px text-32px font-roboto-reg leading-none break-words overflow-hidden">
           {props.name}
         </h1>
-        <div className="h-20px m-w-638px">{/* Tag components here */}</div>
+        <div className="h-20px m-w-638px mb-20px">{init('tags')}</div>
 
         <div className="flex flex-row justify-between">
           <div className="flex-col justify-between">
@@ -146,14 +173,14 @@ function ItemDetails(props) {
             <button
               onClick={handleClick}
               id="contact"
-              className="w-160px h-50px rounded-full bg-blue-400 font-roboto-reg text-18px mb-10px text-white"
+              className="w-160px h-50px rounded-full bg-blue-400 hover:bg-blue-500 font-roboto-reg text-18px mb-10px text-white"
             >
               Contact Seller
             </button>
             <button
               onClick={handleClick}
               id="watch"
-              className="w-160px h-50px rounded-full border-blue-400 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
+              className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
             >
               Add to Watchlist
             </button>
