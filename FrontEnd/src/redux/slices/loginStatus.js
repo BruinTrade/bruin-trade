@@ -12,9 +12,9 @@ export const loginStatus = createSlice({
     reducers: {
         login: (state, action) => {
             //set a token cookie that expires in 7 days
-            Cookies.set('token', action.payload.token, { expires: 7 });
+            Cookies.set('token', "bearer "+action.payload, { expires: 7 });
             //set token to token payload
-            state.token = action.payload;
+            state.token = "bearer "+action.payload;
             //set login to true
             state.login = true;
         },

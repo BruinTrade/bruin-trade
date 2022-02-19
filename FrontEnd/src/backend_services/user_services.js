@@ -20,6 +20,7 @@ async function useLogin(dispatch, username, password) {
     if(status === 200) {
         try {
             const data = res.data;
+            console.log(data.token)
             //set login status
             dispatch(login(data.token));
             //set user info
@@ -38,13 +39,12 @@ async function useLogin(dispatch, username, password) {
 }
 
 async function useLogout(dispatch) {
-    const res = await http.post("/logout");
-    //request success
-    if(res.status === 200) {
+    //remove token
+    try {
         dispatch(logout());
         return { status: 200 };
-    //request failed
-    } else {
+    } catch {
+    //error logginout
         return { status: 300, error: "error logging out." };
     }
 }

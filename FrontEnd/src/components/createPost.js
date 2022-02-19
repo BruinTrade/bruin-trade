@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Form from "./form.js";
-
+import ItemServices from "../backend_services/item_services.js";
+import { useSelector } from 'react-redux'
 
 const conditions = ["Great", "Good", "Poor"];
 
@@ -13,6 +14,22 @@ export default function CreatePost() {
     const [condition, setConditionState] = useState(conditions[0]);
     const [categoryTag, setCategoryTagState] = useState([]);
     const [description, setDescriptionState] = useState("");
+
+    const username = useSelector((state) => state.userInfo.username)
+    const token = useSelector((state) => state.loginStatus.token)
+
+    function handleCreatePost() {
+        console.log("Create Item")
+        console.log("token from call: " + token);
+        const res = ItemServices.create(
+            username,
+            token,
+            title,
+            price,
+            description
+        );
+        console.log(res);
+    }
 
     return (
         <div className='w-800px h-960px bg-white pt-35px pr-25px pl-25px rounded-25px space-y-50px'>
@@ -68,7 +85,7 @@ export default function CreatePost() {
                 type="text"/>
 
             <div className='flex flex-row justify-end mt-30px'>
-                <button className="w-150px h-50px rounded-full bg-blue-400 text-18px text-white bottom-0 right-0 mb-30px hover:bg-blue-500 active:bg-blue-700">
+                <button onClick={ () => handleCreatePost() } className="w-150px h-50px rounded-full bg-blue-400 text-18px text-white bottom-0 right-0 mb-30px hover:bg-blue-500 active:bg-blue-700">
                     Post
                 </button>
             </div>
