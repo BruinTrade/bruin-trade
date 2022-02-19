@@ -15,7 +15,7 @@ export default function PageHome() {
                 <Categories />
             </div>
 
-            <div className='w-357px h-817px mt-21px ml-40px mr-80px bg-white pt-35px pr-25px pl-25px flex flex-row justify-between rounded-25px'>
+            <div className='w-357px h-817px mt-20px ml-40px mr-80px bg-white pr-25px pl-25px flex flex-row justify-between rounded-25px'>
                 <ProfilePage />
             </div>
         </div>

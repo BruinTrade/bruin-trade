@@ -13,7 +13,9 @@ export const Icons = {
     search_icon: "Search.svg",
     location: "Location.svg",
     cart: "Cart.svg",
-    dropdown: "Dropdown.svg"
+    dropdown: "Dropdown.svg",
+    profilePic: "profilePic.svg",
+    star: "Star.svg"
 }
 
 export default get_icon;

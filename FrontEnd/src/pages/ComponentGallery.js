@@ -3,6 +3,8 @@ import SignIn from "../components/signin.js"
 import CategoryItem from "../components/categoryItem.js";
 import ItemPreview from "../components/itemPreview";
 import ConcisePreview from "../components/itemConcisePreview.js";
+import UserProfile from "../components/userProfile.js";
+
 
 
 export default function PageComponentGallery() {
@@ -13,6 +15,7 @@ export default function PageComponentGallery() {
             <SignUp/>
             <SignIn/>
             <CategoryItem label="Books" imgUrl="https://media.wired.com/photos/5be4cd03db23f3775e466767/master/w_120" />
+            <UserProfile userName="aaaaa"/>
         </div>
     )
 }

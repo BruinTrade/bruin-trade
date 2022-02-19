@@ -7,7 +7,7 @@ export default function TradingItems(props) {
 
     return (
         <div>
-            <div className='w-955px h-336px bg-blue-100 pt-25px pb-23px pl-27px rounded-25px grid grid-rows-1 grid-flow-col gap-x-17px overflow-x-auto'>
+            <div className='w-955px h-336px pt-25px pb-23px pl-27px rounded-25px grid grid-rows-1 grid-flow-col gap-x-17px overflow-x-auto'>
                 {arr.map(() => (
                     <ItemPreview />
                 ))}
