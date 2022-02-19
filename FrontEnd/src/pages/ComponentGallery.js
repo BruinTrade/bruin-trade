@@ -3,7 +3,7 @@ import SignIn from "../components/signin.js"
 import CategoryItem from "../components/categoryItem.js";
 import ItemPreview from "../components/itemPreview";
 import UserProfile from "../components/userProfile.js";
-
+import UserProfileMenu from "../components/profileMenu.js";
 
 export default function PageComponentGallery() {
     return (
@@ -13,6 +13,7 @@ export default function PageComponentGallery() {
             <SignIn/>
             <CategoryItem label="Books" imgUrl="https://media.wired.com/photos/5be4cd03db23f3775e466767/master/w_120" />
             <UserProfile userName="aaaaa"/>
+            <UserProfileMenu />
         </div>
     )
 }
