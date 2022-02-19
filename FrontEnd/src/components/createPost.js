@@ -77,26 +77,6 @@ export default function CreatePost() {
 }
 
 
-// The input divs
-function FillQuestion(props) {
-    return (
-        <div>
-            <label className='avenir-med text-14px'>
-                {props.name}
-                <input type={props.type} name="location" className='bg-gray-100 rounded-25px w-full h-40px px-3 py-2' />
-            </label>
-        </div>
-    );
-}
-
-// The Profile div on the right side
-function ProfilePage(props) {
-    return (
-        <div>
-            Photo
-        </div>
-    );
-}
 
 function PhotoUpload(props) {
     return (

@@ -1,5 +1,6 @@
 import React from "react";
 import CreatePost from "../components/createPost";
+import ProfilePage from "../components/profile";
 
 export default function PageCreatePost() {
     return (
@@ -10,6 +11,7 @@ export default function PageCreatePost() {
             </div>
 
             <div className='w-357px h-817px mt-21px ml-40px mr-80px bg-white pt-35px pr-25px pl-25px flex flex-row justify-between rounded-25px'>
+                <ProfilePage />
             </div>
         </div>
     );
