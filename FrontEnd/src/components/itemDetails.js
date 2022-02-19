@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 // TO-DO
-// - implement tag component
 // - align with backend
 
 // !!! IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
