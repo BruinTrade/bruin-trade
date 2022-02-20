@@ -8,7 +8,7 @@ function ConcisePreview(props) {
                 <div>
                     <div className='w-154px h-80px rounded-12px mt-5px mx-auto overflow-hidden'>
                         {/*Image*/}
-                        <img src={props.imgg} />
+                        <img src={props.img} />
                     </div>
 
                     <div className='w-full text-10px mx-auto mt-5px test-gray-700'>

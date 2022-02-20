@@ -1,30 +1,33 @@
 import React from 'react'
+import { Link } from "react-router-dom";
 
 const DUMMY_PRICE = 34.99
 
-function ItemPreview({ props }) {
+function ItemPreview(props) {
     return (
-        <div className='w-250px h-288px flex flex-col item-center justify-between bg-white rounded-12px px-15px'>
-            <div>
-                <div className='w-full h-137px rounded-12px mt-10px mx-auto'>
-                    {/*Image*/}
-                    <img src='https://bruinbound.ucla.edu/assets/images/bruin-bear-full.png' />
-                </div>
+        <Link to={`post/${props.itemid}`}>
+            <div className='w-250px h-288px flex flex-col item-center justify-between bg-white rounded-12px px-15px'>
+                <div>
+                    <div className='w-full h-137px rounded-12px mt-10px mx-auto overflow-hidden'>
+                        {/*Image*/}
+                        <img className='object-cover' src={props.img} />
+                    </div>
 
-                <div className='w-full text-12px mx-auto test-gray-700'>
-                    This div is for text
+                    <div className='w-full text-12px mx-auto test-gray-700'>
+                        {props.text}
+                    </div>
+                </div>
+                <div className='w-full flex flex-row justify-end mb-11px'>
+                    <div className="text-gold" >
+                        ${props.price}
+                    </div>
+
+                    <button>
+                        <img src="./icons/Like.svg" />
+                    </button>
                 </div>
             </div>
-            <div className='w-full flex flex-row justify-end mb-11px'>
-                <div className="text-gold" >
-                    ${DUMMY_PRICE.toString()}
-                </div>
-                
-                <button>
-                    <img src="./icons/Like.svg"/>
-                </button>
-            </div>
-        </div>
+        </Link>
     )
 }
 
