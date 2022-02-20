@@ -1,10 +1,6 @@
 import Item from "../models/Item.js";
 
 export default class ItemListController {
-  static async getItems(req, res, next) {
-    //filter name, category, ...
-  }
-
   static async getItemById(req, res, next) {}
 
   static async createItem(req, res, next) {
@@ -20,7 +16,11 @@ export default class ItemListController {
   }
 
   static async editItem(req, res, next) {
-    let temp_item = new Item(req.body, req.user_info.username, req.params.item_id);
+    let temp_item = new Item(
+      req.body,
+      req.user_info.username,
+      req.params.item_id
+    );
     temp_item
       .update()
       .then((message) => {
@@ -32,7 +32,11 @@ export default class ItemListController {
   }
 
   static async deleteItem(req, res, next) {
-    let temp_item = new Item(req.body, req.user_info.username, req.params.item_id);
+    let temp_item = new Item(
+      req.body,
+      req.user_info.username,
+      req.params.item_id
+    );
     temp_item
       .delete()
       .then((message) => {
@@ -44,8 +48,23 @@ export default class ItemListController {
   }
 
   static async getItems(req, res, next) {
-    const item_list = await Item.getItems(req.query)
-    res.json(item_list)
+    Item.getItems(req.query)
+      .then((item_list) => {
+        res.json(item_list);
+      })
+      .catch(() => {
+        res.json([]);
+      });
+  }
+
+  static async getItemDetails(req, res, next) {
+    Item.getItemDetailsById(req.params.item_id, req.user_info.username)
+      .then((item_details) => {
+        res.json(item_details);
+      })
+      .catch((error_message) => {
+        res.json({ errors: error_message });
+      });
   }
 
   static async viewEditItemPage(req, res, next) {}

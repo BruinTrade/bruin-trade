@@ -20,7 +20,7 @@ function PagePost() {
             Post: {id}
             <div className="flex flex-col justify-center items-center">
                 <div className="text-2xl">Home</div>
-                <ItemDetails/>
+                <ItemDetails id={id} />
             </div>
         </div>)
 }

@@ -15,7 +15,8 @@ export const Icons = {
     cart: "Cart.svg",
     dropdown: "Dropdown.svg",
     profilePic: "profilePic.svg",
-    star: "Star.svg"
+    star: "Star.svg",
+    add: "Add.svg",
 }
 
 export default get_icon;

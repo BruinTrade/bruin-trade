@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import ItemServices from "../backend_services/item_services.js"
+import { useSelector } from 'react-redux'
 
 // TO-DO
 // - align with backend
@@ -60,24 +62,51 @@ function ItemDetails(props) {
   // on the big tile
   // default: 0
   // note: expects an array to be passed in as a prop (for now)
+
+  let cond = "Great";
+  let loc = "UCLA";
+
+  const [loading, setLoading] = useState(true);
+
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState(0);
+  const [desc, setDesc] = useState("");
+  const [images, setImages] = useState([])
+
   const [imgState, setImgState] = useState(0);
-  const totImgs = props.images.length;
   const totTags = props.tags.length;
 
-  // initialization function for tags and images
-  function init(what) {
-    let out = [];
-    let totItems = what === 'tags' ? totTags : totImgs;
-    for (let k = 0; k < totItems; k++) {
-      if (what === 'tags') {
-        out.push(<Tag tag={props.tags[k]} key={k.toString()} id={k} />);
+
+
+  const token = useSelector((state) => state.loginStatus.token)
+
+  useEffect(async () => {
+    const res = await ItemServices.getItemDetailsById(props.id, token);
+    const data = res.data
+    console.log(data)
+    setName(data.title)
+    setDesc(data.description)
+    setPrice(data.price)
+    setImages(data.images)
+    setLoading(false)
+  }, [])
+
+    // initialization function for tags and images
+    function init(what) {
+      let out = [];
+      let totItems = what === 'tags' ? totTags : images.length;
+      for (let k = 0; k < totItems; k++) {
+        if (what === 'tags') {
+          out.push(<Tag tag={props.tags[k]} key={k.toString()} id={k} />);
+        }
+        else {
+          out.push(<ImageTile img={images[k]} key={k.toString()} id={k} />);
+        }
       }
-      else {
-        out.push(<ImageTile img={props.images[k]} key={k.toString()} id={k} />);
-      }
+      return out;
     }
-    return out;
-  }
+  
+
 
   // handles the two buttons being clicked
   function handleClick(e) {
@@ -115,78 +144,84 @@ function ItemDetails(props) {
     )
   }
 
-  return (
-    <div className="w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md">
-      <div className="flex-col">
-        <img
-          src={props.images[imgState]}
-          alt="Oops, something went wrong."
-          className="w-600px h-500px border-gray-100 border-2 mb-15px overflow-hidden"
-        />
-        {/* Initialize the tiles*/}
-        <div className="overflow-hidden flex justify-center w-600px">{init('imgTiles')}</div>
-      </div>
-
-      <div className="flex-col">
-        <h1 className="w-638px h-81px text-32px font-roboto-reg leading-none break-words overflow-hidden">
-          {props.name}
-        </h1>
-        <div className="h-20px m-w-638px mb-20px">{init('tags')}</div>
-
-        <div className="flex flex-row justify-between">
-          <div className="flex-col justify-between">
-            <div className="h-52px w-105px flex-col">
-              {header("Price")}
-              <div className="text-28px mb-20px font-avenir-reg text-gold">
-                {props.price}
+  if(loading) {
+    return <div/>
+  } else {
+    return (
+      <div className="w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md">
+        <div className="flex-col">
+          <img
+            src={images[imgState]}
+            alt="Oops, something went wrong."
+            className="w-600px h-500px border-gray-100 border-2 mb-15px overflow-hidden"
+          />
+          {/* Initialize the tiles*/}
+          <div className="overflow-hidden flex justify-center w-600px">{init('imgTiles')}</div>
+        </div>
+  
+        <div className="flex-col">
+          <h1 className="w-638px h-81px text-32px font-roboto-reg leading-none break-words overflow-hidden">
+            {name}
+          </h1>
+          <div className="h-20px m-w-638px mb-20px">{init('tags')}</div>
+  
+          <div className="flex flex-row justify-between">
+            <div className="flex-col justify-between">
+              <div className="h-52px w-105px flex-col">
+                {header("Price")}
+                <div className="text-28px mb-20px font-avenir-reg text-gold">
+                  {price}
+                </div>
+  
+                {header("Condition")}
+                <div className="text-14px mb-20px font-avenir-reg text-gray-500">
+                  {cond}
+                </div>
+  
+                {header("Location")}
+                <div className="text-14px mb-20px font-avenir-reg text-gray-500">
+                  {loc}
+                </div>
+  
+                {header("Description")}
+                <p className="w-400px h-196px text-12px font-avenir-reg text-gray-500 leading-none overflow-hidden">
+                  {desc}
+                </p>
               </div>
-
-              {header("Condition")}
-              <div className="text-14px mb-20px font-avenir-reg text-gray-500">
-                {props.cond}
-              </div>
-
-              {header("Location")}
-              <div className="text-14px mb-20px font-avenir-reg text-gray-500">
-                {props.loc}
-              </div>
-
-              {header("Description")}
-              <p className="w-400px h-196px text-12px font-avenir-reg text-gray-500 leading-none overflow-hidden">
-                {props.desc}
-              </p>
             </div>
-          </div>
-
-          <div className="flex flex-col">
-            <div className="w-163px h-128px mb-20px border-2">
-              {/* Image is just there as a placeholder */}
-              <img
-                className="h-full m-auto"
-                alt="Oops, something went wrong."
-                src="https://monstar-lab.com/global/wp-content/uploads/sites/11/2019/04/male-placeholder-image.jpeg"
-              ></img>
-              {/* Profile Component */}
+  
+            <div className="flex flex-col">
+              <div className="w-163px h-128px mb-20px border-2">
+                {/* Image is just there as a placeholder */}
+                <img
+                  className="h-full m-auto"
+                  alt="Oops, something went wrong."
+                  src="https://monstar-lab.com/global/wp-content/uploads/sites/11/2019/04/male-placeholder-image.jpeg"
+                ></img>
+                {/* Profile Component */}
+              </div>
+              <button
+                onClick={handleClick}
+                id="contact"
+                className="w-160px h-50px rounded-full bg-blue-400 hover:bg-blue-500 font-roboto-reg text-18px mb-10px text-white"
+              >
+                Contact Seller
+              </button>
+              <button
+                onClick={handleClick}
+                id="watch"
+                className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
+              >
+                Add to Watchlist
+              </button>
             </div>
-            <button
-              onClick={handleClick}
-              id="contact"
-              className="w-160px h-50px rounded-full bg-blue-400 hover:bg-blue-500 font-roboto-reg text-18px mb-10px text-white"
-            >
-              Contact Seller
-            </button>
-            <button
-              onClick={handleClick}
-              id="watch"
-              className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
-            >
-              Add to Watchlist
-            </button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+
+  }
+  
 }
 
 export default ItemDetails;

@@ -15,9 +15,9 @@ export default function SignUp() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
-        const res = UserServices.register(dispatch, username, password, email, location);
+        const res = await UserServices.register(dispatch, username, password, email, location);
         if(res.status === 200) {
             console.log("successful signup");
             navigate('/')

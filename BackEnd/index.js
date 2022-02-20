@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 //import MongoStore from "connect-mongo";
 import User from "./models/User.js";
 import Item from "./models/Item.js"
+import Comment from "./models/Comment.js"
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ const port = process.env.BACKENDPORT || 8000;
 client.connect(process.env.CONNECTSTRING).then(async (client) => {
   await User.getUserCollection(client);
   await Item.getItemCollection(client);
-  
+  await Comment.getCommentCollection(client);
   // let sessionSetup = session({
   //   secret: "KennyOmega",
   //   store: MongoStore.create({ client: client }),

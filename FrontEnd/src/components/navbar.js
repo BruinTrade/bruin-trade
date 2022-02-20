@@ -3,6 +3,9 @@ import get_icon, { Icons } from "./icons_SVG.js"
 import { useSelector } from 'react-redux'
 import { Link } from "react-router-dom";
 import { Menu, Transition } from '@headlessui/react'
+import UserServices from './../backend_services/user_services.js';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 
 function NavBar() {
 
@@ -92,8 +95,46 @@ function NavbarLable(props) {
 
 function NavbarProfile() {
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    async function logout() {
+
+        const res = await UserServices.logout(dispatch);
+
+        if(res.status !== 200) {
+            //error handle
+            console.log("Error: " + res);
+        } else {
+            console.log("logout successful");
+            navigate('/')
+        }
+    }
+
+    function DropdownMenuItem({ label, callBackFunction }) {
+        return (
+            <Menu.Item>
+                {({ active }) => (
+                <button
+                    onClick={() => callBackFunction()}
+                    className={`${
+                    active ? 'bg-blue-50' : ''
+                    } group flex rounded-md items-center w-full text-14px text-gray-500'`}
+                >
+                    <div className="h-40px">
+                        <div className="w-full h-full flex items-center px-12px">
+                            {label}
+                        </div>
+                    </div>
+                </button>
+                )}
+            </Menu.Item>
+        );
+    }
+
     const username = useSelector((state) => state.userInfo.username)
     const profileImage = useSelector((state) => state.userInfo.profileImage)
+
     return (
         <div className="text-right">
             <Menu as="div" className="relative inline-block text-left">
@@ -121,21 +162,9 @@ function NavbarProfile() {
                     leaveTo="transform opacity-0 scale-95"
                 >
                     <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                <Menu.Item>
-                                    {({ active }) => (
-                                    <button
-                                    className={`${
-                                    active ? 'bg-blue-50' : ''
-                                    } group flex rounded-md items-center w-full text-14px text-gray-500'`}
-                                >
-                                    <div className="h-40px">
-                                        <div className="w-full h-full flex items-center px-12px">
-                                            Logout
-                                        </div>
-                                    </div>
-                                </button>
-                                )}
-                                </Menu.Item>
+                        <DropdownMenuItem label="Orders" callBackFunction={() => navigate('/')}/>
+                        <DropdownMenuItem label="Sold" callBackFunction={() => navigate('/')}/>     
+                        <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>
                     </Menu.Items>
                 </Transition>
             </Menu>

@@ -12,14 +12,14 @@ export default function SignIn() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
-        const res = UserServices.login(dispatch, username, password);
+        const res = await UserServices.login(dispatch, username, password);
 
         if(res.status !== 200) {
             //error handle
-            console.log("Error: " + res.error);
+            console.log("Error: " + res);
         } else {
             console.log("login successful");
             navigate('/')
