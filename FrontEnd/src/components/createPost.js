@@ -3,6 +3,8 @@ import Form from "./form.js";
 import ItemServices from "../backend_services/item_services.js";
 import { useSelector } from 'react-redux'
 
+import UploadImage from "./uploadImage.js";
+
 const conditions = ["Great", "Good", "Poor"];
 
 
@@ -13,6 +15,8 @@ export default function CreatePost() {
     const [price, setPriceState] = useState("");
     const [condition, setConditionState] = useState(conditions[0]);
     const [categoryTag, setCategoryTagState] = useState([]);
+    const [images, setImages] = useState([]);
+    const [imageUrls, setImageUrls] = useState([]);
     const [description, setDescriptionState] = useState("");
 
     const username = useSelector((state) => state.userInfo.username)
@@ -26,9 +30,16 @@ export default function CreatePost() {
             token,
             title,
             price,
-            description
+            description,
+            images
         );
         console.log(res);
+    }
+
+    function handleUploadImage(event) {
+        setImages([...images, ...event.target.files])
+        const newUrls = [...event.target.files].map((file, key) => {return URL.createObjectURL(file)})
+        setImageUrls([...imageUrls, ...newUrls])
     }
 
     return (
@@ -45,7 +56,7 @@ export default function CreatePost() {
 
             <div className='flex flex-row justify-between w-full'>
 
-                <div className='grid gap-y-50px w-300px' mr-60px>
+                <div className='grid gap-y-50px w-300px mr-60px'>
                     <Form id="location" 
                         label="Location" 
                         placeholder="Your current location" 
@@ -71,7 +82,7 @@ export default function CreatePost() {
 
                 <div className='flex flex-col justify-start item-start ml-60px w-full'>
 
-                    <PhotoUpload />
+                    <PhotoUpload urls={imageUrls} handleUploadImage={(event) => handleUploadImage(event)}/>
                 </div>
             </div>
 
@@ -115,13 +126,31 @@ function ProfilePage(props) {
     );
 }
 
+function PhotoPreview(props) {
+    return (
+        <div className="w-112px h-80px rounded-8px">
+            <img src={props.imgUrl} className="w-full h-full object-cover" />
+        </div>
+    );
+}
+
 function PhotoUpload(props) {
+
+    const images = props.urls.map((url) => (<PhotoPreview imgUrl={url}/>))
+
     return (
         <div>
             <label className='avenir-med text-14px text-left'>
                 Photos:
             </label>
-            <div className='bg-blue-100 w-390px h-200px rounded-12px'></div>
+
+            <div className="grid grid-cols-3 grid-rows-2">
+                {images}
+            </div>
+
+            <div className="w-112px h-80px rounded-8px">
+                <UploadImage handleUploadImage={(event) => props.handleUploadImage(event)}/>
+            </div>
         </div>
     );
 }

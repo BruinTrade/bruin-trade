@@ -1,8 +1,8 @@
 import SignUp from "../components/signup.js"
 import SignIn from "../components/signin.js"
 import CategoryItem from "../components/categoryItem.js";
-import ItemPreview from "../components/itemPreview";
-
+import ItemPreview from "../components/itemPreview.js";
+import UploadImage from "../components/uploadImage.js";
 
 export default function PageComponentGallery() {
     return (
@@ -11,6 +11,7 @@ export default function PageComponentGallery() {
             <SignUp/>
             <SignIn/>
             <CategoryItem label="Books" imgUrl="https://media.wired.com/photos/5be4cd03db23f3775e466767/master/w_120" />
+            <UploadImage />
         </div>
     )
 }
