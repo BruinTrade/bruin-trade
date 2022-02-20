@@ -44,7 +44,7 @@ module.exports = {
 		boxShadow: {
 			dark: '0px 10px 30px 0px rgba(209, 213, 219, 1)',
 			light: '0px 10px 30px 0px rgba(229, 231, 235, 1)',
-			lightBlue: '0px 10px 30px 0px rgba(168, 219, 245, 1)',
+			lightBlue: '0px 10px 30px 0px rgba(168, 219, 245, 0.5)',
 		},
 		borderWidth: {
 			DEFAULT: '1px',

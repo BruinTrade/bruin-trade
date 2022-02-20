@@ -76,8 +76,6 @@ export default function PageHome() {
             <div className='w-357px h-817px mt-20px ml-40px mr-80px bg-white pr-25px pl-25px flex flex-row justify-between rounded-25px'>
                 <ProfilePage />
             </div>
-
-            
         </div>
     );
 }
