@@ -29,7 +29,6 @@ ItemDetails.defaultProps = {
     "https://cdn.shopify.com/s/files/1/0054/4371/5170/products/Spongebob_464pin.png?v=1627414161",
     "https://m.media-amazon.com/images/I/81NBnyMyDGL._AC_SL1500_.jpg",
     "https://paisano-online.com/wp-content/uploads/2020/02/File_001-900x733.jpg",
-    "https://upload.wikimedia.org/wikipedia/en/thumb/3/33/Patrick_Star.svg/1200px-Patrick_Star.svg.png",
   ],
   tags: [
     "spongebob",
