@@ -9,9 +9,14 @@ export default function Form(props) {
     return (
         <div className="flex flex-col">
             <span className="flex flex-row justify-start items-center space-x-1 tracking-wide text-gray-500 text-14px font-avenir-med mb-2px">
+                {props.isLabelBlue?
+                <label className='text-blue-400'>
+                    {props.label}
+                </label> 
+                : 
                 <label>
                     {props.label}
-                </label>
+                </label>}
                 { required ? <label className="h-full text-red-500 inline-block ">*</label> : null }
             </span>
             {formType === "input" ? 
