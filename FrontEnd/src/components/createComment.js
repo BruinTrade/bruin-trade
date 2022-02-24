@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import Form from "./form.js";
-import ItemServices from "../backend_services/item_services.js";
 import { useSelector } from 'react-redux'
 
 //props.targetUser
@@ -8,14 +7,19 @@ import { useSelector } from 'react-redux'
 export default function CreateComment(props) {
 
     const [commentBody, setCommentBody] = useState("");
+    
 
-    const username = useSelector((state) => state.userInfo.username)
-    const token = useSelector((state) => state.loginStatus.token)
+    //const username = useSelector((state) => state.userInfo.username)
+    //const token = useSelector((state) => state.loginStatus.token)
+    let replyTargetContainer = useSelector((state) => state.replyTarget)
+
+   
 
     function handleCreateComment() {
         // const res = ItemServices.createComment(
         //     token,
-        //     targetUser,
+        //     item_id,
+        //     replyTargetContainer.replyTarget,
         //     commentBody,
         // );
         // console.log(res);
@@ -25,14 +29,13 @@ export default function CreateComment(props) {
         <div className="grid grid-cols-1 w-1354px h-440px bg-white pt-52px pr-25px pl-51px rounded-25px drop-shadow-md place-items-center">
 
             <Form id="comment" 
-                label={props.targetUser ? `@${props.targetUser}` : ""}
+                label={replyTargetContainer.replyTarget ? `@${replyTargetContainer.replyTarget}` : ""}
                 placeholder="Create a new comment here" 
                 value={commentBody} 
                 onChange={(event) => setCommentBody(event.target.value)} 
                 type="text" 
                 width={1266}
                 height={221}
-                required={true}
                 isLabelBlue={true}
                 />
 

@@ -42,6 +42,8 @@ async function useLogout(dispatch) {
     //remove token
     try {
         dispatch(logout());
+        dispatch(setUsername(null));
+        dispatch(setLocation(null));
         return { status: 200 };
     } catch {
     //error logginout
