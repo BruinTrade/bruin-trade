@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import Form from "./form.js";
-
 import UserServices from './../backend_services/user_services.js'
 import { useDispatch } from 'react-redux';
-
 import { useNavigate } from "react-router-dom";
+import { useAlert } from 'react-alert';
 
 export default function SignUp() {
+    const alert = useAlert()
+
     const [username, setUsernameState] = useState("");
     const [password, setPasswordState] = useState("");
     const [email, setEmailState] = useState("");
@@ -22,7 +23,8 @@ export default function SignUp() {
             console.log("successful signup");
             navigate('/')
         } else {
-            console.log("Error: " + res.error);
+            alert.show(res.data.errors)
+            console.log("Error: " + res.data.errors);
         }
     }
 

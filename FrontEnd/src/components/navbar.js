@@ -65,7 +65,7 @@ function NavBar() {
                         </div>
                     ) : (
                         <div id="not logged in" className="h-full w-auto flex flex-row items-center justify-end">
-                            <Link to="/singup">
+                            <Link to="/signup">
                                 <button className="ml-172px w-100px h-50px text-gray-400 border-solid border-2 border-gray-400 rounded-25px" >Sign Up</button>
                             </Link>
                             <Link to="/login">

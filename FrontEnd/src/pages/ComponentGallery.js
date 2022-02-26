@@ -43,7 +43,7 @@ export default function PageComponentGallery() {
             <UserProfile userName="aaaaa"/>
             <UploadImage />
             <CreatePost />
-            <CreateComment targetUser="shawn" />
+            <CreateComment/>
             <CommentList comments={comments}/>
         </div>
     )

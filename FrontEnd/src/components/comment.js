@@ -43,6 +43,9 @@ export default function Comment(props) {
                 <div className="basis-3/100 text-12px text-gray-400 font-avenir-med mb-3px">To: </div>
                 <button className="text-12px text-blue-400 font-avenir-med" onClick={replyHandler_targetUser}>{`@${props.targetUser}`}</button>
             </div>
+            <div className='flex flex-row space-x-4px'>
+                <div className="text-12px text-gray-400 font-avenir-med mb-3px">{props.createdTime}</div>
+            </div>
             <div className='font-avenir-med text-12px text-gray-500 w-1180px'>
                 {props.commentBody}
             </div>

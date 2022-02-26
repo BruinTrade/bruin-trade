@@ -33,8 +33,7 @@ async function useLogin(dispatch, username, password) {
         }
     //request failed
     } else {
-        console.log(res);
-        return { status: status, error: res.error };
+        return { status: status, data: res.data };
     }
 }
 
@@ -74,9 +73,90 @@ async function useRegister(dispatch, username, password, email, location) {
     //request failed
     } else {
         console.log(res);
-        return { status: status, error: res.error };
+        return { status: status, data: res.data };
     }
 }
+
+async function addItemToCart(token, item_id)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    const data = {}
+    return http.post(`/placeholder/${item_id}/addToCart`, data, config)
+}
+
+async function removeFromCart(token, item_id)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    const data = {}
+    return http.post(`/placeholder/${item_id}/removeFromCart`, data, config)
+}
+
+async function getItemsInCart(token)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+
+    return http.get("/placeholder/cart", config)
+}
+
+async function follow(token, target_user_id)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    const data = {}
+    return http.post(`/follow/${target_user_id}`, data, config)
+}
+
+async function unfollow(token, target_user_id)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    const data = {}
+    return http.post(`/unfollow/${target_user_id}`, data, config)
+}
+
+async function getAllFollowings(token)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+   
+    return http.get("/followings", config)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export default UserServices;
 
