@@ -31,7 +31,7 @@ function LongPreview(props) {
 
 
     return (
-        <Link to={`post/${props.id}`}>
+        <Link to={`/post/${props.id}`}>
             <div className='w-1000px h-288px flex flex-row items-center justify-start bg-white rounded-12px px-15px'>
                 <div id="image" className="w-260px h-260px border border-1px border-gray-100 rounded-12px flex flex-col justify-center object-cover">
                     <img src={imageUrl} />

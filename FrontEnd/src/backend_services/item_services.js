@@ -8,6 +8,7 @@ export default class ItemServices {
     }
 
     static getByQuery(by, value) {
+        console.log("in getByQuery")
         return http.get(`/items?${by}=${value}`)
     }
 

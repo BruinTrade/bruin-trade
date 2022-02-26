@@ -33,10 +33,11 @@ export default function ItemPreview(props) {
 }
 
 export function ItemPreviewList({ itemIds }) {
+    console.log(itemIds);
     return (
         <div className="flex flex-col space-y-20px">
-            {itemIds.map(() => (
-                <LongPreview />
+            {itemIds.map((id) => (
+                <LongPreview id={id}/>
             ))}
         </div>
     )

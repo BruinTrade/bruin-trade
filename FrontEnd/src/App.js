@@ -12,6 +12,8 @@ import PageComponentGallery from './pages/ComponentGallery'
 import Loading from './components/loading.js'
 import Search from './pages/Search.js';
 
+
+
 const App = () => (
   <div className='flex flex-row justify-center bg-bg_blue min-h-screen h-max'>
     <div className='w-1512px pb-100px'>

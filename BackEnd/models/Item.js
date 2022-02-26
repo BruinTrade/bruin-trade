@@ -53,8 +53,8 @@ class Item {
       try {
         const item_list = await matching_items.toArray();
         resolve(item_list);
-      } catch {
-        reject("error when converting to array");
+      } catch(error){
+        reject(error);
       }
     });
   }

@@ -3,8 +3,10 @@ import Form from "./form.js";
 import UserServices from './../backend_services/user_services.js';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
+import { useAlert } from 'react-alert'
 
 export default function SignIn() {
+    const alert = useAlert();
 
     const [username, setUsernameState] = useState("");
     const [password, setPasswordState] = useState("");
@@ -19,7 +21,8 @@ export default function SignIn() {
 
         if(res.status !== 200) {
             //error handle
-            console.log("Error: " + res);
+            alert.show(res.data.errors);
+            console.log(res.data.errors);
         } else {
             console.log("login successful");
             navigate('/')

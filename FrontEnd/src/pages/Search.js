@@ -1,24 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ItemPreviewList } from "../components/itemPreview";
 import { Routes, Route, useParams } from 'react-router-dom';
+import ItemServices from "../backend_services/item_services";
 
-
-export default function Search(){
+export default function Search() {
     return <Routes>
-            <Route path=":id" element={<SearchResult />}/>
-        </Routes>;
+        <Route path=":id" element={<SearchResult />} />
+    </Routes>;
 }
+
 
 
 function SearchResult() {
     let { id } = useParams();
+    const [results, setResults] = useState([]);
     //fetch data
-    const searchResult = [1];
-    
-    console.log(id)
-    return(
+
+    useEffect(() => {
+        ItemServices.getByQuery("title", id).then(res => {
+            setResults(res.data.map(item => item._id))
+        })
+    }, [])
+
+    return (
         <div className='mt-50px flex flex-row justify-center'>
-            <ItemPreviewList itemIds={searchResult}/>
+            <ItemPreviewList itemIds={results} />
         </div>
-    ); 
+    )
 }
