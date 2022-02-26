@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import UserProfile from "./userProfile";
 import Form from "./form";
+import LongPreview from "./itemPreviewLong";
 
 // TO-DO: 
 // - finish subscriptions and implement subscriptions page function
@@ -13,6 +14,7 @@ export default function ProfileDetails() {
   const [username, setUsername] = useState("The_Guy");
   const [email, setEmail] = useState("theguy@gmail.com");
   const [subPageNum, setSubPageNum] = useState(1);
+  const watchlist = [1,2,3,4,5]
 
   function saveChanges() {
     // to be implemented
@@ -39,8 +41,10 @@ export default function ProfileDetails() {
   switch (state) {
     case 1: // Watch List
       menu = (
-        <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
-          work in progress...
+        <div className="flex flex-col space-y-20px">
+          {watchlist.map(() => (
+            <LongPreview />
+          ))}
         </div>
       );
       break;

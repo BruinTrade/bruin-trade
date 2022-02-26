@@ -14,27 +14,27 @@ function LongPreview(props) {
     const location = "Westwood, CA";
     const price = 102;
     const description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s."
-    
-    function editPost() {}
-    function removePost() {}
 
-    function addToWatchList() {}
+    function editPost() { }
+    function removePost() { }
+
+    function addToWatchList() { }
 
     const buttonsMyPost = [
-        <div className="text-12px text-red-500" onClick={() => editPost()}>edit</div>,
-        <div className="text-12px text-gray-400" onClick={() => removePost()}>remove</div>
+        <button type="button" className="text-12px text-red-500" onClick={() => editPost()}>edit</button>,
+        <button className="text-12px text-gray-400" onClick={() => removePost()}>remove</button>
     ]
 
     const buttonsOthersPost = [
-        <div className="text-blue-400 text-14px border border-1 border-blue-400 rounded-6px px-2 py-1" onClick={() => addToWatchList()}>Add to Watch List</div>
+        <button type="button" className="text-blue-400 text-14px border border-1 border-blue-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); console.log("bob") ;addToWatchList()}}>Add to Watch List</button>
     ]
 
 
     return (
-        <Link to={`post/${props.itemid}`}>
+        <Link to={`post/${props.id}`}>
             <div className='w-1000px h-288px flex flex-row items-center justify-start bg-white rounded-12px px-15px'>
                 <div id="image" className="w-260px h-260px border border-1px border-gray-100 rounded-12px flex flex-col justify-center object-cover">
-                    <img src={imageUrl}/>
+                    <img src={imageUrl} />
                 </div>
                 <div id="detail" className="flex flex-col justify-start ml-10px">
                     <div id="upper" className="flex flex-row ">
@@ -75,12 +75,12 @@ function LongPreview(props) {
                     </div>
                 </div>
             </div>
-        </Link >
+        </Link>
     )
 }
 
 
-function Status({num, type}) {
+function Status({ num, type }) {
     return (
         <div className="flex flex-row justify-end text-gray-400 text-12px">
             {num} {type}
@@ -89,7 +89,7 @@ function Status({num, type}) {
 }
 
 
-function StatusLabel({title, children}) {
+function StatusLabel({ title, children }) {
     return (
         <div className="flex flex-col items-start space-y-2px mb-10px">
             <div className="text-12px text-gray-400">{title}:</div>
