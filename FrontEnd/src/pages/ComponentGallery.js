@@ -5,11 +5,13 @@ import ItemPreview from "../components/itemPreview";
 import ConcisePreview from "../components/itemConcisePreview.js";
 import UserProfile from "../components/userProfile.js";
 import UploadImage from "../components/uploadImage.js";
+import LongPreview from "../components/itemPreviewLong.js";
 
 export default function PageComponentGallery() {
     return (
         <div className="flex flex-col space-y-10">
             <ItemPreview />
+            <LongPreview />
             <ConcisePreview />
             <SignUp/>
             <SignIn/>
