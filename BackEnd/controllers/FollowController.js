@@ -9,7 +9,7 @@ export default class FollowController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -21,7 +21,7 @@ export default class FollowController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -32,7 +32,7 @@ export default class FollowController {
         res.json({ users_followed: result });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 }

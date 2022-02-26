@@ -10,6 +10,9 @@ import PageLogin from './pages/Login.js'
 import PageCreatePost from "./pages/CreatePost.js"
 import PageComponentGallery from './pages/ComponentGallery'
 import Loading from './components/loading.js'
+import Search from './pages/Search.js';
+
+
 
 const App = () => (
   <div className='flex flex-row justify-center bg-bg_blue min-h-screen h-max'>
@@ -26,6 +29,7 @@ const App = () => (
             <Route path="/login" element={<PageLogin/>} />
             <Route path="/components" element={<PageComponentGallery/>} />
             <Route path="/create-post" element={<PageCreatePost/>} />
+            <Route path="/search/*" element={<Search/>} />
           </Routes>
         </Suspense>
       </Router>

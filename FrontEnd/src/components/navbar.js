@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import get_icon, { Icons } from "./icons_SVG.js"
 import { useSelector } from 'react-redux'
 import { Link } from "react-router-dom";
@@ -9,10 +9,18 @@ import { useNavigate } from "react-router-dom";
 
 function NavBar() {
 
+    const navigate = useNavigate();
+
     const login = useSelector((state) => state.loginStatus.login)
     const location = useSelector((state) => state.userInfo.location)
     const numCartItem = 0;
     
+    const [searchValue, setSearchValue] = useState();
+    
+    function search() {
+        navigate(`/search/${searchValue}`)
+    }
+
     return (
         <div className="w-full flex flex-row justify-center">
             <div className="flex flex-row justify-between items-center pt-50px w-1352px">
@@ -21,8 +29,8 @@ function NavBar() {
                         {get_icon(Icons.logo)}
                     </Link>
                     <div className="flex items-center justify-between rounded-25px bg-white h-50px w-800px text-gray-200">
-                        <input id="search term" className="w-full border-0 mx-5 py-2 rounded-lg focus:outline-none text-14px text-gray-500 placeholder-gray-200" placeholder="Search for used goods around you"/>
-                        <button onClick={() => {}} className="flex justify-center items-center rounded-25px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 w-50px h-35px mr-10px hover:cursor-pointer">
+                        <input id="search term" className="w-full border-0 mx-5 py-2 rounded-lg focus:outline-none text-14px text-gray-500 placeholder-gray-200" placeholder="Search for used goods around you" value={searchValue} onChange={(event) => setSearchValue(event.target.value)}/>
+                        <button onClick={() => search()} className="flex justify-center items-center rounded-25px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 w-50px h-35px mr-10px hover:cursor-pointer">
                             <div className="w-20px h-20px">
                                 {get_icon(Icons.search_icon)}
                             </div>
@@ -65,7 +73,7 @@ function NavBar() {
                         </div>
                     ) : (
                         <div id="not logged in" className="h-full w-auto flex flex-row items-center justify-end">
-                            <Link to="/singup">
+                            <Link to="/signup">
                                 <button className="ml-172px w-100px h-50px text-gray-400 border-solid border-2 border-gray-400 rounded-25px" >Sign Up</button>
                             </Link>
                             <Link to="/login">
@@ -162,6 +170,7 @@ function NavbarProfile() {
                     leaveTo="transform opacity-0 scale-95"
                 >
                     <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <DropdownMenuItem label="Create New Post" callBackFunction={() => navigate('/create-post')}/>
                         <DropdownMenuItem label="Orders" callBackFunction={() => navigate('/')}/>
                         <DropdownMenuItem label="Sold" callBackFunction={() => navigate('/')}/>     
                         <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>

@@ -22,10 +22,10 @@ export default function CreatePost() {
     const username = useSelector((state) => state.userInfo.username)
     const token = useSelector((state) => state.loginStatus.token)
 
-    function handleCreatePost() {
+    async function handleCreatePost() {
         console.log("Create Item")
         console.log("token from call: " + token);
-        const res = ItemServices.create(
+        const res = await ItemServices.create(
             username,
             token,
             title,

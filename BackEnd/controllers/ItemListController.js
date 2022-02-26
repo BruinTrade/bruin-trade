@@ -11,7 +11,7 @@ export default class ItemListController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -27,7 +27,7 @@ export default class ItemListController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -43,7 +43,7 @@ export default class ItemListController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -52,8 +52,8 @@ export default class ItemListController {
       .then((item_list) => {
         res.json(item_list);
       })
-      .catch(() => {
-        res.json([]);
+      .catch((error) => {
+        res.status(201).json({errors: error});
       });
   }
 
@@ -63,7 +63,7 @@ export default class ItemListController {
         res.json(item_details);
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 

@@ -17,10 +17,10 @@ export default class UserController {
               location: temp_user.data.location,
             },
             "scretekeygeneratedbyajshawn",
-            { expiresIn: "1h" }
+            { expiresIn: "24h" }
           );
         } catch (error) {
-          res.json({ error: error });
+          res.status(201).json({ error: error });
           return;
         }
 
@@ -33,7 +33,7 @@ export default class UserController {
       })
 
       .catch((errors) => {
-        res.json({ errors: errors });
+        res.status(201).json({ errors: errors });
       });
   }
 
@@ -57,7 +57,7 @@ export default class UserController {
             { expiresIn: "1h" }
           );
         } catch (error) {
-          res.json({ error: error });
+          res.status(201).json({ error: error });
           return;
         }
 
@@ -71,7 +71,7 @@ export default class UserController {
         });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
 
       console.log("login from backend");
@@ -101,7 +101,7 @@ export default class UserController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ error: error_message });
+        res.status(201).json({ error: error_message });
       });
   }
 
@@ -111,7 +111,7 @@ export default class UserController {
         res.json({ cart: cart });
       })
       .catch((error_message) => {
-        res.json({ error: error_message });
+        res.status(201).json({ error: error_message });
       });
   }
 
@@ -121,7 +121,7 @@ export default class UserController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ error: error_message });
+        res.status(201).json({ error: error_message });
       });
   }
 

@@ -3,8 +3,10 @@ import Form from "./form.js";
 import UserServices from './../backend_services/user_services.js';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
+import { useAlert } from 'react-alert'
 
 export default function SignIn() {
+    const alert = useAlert();
 
     const [username, setUsernameState] = useState("");
     const [password, setPasswordState] = useState("");
@@ -19,7 +21,8 @@ export default function SignIn() {
 
         if(res.status !== 200) {
             //error handle
-            console.log("Error: " + res);
+            alert.show(res.data.errors);
+            console.log(res.data.errors);
         } else {
             console.log("login successful");
             navigate('/')
@@ -29,7 +32,7 @@ export default function SignIn() {
     return (
         <div>
             <form onSubmit = {handleSubmit} className='font-avenir-reg text-14px drop-shadow w-350px h-298px bg-white rounded-25px item-center flex flex-col px-25px pt-29px justify-between'>
-                <Form id="" label="Username" placeholder="No more than 20 characters" value={username} onChange={(event) => setUsernameState(event.target.value)} type="text" maxLength={20} minLength={3}/>
+                <Form label="Username" placeholder="No more than 20 characters" value={username} onChange={(event) => setUsernameState(event.target.value)} type="text" maxLength={20} minLength={3}/>
                 <Form label="Password" placeholder="At least 8 characters" value={password} onChange={(event) => setPasswordState(event.target.value)} type="password" maxLength={100} minLength={8} />
                 <input className="font-avenir-med mb-30px mt-51px text-white text-16px rounded-25px drop-shadow h-40px bg-gradient-to-r from-blue-400 to-blue-500 hover:cursor-pointer hover:drop-shadow-md" type="submit" value="Login"/>
             </form>
