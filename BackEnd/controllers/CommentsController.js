@@ -16,7 +16,7 @@ export default class CommentsController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -28,7 +28,7 @@ export default class CommentsController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.json({ errors: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 }
