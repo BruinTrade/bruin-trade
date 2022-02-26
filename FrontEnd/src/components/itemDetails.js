@@ -2,27 +2,12 @@ import React, { useState, useEffect } from "react";
 import ItemServices from "../backend_services/item_services.js"
 import { useSelector } from 'react-redux'
 
-// TO-DO
-// - align with backend
 
-// !!! IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
+// IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
 // will appear cutoff and may or may not overflow.
 
-// !!! IMPORTANT: For now, images prop is an array that contains URLs to the images. It's probably not what the final implementation should be.
-// this is only so I can test out the front end of things
-
-// Template for header (name of item)
-// to avoid duplicate code
-// Q: Why does Home.js not require the header function to also be imported when ItemDetails uses it?
-function header(label) {
-  return (
-    <h2 className="text-12px text-gray-400 font-roboto-reg mb-3px">{label}</h2>
-  );
-}
-
-// for testing purposes
+/* for testing purposes
 //------------------------ -----------------------------------
-
 // (!) .defaultProps is deprecated
 ItemDetails.defaultProps = {
   images: [
@@ -44,24 +29,21 @@ ItemDetails.defaultProps = {
   cond: "Great",
   loc: `[icon to be added] Westwood`,
   desc: "Warning: This text will not overflow but will be truncated and appear cut off if there are too many words.",
-};
+};*/
 
-//------------------------------------------------------------
+// Template for header (name of item)
+// to avoid duplicate code
+function header(label) {
+  return (
+    <h2 className="text-12px text-gray-400 font-roboto-reg mb-3px">{label}</h2>
+  );
+}
 
-// DOCUMENTATION:
-// ItemDetails props are
-// name => name of item (string)
-// price => price of item (type to be determined)
-// cond => condition of the item (string)
-// loc => location of item (string)
-// desc => description of item (string)
-// images => path to the image on a remote database
-
+//------------------------------------------------------------*/
 function ItemDetails(props) {
   // imgState keeps track of which image to show
   // on the big tile
   // default: 0
-  // note: expects an array to be passed in as a prop (for now)
 
   let cond = "Great";
   let loc = "UCLA";
@@ -219,9 +201,7 @@ function ItemDetails(props) {
         </div>
       </div>
     );
-
   }
-  
 }
 
 export default ItemDetails;
