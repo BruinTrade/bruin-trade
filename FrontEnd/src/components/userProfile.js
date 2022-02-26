@@ -2,7 +2,7 @@ import React from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
 
-function UserProfile() {
+export default function UserProfile() {
     const username = useSelector((state) => state.userInfo.username)
     const profileImage = useSelector((state) => state.userInfo.profileImage)
     const rating = useSelector((state) => state.userInfo.rating);
@@ -60,4 +60,3 @@ function UserRating(props) {
         </div>
     );
 }
-export default UserProfile; 
