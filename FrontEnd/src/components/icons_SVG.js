@@ -3,7 +3,7 @@ import { ReactSVG } from 'react-svg';
 
 export function get_icon(icon) {
     //path here is strange
-    const fileName = "icons/" + icon;
+    const fileName = "/icons/" + icon;
     return <ReactSVG src={fileName} />;
 }
 

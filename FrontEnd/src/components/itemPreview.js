@@ -1,9 +1,10 @@
 import React from 'react'
 import { Link } from "react-router-dom";
+import LongPreview from './itemPreviewLong';
 
 const DUMMY_PRICE = 34.99
 
-function ItemPreview(props) {
+export default function ItemPreview(props) {
     return (
         <Link to={`post/${props.itemid}`}>
             <div className='w-250px h-288px flex flex-col item-center justify-between bg-white rounded-12px px-15px'>
@@ -31,5 +32,12 @@ function ItemPreview(props) {
     )
 }
 
-
-export default ItemPreview;
+export function ItemPreviewList({ itemIds }) {
+    return (
+        <div className="flex flex-col space-y-20px">
+            {itemIds.map(() => (
+                <LongPreview />
+            ))}
+        </div>
+    )
+}

@@ -27,7 +27,7 @@ const App = () => (
             <Route path="/login" element={<PageLogin/>} />
             <Route path="/components" element={<PageComponentGallery/>} />
             <Route path="/create-post" element={<PageCreatePost/>} />
-            <Route path="/search" element={<Search/>} />
+            <Route path="/search/*" element={<Search/>} />
           </Routes>
         </Suspense>
       </Router>
