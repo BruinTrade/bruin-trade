@@ -64,7 +64,7 @@ export default function PageHome() {
         <div className="mt-63px ml-80px flex flex-col space-y-30px">
           <div>
             <div className="pl-25px avenir-med text-gray-500 text-20px mb-10px">
-              Trading Items
+              Trending Items
             </div>
             <TradingItems items={items} />
           </div>

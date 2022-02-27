@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UserProfile from "./userProfile";
 import Form from "./form";
-import LongPreview from "./itemPreviewLong";
+import { ItemPreviewList } from "./itemPreview";
+import UserServices from "../backend_services/user_services";
+import { useSelector } from "react-redux";
+import commentServices from '../backend_services/comment_services';
 
 // TO-DO: 
 // - finish subscriptions and implement subscriptions page function
@@ -9,12 +12,28 @@ import LongPreview from "./itemPreviewLong";
 
 
 export default function ProfileDetails() {
+  const original_username = useSelector((state) => state.loginStatus.username)
+  const token = useSelector((state) => state.loginStatus.token)
+
+  const [loading, setLoading] = useState(true);
   const [state, setState] = useState(0);
   const [stateTag, setStateTag] = useState("Profile");
-  const [username, setUsername] = useState("The_Guy");
   const [email, setEmail] = useState("theguy@gmail.com");
   const [subPageNum, setSubPageNum] = useState(1);
+  const [username, setUsername] = useState(original_username);
+  const [watchlistItemIDs, setWatchlistItemIDs] = useState([]);
   const watchlist = [1,2,3,4,5]
+
+ 
+
+  useEffect(() => {
+        UserServices.getItemsInCart(token).then((res) => {
+            const data = res.data
+            //console.log("data", data)
+            setWatchlistItemIDs(data.cart.map(item => item._id))
+            setLoading(false);
+        })
+  }, [])
 
   function saveChanges() {
     // to be implemented
@@ -26,7 +45,7 @@ export default function ProfileDetails() {
 
   function Sub() {
     return (
-      <div className="w-1000px h-91px pl-31px pr-22px flex bg-white rounded-25px flex-row flex justify-between items-center overflow-hidden drop-shadow-md">
+      <div className="w-1000px h-91px pl-31px pr-22px flex bg-white rounded-25px flex-row justify-between items-center overflow-hidden drop-shadow-md">
         <div className="pt-20px flex flex-row text-gray-400 text-12px font-avenir-reg items-center">
           <UserProfile />
           <div className="w-8px"/>
@@ -36,16 +55,14 @@ export default function ProfileDetails() {
       </div>
     );
   }
+  //console.log("watchlistItemIDs", watchlistItemIDs)
 
   let menu;
   switch (state) {
     case 1: // Watch List
       menu = (
-        <div className="flex flex-col space-y-20px">
-          {watchlist.map(() => (
-            <LongPreview />
-          ))}
-        </div>
+        watchlistItemIDs.length === 0 ? <div className="w-full">Nothing in watch list yet =.=</div> :
+        <ItemPreviewList itemIds={watchlistItemIDs} />
       );
       break;
     case 2: // Orders
@@ -125,7 +142,7 @@ export default function ProfileDetails() {
   }
 
   return (
-    <div className="flex flex-row mt-10px">
+    <div className="w-full flex flex-row justify-start mt-10px ml-80px">
       <div className="h-817px w-310px mr-30px rounded-25px pt-40px bg-white drop-shadow-md flex flex-col items-center">
         <UserProfile />
         <div className="flex flex-col items-start mb-38px mt-29px">
@@ -134,9 +151,11 @@ export default function ProfileDetails() {
             <button onClick={() => {setState(1); setStateTag("Watch List")}} className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med">
               Watch List
             </button>
+            {/*
             <button onClick={() => {setState(2); setStateTag("Orders")}} className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med">
               Orders
             </button>
+            */}
             <button onClick={() => {setState(3); setStateTag("Sold")}} className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med">
               Sold
             </button>
@@ -165,3 +184,12 @@ export default function ProfileDetails() {
     </div>
   );
 }
+
+
+/*
+        <div className="flex flex-col space-y-20px">
+          {watchlistItemIDs.map((item_id) => (
+            <ItemPreview.Long />
+          ))}
+        </div>
+*/

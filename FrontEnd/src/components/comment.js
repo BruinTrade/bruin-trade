@@ -36,7 +36,7 @@ export default function Comment(props) {
                 <button className="text-12px text-blue-400 font-avenir-med" onClick={replyHandler_author}>{`@${props.author}`}</button>
                 {
                     username === props.author ? 
-                    <div className='flex flex-row justify-end w-1170px'>
+                    <div className='flex flex-row justify-end w-1200px'>
                         <button className=" text-12px text-gray-400 font-avenir-med rounded-full bg-red-100 w-50px " onClick={deleteComment}>Delete</button>
                     </div>
                     :

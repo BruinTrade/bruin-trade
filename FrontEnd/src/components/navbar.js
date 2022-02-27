@@ -182,10 +182,10 @@ function NavbarProfile() {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
                         <DropdownMenuItem label="Create New Post" callBackFunction={() => navigate('/create-post')}/>
-                        <DropdownMenuItem label="Orders" callBackFunction={() => navigate('/')}/>
-                        <DropdownMenuItem label="Sold" callBackFunction={() => navigate('/')}/>     
+                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/about')}/>
+                        <DropdownMenuItem label="Cart" callBackFunction={() => navigate('/about')}/> 
                         <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>
                     </Menu.Items>
                 </Transition>

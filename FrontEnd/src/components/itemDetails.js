@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ItemServices from "../backend_services/item_services.js"
+import UserServices from '../backend_services/user_services.js';
 import CommentList from "../components/commentList.js"
 import CreateComment from "../components/createComment.js"
 import { useSelector } from 'react-redux';
+import { useAlert } from 'react-alert'
 
 
 
@@ -38,7 +40,7 @@ ItemDetails.defaultProps = {
 // to avoid duplicate code
 function header(label) {
   return (
-    <h2 className="text-12px text-gray-400 font-roboto-reg mb-3px">{label}</h2>
+    <h2 className="text-14px text-gray-400 font-roboto-reg mb-3px">{label}</h2>
   );
 }
 
@@ -89,14 +91,22 @@ function ItemDetails(props) {
   const [price, setPrice] = useState(0);
   const [desc, setDesc] = useState("");
   const [images, setImages] = useState([])
+  const [imgState, setImgState] = useState(0);
   const [tags, setTags] = useState([])
   const [itemOwner, setItemOwner] = useState("")
-  const [imgState, setImgState] = useState(0);
   const [relatedComments, setRelatedComments] = useState([])
   const [changeFlag, setChangeFlag] = useState(true)
   const totTags = tags.length;
 
+  const alert = useAlert()
+  
   const token = useSelector((state) => state.loginStatus.token)
+
+  const myRef = useRef(null)
+  const executeScroll = () => {
+    myRef.current.scrollIntoView();
+
+  }
 
   useEffect(async () => {
     const res = await ItemServices.getItemDetailsById(props.id, token);
@@ -114,13 +124,14 @@ function ItemDetails(props) {
   // initialization function for tags and images
   function init(what) {
     let out = [];
-    let totItems = what === 'tags' ? totTags : 0;
+    const imgLen = images ? images.length : 0
+    let totItems = what === 'tags' ? totTags : imgLen
     for (let k = 0; k < totItems; k++) {
       if (what === 'tags') {
         out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
       }
       else {
-        out.push(<ImageTile img={images[k]} key={k.toString()} id={k} />);
+        out.push(<ImageTile img={images[k]} key={k.toString()} id={k}/>);
       }
     }
     return out;
@@ -145,12 +156,12 @@ function ItemDetails(props) {
     return (
       <button
         onClick={() => setImgState(props.id)}
-        className="w-80px h-80px rounded-12px border-blue-400 mr-10px border hover:border-2 hover:shadow-lightBlue hover:shadow-inner overflow-hidden"
+        className={`w-80px h-84px rounded-12px mr-10px border-2 hover:border-blue-300 hover:shadow-inner overflow-hidden ${props.id === imgState ? "border-blue-400" : "border-transparent"}`}
       >
         <img
-          className="h-full w-auto m-auto"
+          className="h-full w-auto m-auto object-cover"
           src={props.img}
-          alt="Oops, something went wrong."
+          alt="Oops, currently no image available for this item."
         />
       </button>
     );
@@ -164,17 +175,30 @@ function ItemDetails(props) {
     )
   }
 
+  function handleContactSeller() {
+  }
+
+  function handleAddToCart() {
+    UserServices.addItemToCart(token, props.id).then((res) => {
+      if (res.status !== 200)
+      {
+        alert.show(res.data.errors)
+      }
+    })
+  }
+  
+
   if (loading) {
     return <div />
   } else {
     return (
       <div className="flex flex-col space-y-30px">
         <div className="w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md mt-40px">
-          <div className="flex-col">
+          <div id="image" className="flex-col">
             <img
               src={images ? images[imgState] : null}
-              alt="Oops, something went wrong."
-              className="w-600px h-500px border-gray-100 border-2 mb-15px overflow-hidden" />
+              alt="Oops, currently no image available for this item."
+              className="w-600px h-500px rounded-12px border-gray-100 border-2 mb-15px overflow-hidden object-contain" />
             {/* Initialize the tiles*/}
             <div className="overflow-hidden flex justify-center w-600px">{init('imgTiles')}</div>
           </div>
@@ -204,7 +228,7 @@ function ItemDetails(props) {
                   </div>
 
                   {header("Description")}
-                  <p className="w-400px h-196px text-12px font-avenir-reg text-gray-500 leading-none overflow-hidden">
+                  <p className="w-450px h-196px text-14px font-avenir-reg text-gray-500 leading-none overflow-y-scroll">
                     {desc}
                   </p>
                 </div>
@@ -215,20 +239,20 @@ function ItemDetails(props) {
                   {/* Image is just there as a placeholder */}
                   <img
                     className="h-80px w-80px rounded-full m-auto"
-                    alt="Oops, something went wrong."
+                    alt="Oops, currently no image available."
                     src="https://monstar-lab.com/global/wp-content/uploads/sites/11/2019/04/male-placeholder-image.jpeg"
                   ></img>
                   {/* Profile Component */}
                 </div>
                 <button
-                  onClick={handleClick}
+                  onClick={executeScroll}
                   id="contact"
                   className="w-160px h-50px rounded-full bg-blue-400 hover:bg-blue-500 font-roboto-reg text-18px mb-10px text-white"
                 >
                   Contact Seller
                 </button>
                 <button
-                  onClick={handleClick}
+                  onClick={handleAddToCart}
                   id="watch"
                   className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
                 >
@@ -239,9 +263,10 @@ function ItemDetails(props) {
           </div>
         </div>
         <CommentList comments={relatedComments} updateState={() => setChangeFlag(!changeFlag)}/>
-        <CreateComment item_id={props.id} item_owner={itemOwner} updateState={() => setChangeFlag(!changeFlag)} />
+        <div ref={myRef}>
+          <CreateComment item_id={props.id} item_owner={itemOwner} updateState={() => setChangeFlag(!changeFlag)} />
+        </div>
       </div>
-
     );
   }
 }

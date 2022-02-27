@@ -54,7 +54,7 @@ export default function CreateComment(props) {
         <div className="flex flex-col pt-25px items-center w-1354px h-440px bg-white rounded-25px drop-shadow-md ">
             <Form id="comment" 
                 label={replyTargetContainer.replyTarget ? `@${replyTargetContainer.replyTarget}` : ""}
-                placeholder="Create a new comment here" 
+                placeholder="Create a new message here" 
                 value={commentBody} 
                 onChange={(event) => setCommentBody(event.target.value)} 
                 type="text" 

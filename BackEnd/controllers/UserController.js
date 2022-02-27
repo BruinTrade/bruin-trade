@@ -20,7 +20,7 @@ export default class UserController {
             { expiresIn: "24h" }
           );
         } catch (error) {
-          res.status(201).json({ error: error });
+          res.status(201).json({ errors: error });
           return;
         }
 
@@ -54,10 +54,10 @@ export default class UserController {
               followings: user_info.followings,
             },
             "scretekeygeneratedbyajshawn",
-            { expiresIn: "1h" }
+            { expiresIn: "24h" }
           );
         } catch (error) {
-          res.status(201).json({ error: error });
+          res.status(201).json({ errors: error });
           return;
         }
 
@@ -101,7 +101,7 @@ export default class UserController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.status(201).json({ error: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -111,7 +111,7 @@ export default class UserController {
         res.json({ cart: cart });
       })
       .catch((error_message) => {
-        res.status(201).json({ error: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 
@@ -121,7 +121,7 @@ export default class UserController {
         res.json({ status: message });
       })
       .catch((error_message) => {
-        res.status(201).json({ error: error_message });
+        res.status(201).json({ errors: error_message });
       });
   }
 

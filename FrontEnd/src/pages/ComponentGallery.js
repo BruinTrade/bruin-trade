@@ -5,7 +5,6 @@ import ItemPreview from "../components/itemPreview";
 import ConcisePreview from "../components/itemConcisePreview.js";
 import UserProfile from "../components/userProfile.js";
 import UploadImage from "../components/uploadImage.js";
-import LongPreview from "../components/itemPreviewLong.js";
 import CreatePost from "../components/createPost.js";
 import CreateComment from "../components/createComment.js";
 import CommentList from "../components/commentList.js";
@@ -34,8 +33,8 @@ const comments = [
 export default function PageComponentGallery() {
     return (
         <div className="flex flex-col space-y-10">
-            <ItemPreview />
-            <LongPreview />
+            <ItemPreview.Short />
+            <ItemPreview.Long />
             <ConcisePreview />
             <SignUp/>
             <SignIn/>
