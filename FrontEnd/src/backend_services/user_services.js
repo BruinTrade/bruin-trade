@@ -8,6 +8,18 @@ const UserServices = {
     logout : useLogout,
 
     register: useRegister,
+
+    addItemToCart: addItemToCart,
+
+    removeFromCart: removeFromCart,
+
+    getItemsInCart: getItemsInCart,
+
+    follow: follow,
+
+    unfollow: unfollow,
+
+    getAllFollowings: getAllFollowings
 }
 
 async function useLogin(dispatch, username, password) {
@@ -142,21 +154,6 @@ async function getAllFollowings(token)
    
     return http.get("/followings", config)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export default UserServices;
 

@@ -1,7 +1,8 @@
 import http from "../axios-http"
 
 const commentServices = {
-    
+    addComment: addComment,
+    deleteComment: deleteComment
 }
 
 async function addComment(token, content, target_user, item_id) {
@@ -24,7 +25,7 @@ async function deleteComment(token, comment_id) {
     return http.post(`/delete_comment/${comment_id}`, data, config)
 }
 
-
+export default commentServices
 
 
 
