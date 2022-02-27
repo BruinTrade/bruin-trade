@@ -6,19 +6,32 @@ import { Menu, Transition } from '@headlessui/react'
 import UserServices from './../backend_services/user_services.js';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
+//import { useAlert } from 'react-alert'
 
 function NavBar() {
-
+    //const alert = useAlert()
     const navigate = useNavigate();
 
     const login = useSelector((state) => state.loginStatus.login)
     const location = useSelector((state) => state.userInfo.location)
     const numCartItem = 0;
     
-    const [searchValue, setSearchValue] = useState();
+    const [searchValue, setSearchValue] = useState("");
     
+
+    
+    
+
     function search() {
-        navigate(`/search/${searchValue}`)
+        if (searchValue !== "")
+        {
+            navigate(`/search/${searchValue}`)
+        }
+        else
+        {
+            navigate("/search/get_all_items")
+        }
+       
     }
 
     return (

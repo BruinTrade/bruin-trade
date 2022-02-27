@@ -1,28 +1,52 @@
 import React, { useState } from 'react'
 import Form from "./form.js";
 import { useSelector } from 'react-redux'
-
+import { useAlert } from 'react-alert'
+import commentServices from '../backend_services/comment_services.js';
 //props.targetUser
 
 export default function CreateComment(props) {
 
-    const [commentBody, setCommentBody] = useState("");
     
+    const alert = useAlert()
+    const token = useSelector((state) => state.loginStatus.token)
+    const replyTargetContainer = useSelector((state) => state.replyTarget)
+    const [commentBody, setCommentBody] = useState("");
 
-    //const username = useSelector((state) => state.userInfo.username)
-    //const token = useSelector((state) => state.loginStatus.token)
-    let replyTargetContainer = useSelector((state) => state.replyTarget)
+    //addComment(token, content, target_user, item_id)
 
-   
+    async function handleCreateComment() {
+        let replyTarget
+        if (replyTargetContainer.replyTarget !== null)
+        {
+            replyTarget = replyTargetContainer.replyTarget
+        }
+        else
+        {
+            replyTarget = props.item_owner
+        }
 
-    function handleCreateComment() {
-        // const res = ItemServices.createComment(
-        //     token,
-        //     item_id,
-        //     replyTargetContainer.replyTarget,
-        //     commentBody,
-        // );
-        // console.log(res);
+        if (commentBody === "")
+        {
+            alert.show("Please provide comment content")
+            return
+        }
+    
+        const res = await commentServices.addComment(
+           token,
+           commentBody,
+           replyTarget,
+           Date().toLocaleString(),
+           props.item_id,
+        );
+        if (res.status !== 200)
+        {
+            alert.show(res.data.errors)
+        }
+        else
+        {
+            setCommentBody("")
+        }
     }
 
     return (

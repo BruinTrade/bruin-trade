@@ -1,15 +1,16 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { setReplyTarget } from '../redux/slices/replyTarget';
-
+import commentServices from '../backend_services/comment_services';
 
 
 export default function Comment(props) {
 
+    
     const dispatch = useDispatch();
 
     const username = useSelector((state) => state.userInfo.username)
-
+    const token = useSelector((state) => state.loginStatus.token)
     // const author = props.author;
     // const targetUser = props.targetUser;
     // const commentBody = props.commentBody;
@@ -22,8 +23,11 @@ export default function Comment(props) {
     }
 
     function deleteComment() {
-
+        commentServices.deleteComment(token, props.comment_id).then(() => {
+            
+        })
     }
+
 
     return (
         <div className="w-1180px pb-40px">

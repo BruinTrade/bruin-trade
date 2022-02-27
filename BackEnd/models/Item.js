@@ -38,9 +38,9 @@ class Item {
       let query;
       //can have more filters
       if (input_query.title) {
-        query = { $text: { $search: input_query.title } };
+        query = { $text: { $search: input_query.title} };
       } else if (input_query.owner) {
-        query = { $text: { $search: input_query.owner } };
+        query = { $text: { $search: input_query.owner} };
       }
 
       let matching_items;
@@ -113,23 +113,24 @@ class Item {
         reject("failed to get item details")
       }
 
-      const related_comments = item_details.relatedComments
-      const filtered_comments = []
-      if (current_user != temp_item_info.owner)
-      {
-        related_comments.forEach(comment => {
-          if (comment.author === current_user || comment.target_user === current_user || !comment.target_user)
-          {
-            filtered_comments.push(comment)
-          }
-        });
-        item_details = {...item_details, relatedComments : filtered_comments}
-        resolve(item_details)
-      }
-      else
-      {
-        resolve(item_details)
-      }
+      // const related_comments = item_details.relatedComments
+      // const filtered_comments = []
+      // if (current_user != temp_item_info.owner)
+      // {
+      //   related_comments.forEach(comment => {
+      //     if (comment.author === current_user || comment.target_user === current_user || !comment.target_user)
+      //     {
+      //       filtered_comments.push(comment)
+      //     }
+      //   });
+      //   item_details = {...item_details, relatedComments : filtered_comments}
+      //   resolve(item_details)
+      // }
+      // else
+      // {
+      //   resolve(item_details)
+      // }
+      resolve(item_details)
     });
   }
 

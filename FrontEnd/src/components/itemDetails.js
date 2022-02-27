@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import ItemServices from "../backend_services/item_services.js"
-import { useSelector } from 'react-redux'
 import CommentList from "../components/commentList.js"
 import CreateComment from "../components/createComment.js"
+import { useSelector } from 'react-redux';
 
 
 
@@ -42,26 +42,26 @@ function header(label) {
   );
 }
 
-const comments = [
-  {
-    createdTime: "Sun May 24 2020 09:59:56 GMT+0530 (India Standard Time)",
-    commentBody: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's stanLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Isum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.dard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.Ï",
-    targetUser: "Shawn",
-    author: "bob"
-  },
-  {
-    createdTime: "Sun May 24 2020 09:59:56 GMT+0530 (India Standard Time)",
-    commentBody: "Lorem Ipsumto make a type specimen book. It has survived not only five centuries.Ï",
-    targetUser: "bob",
-    author: "Alex"
-  },
-  {
-    createdTime: "Sun May 24 2020 09:59:56 GMT+0530 (India Standard Time)",
-    commentBody: "Lorem Ipsumto Lorem make a type specimen m Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's stanLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Isum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.dard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.Ï",
-    targetUser: "Bob",
-    author: "Shawn"
-  }
-]
+// const comments = [
+//   {
+//     createdTime: "Sun May 24 2020 09:59:56 GMT+0530 (India Standard Time)",
+//     commentBody: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's stanLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Isum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.dard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.Ï",
+//     targetUser: "Shawn",
+//     author: "bob"
+//   },
+//   {
+//     createdTime: "Sun May 24 2020 09:59:56 GMT+0530 (India Standard Time)",
+//     commentBody: "Lorem Ipsumto make a type specimen book. It has survived not only five centuries.Ï",
+//     targetUser: "bob",
+//     author: "Alex"
+//   },
+//   {
+//     createdTime: "Sun May 24 2020 09:59:56 GMT+0530 (India Standard Time)",
+//     commentBody: "Lorem Ipsumto Lorem make a type specimen m Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's stanLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Isum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.dard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries.Ï",
+//     targetUser: "Bob",
+//     author: "Shawn"
+//   }
+// ]
 
 //------------------------------------------------------------
 
@@ -90,13 +90,13 @@ function ItemDetails(props) {
   const [desc, setDesc] = useState("");
   const [images, setImages] = useState([])
   const [tags, setTags] = useState([])
-
+  const [itemOwner, setItemOwner] = useState("")
   const [imgState, setImgState] = useState(0);
+  const [relatedComments, setRelatedComments] = useState([])
   const totTags = tags.length;
 
-
-
   const token = useSelector((state) => state.loginStatus.token)
+
 
   useEffect(async () => {
     const res = await ItemServices.getItemDetailsById(props.id, token);
@@ -106,8 +106,10 @@ function ItemDetails(props) {
     setDesc(data.description)
     setPrice(data.price)
     setImages(data.images)
+    setItemOwner(data.owner)
+    setRelatedComments(data.relatedComments)
     setLoading(false)
-  }, [])
+  }, [relatedComments])
 
   // initialization function for tags and images
   function init(what) {
@@ -236,8 +238,8 @@ function ItemDetails(props) {
             </div>
           </div>
         </div>
-        <CommentList comments={comments} />
-        <CreateComment />
+        <CommentList comments={relatedComments} />
+        <CreateComment item_id={props.id} item_owner={itemOwner}/>
       </div>
 
     );

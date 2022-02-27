@@ -6,10 +6,11 @@ export default class CommentsController {
     const content = req.body.content;
     const item_id = req.params.item_id;
     const target_user = req.body.target_user;
+    const created_time = req.body.created_time;
     if (!content || !item_id) {
       res.json({ error: "must provide content and item_id" });
     }
-    let temp_comment = new Comment(author, content, item_id, target_user);
+    let temp_comment = new Comment(author, content, item_id, target_user, created_time);
     temp_comment
       .addComment()
       .then((message) => {

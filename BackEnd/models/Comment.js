@@ -4,19 +4,21 @@ import Item from "./Item.js";
 let commmentCollection;
 
 class Comment {
-  constructor(author, content, item_id, target_user) {
+  constructor(author, content, item_id, target_user, created_time) {
     if (target_user) {
       this.data = {
         author: author,
         content: content,
         item_id: item_id,
-        target_user: target_user
+        target_user: target_user,
+        created_time: created_time
       };
     } else {
       this.data = {
         author: author,
         content: content,
         item_id: item_id,
+        created_time: created_time
       };
     }
     this.errors = [];

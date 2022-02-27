@@ -23,6 +23,7 @@ export const loginStatus = createSlice({
             Cookies.remove('token');
             state.login = false;
             state.token = null;
+            state.replyTarget = null;
         }
     }
 })
