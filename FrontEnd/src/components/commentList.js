@@ -7,7 +7,7 @@ export default function CommentList(props) {
   //console.log(comments)
 
   return props.comments.length ? (
-    <div className="grid grid-cols-1 w-1354px bg-white pt-40px pr-25px pl-40px rounded-25px drop-shadow-md place-items-center">
+    <div className="flex flex-col w-1354px bg-white pt-40px pr-25px pl-40px rounded-25px drop-shadow-md place-items-center">
       {comments.map((element) => {
         return (
           <Comment
@@ -16,6 +16,7 @@ export default function CommentList(props) {
             commentBody={element.content}
             createdTime={element.created_time}
             comment_id={element._id}
+            updateState={props.updateState}
           />
         );
       })}

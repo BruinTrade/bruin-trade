@@ -3,7 +3,6 @@ import Form from "./form.js";
 import { useSelector } from 'react-redux'
 import { useAlert } from 'react-alert'
 import commentServices from '../backend_services/comment_services.js';
-//props.targetUser
 
 export default function CreateComment(props) {
 
@@ -12,8 +11,6 @@ export default function CreateComment(props) {
     const token = useSelector((state) => state.loginStatus.token)
     const replyTargetContainer = useSelector((state) => state.replyTarget)
     const [commentBody, setCommentBody] = useState("");
-
-    //addComment(token, content, target_user, item_id)
 
     async function handleCreateComment() {
         let replyTarget
@@ -31,12 +28,14 @@ export default function CreateComment(props) {
             alert.show("Please provide comment content")
             return
         }
-    
+
+        const time = Date().toLocaleString()
+
         const res = await commentServices.addComment(
            token,
            commentBody,
            replyTarget,
-           Date().toLocaleString(),
+           time,
            props.item_id,
         );
         if (res.status !== 200)
@@ -47,10 +46,12 @@ export default function CreateComment(props) {
         {
             setCommentBody("")
         }
+
+        props.updateState();
     }
 
     return (
-        <div className="flex flex-col pt-25px items-center w-1354px h-440px bg-white pt-52px rounded-25px drop-shadow-md ">
+        <div className="flex flex-col pt-25px items-center w-1354px h-440px bg-white rounded-25px drop-shadow-md ">
             <Form id="comment" 
                 label={replyTargetContainer.replyTarget ? `@${replyTargetContainer.replyTarget}` : ""}
                 placeholder="Create a new comment here" 

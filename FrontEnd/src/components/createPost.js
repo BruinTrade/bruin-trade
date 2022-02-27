@@ -2,38 +2,73 @@ import React, { useState } from 'react'
 import Form from "./form.js";
 import ItemServices from "../backend_services/item_services.js";
 import { useSelector } from 'react-redux'
-
+import { useAlert } from 'react-alert'
 import UploadImage from "./uploadImage.js";
 
 const conditions = ["Great", "Good", "Poor"];
-
+const categories = ["Books", "Music", "Fashion", "Computers", "Audios", "Toys", "Other"]
 
 export default function CreatePost() {
+    const alert = useAlert()
 
     const [title, setTitleState] = useState("");
     const [location, setLocationState] = useState("");
     const [price, setPriceState] = useState("");
+    const [categoryTag, setCategoryTagState] = useState(categories[6]);
+    const [description, setDescriptionState] = useState("");
     const [condition, setConditionState] = useState(conditions[0]);
-    const [categoryTag, setCategoryTagState] = useState([]);
     const [images, setImages] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
-    const [description, setDescriptionState] = useState("");
+   
 
     const username = useSelector((state) => state.userInfo.username)
     const token = useSelector((state) => state.loginStatus.token)
 
     async function handleCreatePost() {
-        console.log("Create Item")
-        console.log("token from call: " + token);
+        let isvalid = true
+        if (title === "")
+        {
+            alert.show("Please provide a title")
+            isvalid = false
+        }
+
+        if (location === "")
+        {
+            alert.show("Please provide a location")
+            isvalid = false
+        }
+
+        if (price === "")
+        {
+            alert.show("Please provide a price")
+            isvalid = false
+        }
+
+        if (description === "")
+        {
+            alert.show("Please provide a description")
+            isvalid = false
+        }
+
+        if (!isvalid)
+        {
+            return
+        }
+
+        // console.log("Create Item")
+        // console.log("token from call: " + token);
         const res = await ItemServices.create(
             username,
             token,
             title,
             price,
             description,
-            images
+            images,
+            condition,
+            location,
+            categoryTag
         );
-        console.log(res);
+        // console.log(res);
     }
 
     function handleUploadImage(event) {
@@ -71,17 +106,23 @@ export default function CreatePost() {
                         onChange={(event) => setPriceState(event.target.value)} 
                         type="text" 
                         required={true}/>
-                    <Form id="condition"
+                     <Form id="condition"
                         label="Condition"
                         formType="selection"
                         options={conditions}
                         selected={condition}
                         onChange={setConditionState}
+                        required={true}/>    
+                    <Form id="category"
+                        label="Category"
+                        formType="selection"
+                        options={categories}
+                        selected={categoryTag}
+                        onChange={setCategoryTagState}
                         required={true}/>
                 </div>
 
                 <div className='flex flex-col justify-start item-start ml-60px w-full'>
-
                     <PhotoUpload urls={imageUrls} handleUploadImage={(event) => handleUploadImage(event)}/>
                 </div>
             </div>
@@ -90,10 +131,11 @@ export default function CreatePost() {
                 label="Description" 
                 width={750}
                 height={200}
-                placeholder="Optional description of the item" 
+                placeholder="Description of the item" 
                 value={description} 
                 onChange={(event) => setDescriptionState(event.target.value)} 
-                type="text"/>
+                type="text"
+                required={true}/>
 
             <div className='flex flex-row justify-end mt-30px'>
                 <button onClick={ () => handleCreatePost() } className="w-150px h-50px rounded-full bg-blue-400 text-18px text-white bottom-0 right-0 mb-30px hover:bg-blue-500 active:bg-blue-700">

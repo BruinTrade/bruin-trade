@@ -93,10 +93,10 @@ function ItemDetails(props) {
   const [itemOwner, setItemOwner] = useState("")
   const [imgState, setImgState] = useState(0);
   const [relatedComments, setRelatedComments] = useState([])
+  const [changeFlag, setChangeFlag] = useState(true)
   const totTags = tags.length;
 
   const token = useSelector((state) => state.loginStatus.token)
-
 
   useEffect(async () => {
     const res = await ItemServices.getItemDetailsById(props.id, token);
@@ -109,12 +109,12 @@ function ItemDetails(props) {
     setItemOwner(data.owner)
     setRelatedComments(data.relatedComments)
     setLoading(false)
-  }, [relatedComments])
+  }, [changeFlag])
 
   // initialization function for tags and images
   function init(what) {
     let out = [];
-    let totItems = what === 'tags' ? totTags : images.length;
+    let totItems = what === 'tags' ? totTags : 0;
     for (let k = 0; k < totItems; k++) {
       if (what === 'tags') {
         out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
@@ -172,7 +172,7 @@ function ItemDetails(props) {
         <div className="w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md mt-40px">
           <div className="flex-col">
             <img
-              src={images[imgState]}
+              src={images ? images[imgState] : null}
               alt="Oops, something went wrong."
               className="w-600px h-500px border-gray-100 border-2 mb-15px overflow-hidden" />
             {/* Initialize the tiles*/}
@@ -190,7 +190,7 @@ function ItemDetails(props) {
                 <div className="h-52px w-105px flex-col">
                   {header("Price")}
                   <div className="text-28px mb-20px font-avenir-reg text-gold">
-                    {price}
+                    ${price}
                   </div>
 
                   {header("Condition")}
@@ -211,10 +211,10 @@ function ItemDetails(props) {
               </div>
 
               <div className="flex flex-col">
-                <div className="w-163px h-128px mb-20px border-2">
+                <div className="w-163px h-128px mb-20px">
                   {/* Image is just there as a placeholder */}
                   <img
-                    className="h-full m-auto"
+                    className="h-80px w-80px rounded-full m-auto"
                     alt="Oops, something went wrong."
                     src="https://monstar-lab.com/global/wp-content/uploads/sites/11/2019/04/male-placeholder-image.jpeg"
                   ></img>
@@ -238,8 +238,8 @@ function ItemDetails(props) {
             </div>
           </div>
         </div>
-        <CommentList comments={relatedComments} />
-        <CreateComment item_id={props.id} item_owner={itemOwner}/>
+        <CommentList comments={relatedComments} updateState={() => setChangeFlag(!changeFlag)}/>
+        <CreateComment item_id={props.id} item_owner={itemOwner} updateState={() => setChangeFlag(!changeFlag)} />
       </div>
 
     );

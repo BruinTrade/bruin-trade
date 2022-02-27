@@ -32,7 +32,7 @@ export default class ItemServices {
         return http.post(`/${username}/${item_id}/edit`, data, config)
     }
 
-    static async create(username, token, new_title, new_price, new_description, image_array) {
+    static async create(username, token, new_title, new_price, new_description, image_array, condition, location, tags) {
         const config = {
             headers: {
                 access_control: token,
@@ -100,7 +100,7 @@ export default class ItemServices {
         
         //console.log(url_array)
 
-        const data = { title: new_title, price: new_price, description: new_description, images: [...url_array]}
+        const data = { title: new_title, price: new_price, description: new_description, images: [...url_array], condition: condition, location: location, tags: tags}
 
         return http.post(`/${username}/createItem`, data, config)
     }

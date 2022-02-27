@@ -24,7 +24,7 @@ export default function Comment(props) {
 
     function deleteComment() {
         commentServices.deleteComment(token, props.comment_id).then(() => {
-            
+            props.updateState()
         })
     }
 
