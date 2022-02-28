@@ -32,7 +32,7 @@ async function useLogin(dispatch, username, password) {
     if(status === 200) {
         try {
             const data = res.data;
-            console.log(data.token)
+            //console.log(data.token)
             //set login status
             dispatch(login(data.token));
             //set user info

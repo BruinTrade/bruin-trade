@@ -5,6 +5,7 @@ import CommentList from "../components/commentList.js"
 import CreateComment from "../components/createComment.js"
 import { useSelector } from 'react-redux';
 import { useAlert } from 'react-alert'
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -96,12 +97,13 @@ function ItemDetails(props) {
   const [itemOwner, setItemOwner] = useState("")
   const [relatedComments, setRelatedComments] = useState([])
   const [changeFlag, setChangeFlag] = useState(true)
+
   const totTags = tags.length;
 
   const alert = useAlert()
   
   const token = useSelector((state) => state.loginStatus.token)
-
+  const navigate = useNavigate()
   const myRef = useRef(null)
   const executeScroll = () => {
     myRef.current.scrollIntoView();
@@ -110,6 +112,11 @@ function ItemDetails(props) {
 
   useEffect(async () => {
     const res = await ItemServices.getItemDetailsById(props.id, token);
+    if (res.status !== 200)
+    {
+      alert.show(res.data.errors ? res.data.errors : res.data.error)
+      navigate("/")
+    }
     const data = res.data
     console.log(data)
     setName(data.title)

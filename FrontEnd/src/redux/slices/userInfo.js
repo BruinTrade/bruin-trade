@@ -14,12 +14,12 @@ export const userInfo = createSlice({
     reducers: {
         setUsername: (state, action) => {
             //set username
-            Cookies.set('username', action.payload);
+            Cookies.set('username', action.payload, { expires: 7 });
             state.username = action.payload;
         },
         setLocation: (state, action) => {
             //set location
-            Cookies.set('location', action.payload);
+            Cookies.set('location', action.payload, { expires: 7 });
             state.location = action.payload;
         }
     }

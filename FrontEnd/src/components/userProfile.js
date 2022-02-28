@@ -9,7 +9,7 @@ export default function UserProfile() {
 
     return (
         <div className='flex flex-col justify-start items-center w-80px'>
-            <div id="profileImg" class="w-full h-80px rounded-full overflow-hidden bg-blue-100">
+            <div id="profileImg" className="w-full h-80px rounded-full overflow-hidden bg-blue-100">
                 <img src={profileImage} className="w-full h-full object-cover" />
             </div>
             <div id="username" className='flex flex-row justify-center text-16px text-gray-500 mt-10px'>
