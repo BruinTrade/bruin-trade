@@ -16,27 +16,28 @@ import ItemServices from "../backend_services/item_services";
 
 export default ItemDataProvider;
 
-function ItemDataProvider(previewType, item_id) {
+function ItemDataProvider(props) {
 
     let cond = "Great";
     let loc = "UCLA";
-  
+    const previewType = props.previewType
+    const item_id = props.item_id
+    
+    const token = useSelector((state) => state.loginStatus.token)
     const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState("");
     const [price, setPrice] = useState(0);
     const [desc, setDesc] = useState("");
     const [images, setImages] = useState([])
-    const [tags, setTags] = useState([])
     const [itemOwner, setItemOwner] = useState("")
-
-    //let title, price, desc, images, tags, itemOwner
-    const token = useSelector((state) => state.loginStatus.token)
-    console.log(item_id)
+    //const [tags, setTags] = useState([])
+  
+    //console.log(item_id)
 
     useEffect(() => {
         ItemServices.getItemDetailsById(item_id, token).then((res) => {
             const data = res.data
-            console.log("data", data)
+            //console.log("data", data)
             setTitle(data.title)
             let temp_description = data.description
             if (temp_description.length > 300)
@@ -47,16 +48,16 @@ function ItemDataProvider(previewType, item_id) {
             setPrice(data.price)
             setImages(data.images)
             setItemOwner(data.owner)
-            // title = data.title
-            // desc = data.description
-            // price = data.price
-            // images = data.images
-            // itemOwner = data.owner
             setLoading(false);
         })
-    }, [])
+    }, [item_id])
 
-    if(loading) return <div/>
+    
+
+    if(loading) 
+    {
+        return <div></div>
+    }
     
     if(previewType === "long")
         return <ItemPreviewLong id={item_id} title={title} price={price} description={desc} images={images ? images[0] : null} itemOwner={itemOwner} condition={cond} location={loc} />
@@ -117,7 +118,7 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
     const buttonsOthersPost = [
         <button type="button" className="text-blue-400 text-14px border border-1 border-blue-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); console.log("bob") ;addToWatchList()}}>Add to Watch List</button>
     ]
-    console.log(images)
+    //console.log(images)
     return (
         <Link to={`/post/${id}`}>
             <div className='w-1000px h-288px flex flex-row items-center justify-start bg-white rounded-12px pl-15px pr-30px'>
@@ -189,14 +190,16 @@ function StatusLabel({ title, children }) {
 }
 
 
-export function ItemPreviewList({ itemIds, type }) {
-    type = type ? type : "long"
-    itemIds = itemIds ? itemIds : []
+export function ItemPreviewList(props) {
+    const type = props.type ? props.type : "long"
+    const itemIds = props.itemIds ? props.itemIds : []
     return (
         <div className={`${type === "long" ? "flex flex-col space-y-20px" : "w-955px h-336px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto"}`}>
-            {itemIds.map((id) => (
-                ItemDataProvider(type, id)
-            ))}
+            {itemIds.map((id) => {
+                return <ItemDataProvider previewType={type} item_id={id}/>
+             }
+            )}
         </div>
     )
 }
+

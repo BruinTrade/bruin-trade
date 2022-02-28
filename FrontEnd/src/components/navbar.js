@@ -1,26 +1,27 @@
 import React, { Fragment, useState } from "react";
 import get_icon, { Icons } from "./icons_SVG.js"
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link } from "react-router-dom";
 import { Menu, Transition } from '@headlessui/react'
 import UserServices from './../backend_services/user_services.js';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
+import { setQuery } from '../redux/slices/query.js';
 //import { useAlert } from 'react-alert'
 
 function NavBar() {
     //const alert = useAlert()
     const navigate = useNavigate();
-
+    //const dispatch = useDispatch();
     const login = useSelector((state) => state.loginStatus.login)
     const location = useSelector((state) => state.userInfo.location)
     const numCartItem = 0;
     
     const [searchValue, setSearchValue] = useState("");
     
-
-    
-    
+    // function search() {
+    //     dispatch(setQuery(searchValue))
+    //     navigate("/search")
+    // }
 
     function search() {
         if (searchValue !== "")
@@ -31,7 +32,6 @@ function NavBar() {
         {
             navigate("/search/get_all_items")
         }
-       
     }
 
     return (

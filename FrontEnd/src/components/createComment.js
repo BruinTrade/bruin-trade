@@ -6,7 +6,6 @@ import commentServices from '../backend_services/comment_services.js';
 
 export default function CreateComment(props) {
 
-    
     const alert = useAlert()
     const token = useSelector((state) => state.loginStatus.token)
     const replyTargetContainer = useSelector((state) => state.replyTarget)

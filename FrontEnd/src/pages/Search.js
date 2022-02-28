@@ -1,7 +1,9 @@
+
 import React, { useEffect, useState } from "react";
 import { ItemPreviewList } from "../components/itemPreview";
-import { Routes, Route, useParams } from 'react-router-dom';
 import ItemServices from "../backend_services/item_services";
+import { Routes, Route, useParams } from 'react-router-dom';
+//import { useSelector } from 'react-redux'
 
 export default function Search() {
     return <Routes>
@@ -9,7 +11,8 @@ export default function Search() {
     </Routes>;
 }
 
-
+//!!!
+//subtle bug: if input "//////" as query... it's treated as part of the url and ignored
 
 function SearchResult() {
     let { id } = useParams();
@@ -31,7 +34,6 @@ function SearchResult() {
         }
     }, [id])
 
-
     return (
 
         loading ? <div className='mt-50px flex flex-row justify-center font-avenir-med text-300px text-gray-500'>
@@ -50,3 +52,4 @@ function SearchResult() {
             )
     )
 }
+
