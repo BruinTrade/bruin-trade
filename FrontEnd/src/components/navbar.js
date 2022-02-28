@@ -1,22 +1,40 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import get_icon, { Icons } from "./icons_SVG.js"
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from "react-router-dom";
 import { Menu, Transition } from '@headlessui/react'
 import UserServices from './../backend_services/user_services.js';
 import { useNavigate } from "react-router-dom";
-import { setQuery } from '../redux/slices/query.js';
-//import { useAlert } from 'react-alert'
+//import { setQuery } from '../redux/slices/query.js';
+import { useAlert } from 'react-alert'
 
 function NavBar() {
-    //const alert = useAlert()
     const navigate = useNavigate();
     //const dispatch = useDispatch();
     const login = useSelector((state) => state.loginStatus.login)
     const location = useSelector((state) => state.userInfo.location)
-    const numCartItem = 0;
+    const token =  useSelector((state) => state.loginStatus.token)
+    const cartChange = useSelector((state) => state.cartChange.cartChange)
+    const alert = useAlert()
     
     const [searchValue, setSearchValue] = useState("");
+    const [numCartItem, setNumCartItem] = useState(0);
+
+    useEffect(() => {
+        if (login)
+        {
+            UserServices.getItemsInCart(token).then((res) => {
+                if (res.status !== 200)
+                {
+                    alert.show(res.data.errors ? res.data.errors : res.data.error)
+                }
+                const data = res.data
+                //console.log("data", data)
+                setNumCartItem(data.cart.length)
+            })
+        }
+    }, [cartChange])
+    
     
     // function search() {
     //     dispatch(setQuery(searchValue))
@@ -33,6 +51,8 @@ function NavBar() {
             navigate("/search/get_all_items")
         }
     }
+
+   
 
     return (
         <div className="w-full flex flex-row justify-center">
@@ -68,10 +88,10 @@ function NavBar() {
 
                                 <NavbarLable label="Cart">
                                     <div className="static h-full">
-                                        <div className="absolute w-45px h-45px">
+                                        <div className="absolute w-45px h-45px" onClick={() => {navigate("/about")}}>
                                             {get_icon(Icons.cart)}
                                         </div>
-                                        <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold">
+                                        <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold" onClick={() => {navigate("/about")}}>
                                             {numCartItem ?? 0}
                                         </div>
                                     </div>

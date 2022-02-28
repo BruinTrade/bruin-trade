@@ -6,7 +6,8 @@ import CreateComment from "../components/createComment.js"
 import { useSelector } from 'react-redux';
 import { useAlert } from 'react-alert'
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from 'react-redux'
+import { setCartChange } from '../redux/slices/cartChangeFlag';
 
 
 // IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
@@ -83,11 +84,12 @@ function ItemDetails(props) {
   // on the big tile
   // default: 0
 
+  const dispatch = useDispatch()
+
   let cond = "Great";
   let loc = "UCLA";
 
   const [loading, setLoading] = useState(true);
-
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [desc, setDesc] = useState("");
@@ -96,6 +98,7 @@ function ItemDetails(props) {
   const [tags, setTags] = useState([])
   const [itemOwner, setItemOwner] = useState("")
   const [relatedComments, setRelatedComments] = useState([])
+  const [cart, setCart] = useState([])
   const [changeFlag, setChangeFlag] = useState(true)
 
   const totTags = tags.length;
@@ -117,8 +120,17 @@ function ItemDetails(props) {
       alert.show(res.data.errors ? res.data.errors : res.data.error)
       navigate("/")
     }
+    UserServices.getItemsInCart(token).then((res) => {
+      if (res.status !== 200)
+      {
+      alert.show(res.data.errors ? res.data.errors : res.data.error)
+      navigate("/")
+      }
+      setCart(res.data.cart.map(item => item._id)) 
+      //console.log("data", data)
+    })
     const data = res.data
-    console.log(data)
+    //console.log(data)
     setName(data.title)
     setDesc(data.description)
     setPrice(data.price)
@@ -191,9 +203,24 @@ function ItemDetails(props) {
       {
         alert.show(res.data.errors)
       }
+      dispatch(setCartChange())
+      setChangeFlag(!changeFlag)
     })
   }
   
+  function handleRemoveFromCart() 
+  {
+    UserServices.removeFromCart(token, props.id).then((res) => {
+      if (res.status !== 200)
+      {
+        alert.show(res.data.errors)
+      }
+      dispatch(setCartChange())
+      setChangeFlag(!changeFlag)
+    })
+  }
+
+  //console.log(cart)
 
   if (loading) {
     return <div />
@@ -258,6 +285,16 @@ function ItemDetails(props) {
                 >
                   Contact Seller
                 </button>
+                {
+                 
+                  cart.includes(props.id) ? <button
+                  onClick={handleRemoveFromCart}
+                  id="watch"
+                  className="w-160px h-50px rounded-full border-red-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-red-400"
+                >
+                  Remove From Cart
+                </button>
+                :
                 <button
                   onClick={handleAddToCart}
                   id="watch"
@@ -265,6 +302,7 @@ function ItemDetails(props) {
                 >
                   Add to Watchlist
                 </button>
+                }
               </div>
             </div>
           </div>
