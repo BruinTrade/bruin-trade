@@ -83,12 +83,14 @@ function ItemDetails(props) {
   // imgState keeps track of which image to show
   // on the big tile
   // default: 0
-
+  const alert = useAlert()
   const dispatch = useDispatch()
-
-  let cond = "Great";
-  let loc = "UCLA";
-
+  const token = useSelector((state) => state.loginStatus.token)
+  const navigate = useNavigate()
+  const myRef = useRef(null)
+  const executeScroll = () => {
+    myRef.current.scrollIntoView();
+  }
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
@@ -96,22 +98,14 @@ function ItemDetails(props) {
   const [images, setImages] = useState([])
   const [imgState, setImgState] = useState(0);
   const [tags, setTags] = useState([])
+  const [category, setCategory] = useState("")
   const [itemOwner, setItemOwner] = useState("")
+  const [loc, setLoc] = useState("")
+  const [cond, setCond] = useState("")
   const [relatedComments, setRelatedComments] = useState([])
   const [cart, setCart] = useState([])
   const [changeFlag, setChangeFlag] = useState(true)
-
   const totTags = tags.length;
-
-  const alert = useAlert()
-  
-  const token = useSelector((state) => state.loginStatus.token)
-  const navigate = useNavigate()
-  const myRef = useRef(null)
-  const executeScroll = () => {
-    myRef.current.scrollIntoView();
-
-  }
 
   useEffect(async () => {
     const res = await ItemServices.getItemDetailsById(props.id, token);
@@ -137,6 +131,9 @@ function ItemDetails(props) {
     setImages(data.images)
     setItemOwner(data.owner)
     setRelatedComments(data.relatedComments)
+    setCond(data.condition)
+    setCategory(data.tags)
+    setLoc(data.location)
     setLoading(false)
   }, [changeFlag])
 
@@ -219,6 +216,10 @@ function ItemDetails(props) {
       setChangeFlag(!changeFlag)
     })
   }
+  function sellerProfile()
+  {
+
+  }
 
   //console.log(cart)
 
@@ -284,6 +285,13 @@ function ItemDetails(props) {
                   className="w-160px h-50px rounded-full bg-blue-400 hover:bg-blue-500 font-roboto-reg text-18px mb-10px text-white"
                 >
                   Contact Seller
+                </button>
+                <button
+                  onClick={sellerProfile}
+                  id="sellerProfile"
+                  className="w-160px h-50px rounded-full bg-blue-300 hover:bg-blue-500 font-roboto-reg text-18px mb-10px text-white"
+                >
+                  Seller Profile
                 </button>
                 {
                  

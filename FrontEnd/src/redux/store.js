@@ -5,6 +5,7 @@ import loading from './slices/loading.js';
 import replyTarget from './slices/replyTarget.js';
 import query from './slices/query.js';
 import cartChange from './slices/cartChangeFlag.js';
+import sellingItemsChange from './slices/sellingItemsChange.js';
 
 export const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
         loading: loading,
         replyTarget: replyTarget,
         query: query,
-        cartChange: cartChange
+        cartChange: cartChange,
+        sellingItemsChange: sellingItemsChange
     },
 })

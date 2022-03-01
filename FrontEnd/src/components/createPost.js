@@ -4,13 +4,15 @@ import ItemServices from "../backend_services/item_services.js";
 import { useSelector } from 'react-redux'
 import { useAlert } from 'react-alert'
 import UploadImage from "./uploadImage.js";
+import { useNavigate } from 'react-router-dom';
+
 
 const conditions = ["Great", "Good", "Poor"];
 const categories = ["Books", "Music", "Fashion", "Computers", "Audios", "Toys", "Other"]
 
 export default function CreatePost() {
     const alert = useAlert()
-
+    const navigate = useNavigate()
     const [title, setTitleState] = useState("");
     const [location, setLocationState] = useState("");
     const [price, setPriceState] = useState("");
@@ -69,6 +71,7 @@ export default function CreatePost() {
             categoryTag
         );
         // console.log(res);
+        navigate("/about")
     }
 
     function handleUploadImage(event) {

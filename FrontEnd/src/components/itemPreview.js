@@ -3,6 +3,11 @@ import { useSelector } from 'react-redux';
 import { Link } from "react-router-dom";
 import get_icon, { Icons } from "./icons_SVG";
 import ItemServices from "../backend_services/item_services";
+import {useAlert} from "react-alert";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux'
+import { setSellingItemsChange } from '../redux/slices/sellingItemsChange';
+
 
 // const previewTypes = {
 //     long : "long",
@@ -18,8 +23,7 @@ export default ItemDataProvider;
 
 function ItemDataProvider(props) {
 
-    let cond = "Great";
-    let loc = "UCLA";
+    
     const previewType = props.previewType
     const item_id = props.item_id
     
@@ -30,6 +34,9 @@ function ItemDataProvider(props) {
     const [desc, setDesc] = useState("");
     const [images, setImages] = useState([])
     const [itemOwner, setItemOwner] = useState("")
+    const [loc, setLoc] = useState("")
+    const [cond, setCond] = useState("")
+    const [category, setCategory] = useState("")
     //const [tags, setTags] = useState([])
   
     //console.log(item_id)
@@ -40,7 +47,7 @@ function ItemDataProvider(props) {
             //console.log("data", data)
             setTitle(data.title)
             let temp_description = data.description
-            if (temp_description.length > 300)
+            if (temp_description && temp_description.length > 300)
             {
                 temp_description = (temp_description.slice(0, 300)) + "..."
             }
@@ -48,6 +55,9 @@ function ItemDataProvider(props) {
             setPrice(data.price)
             setImages(data.images)
             setItemOwner(data.owner)
+            setCond(data.condition)
+            setCategory(data.tags)
+            setLoc(data.location)
             setLoading(false);
         })
     }, [item_id])
@@ -60,15 +70,15 @@ function ItemDataProvider(props) {
     }
     
     if(previewType === "long")
-        return <ItemPreviewLong id={item_id} title={title} price={price} description={desc} images={images ? images[0] : null} itemOwner={itemOwner} condition={cond} location={loc} />
+        return <ItemPreviewLong hasDeleteButton={props.hasDeleteButton} id={item_id} title={title} price={price} description={desc} images={images ? images[0] : null} itemOwner={itemOwner} condition={cond} location={loc} token={token}/>
     else if(previewType === "short")
-        return <ItemPreviewShort id={item_id} title={title} price={price} image={images ? images[0] : null} itemOwner={itemOwner} />
+        return <ItemPreviewShort hasDeleteButton={props.hasDeleteButton} id={item_id} title={title} price={price} image={images ? images[0] : null} itemOwner={itemOwner} />
     else
         return <div/>
 }
 
 
-export function ItemPreviewShort({ id, title, price, image }) {
+export function ItemPreviewShort({ id, title, price, image, hasDeleteButton }) {
     return (
         <Link to={`post/${id}`}>
             <div className='w-250px h-288px flex flex-col item-center justify-between bg-white rounded-12px px-15px'>
@@ -92,7 +102,7 @@ export function ItemPreviewShort({ id, title, price, image }) {
 }
 
 
-export function ItemPreviewLong({ id, title, price, images, itemOwner, condition, location, description }) {
+export function ItemPreviewLong({ id, title, price, images, itemOwner, condition, location, description, hasDeleteButton, token}) {
     // console.log(id)
     // console.log(title)
     // console.log(price)
@@ -104,25 +114,39 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
 
     // const numWatching = 10;
     // const numLikes = 2;
+    const navigate = useNavigate()
+    const alert = useAlert()
+    const dispatch = useDispatch()
 
     function editPost() { }
     function removePost() { }
+    function addToWatchList() {}
+    function deleteItemHandler() {
+        ItemServices.delete(itemOwner, id, token).then((res) => {
+            if (res.status !== 200) {
+                alert.show(res.data.errors ? res.data.errors : res.data.error);
+                navigate("/");
+            }
+            dispatch(setSellingItemsChange())
+        })
+    }
 
-    function addToWatchList() { }
+    // const buttonsMyPost = [
+    //     <button type="button" className="text-12px text-red-500" onClick={() => editPost()}>edit</button>,
+    //     <button className="text-12px text-gray-400" onClick={() => removePost()}>remove</button>
+    // ]
 
-    const buttonsMyPost = [
-        <button type="button" className="text-12px text-red-500" onClick={() => editPost()}>edit</button>,
-        <button className="text-12px text-gray-400" onClick={() => removePost()}>remove</button>
-    ]
+    // const buttonsOthersPost = [
+    //     <button type="button" className="text-blue-400 text-14px border border-1 border-blue-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); console.log("bob") ;addToWatchList()}}>Add to Watch List</button>
+    // ]
 
-    const buttonsOthersPost = [
-        <button type="button" className="text-blue-400 text-14px border border-1 border-blue-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); console.log("bob") ;addToWatchList()}}>Add to Watch List</button>
-    ]
+  
+       
     //console.log(images)
     return (
         <Link to={`/post/${id}`}>
             <div className='w-1000px h-288px flex flex-row items-center justify-start bg-white rounded-12px pl-15px pr-30px'>
-                <div id="image" className="w-260px h-260px border border-1px border-gray-100 rounded-12px flex flex-col justify-center object-cover">
+                <div id="image" className="w-260px h-260px border border-1px border-gray-100 rounded-12px flex flex-col justify-center object-cover overflow-hidden">
                     <img src={images} />
                 </div>
                 <div id="detail" className="grow flex flex-col justify-start ml-10px">
@@ -161,6 +185,11 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
                     <div id="lower" className="flex flex-row justify-between">
                         <div className="text-gray-300 text-12px">{itemOwner}</div>
                         <div id="buttons" className="flex flex-row space-x-15px">
+                            {
+                                hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); console.log("bob") ;deleteItemHandler()}}>Delete Item</button>
+                                : 
+                                <div></div>
+                            }
                             {/* {buttonsOthersPost} */}
                         </div>
                     </div>
@@ -196,7 +225,7 @@ export function ItemPreviewList(props) {
     return (
         <div className={`${type === "long" ? "flex flex-col space-y-20px" : "w-955px h-336px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto"}`}>
             {itemIds.map((id) => {
-                return <ItemDataProvider previewType={type} item_id={id}/>
+                return <ItemDataProvider previewType={type} item_id={id} hasDeleteButton={props.hasDeleteButton}/>
              }
             )}
         </div>

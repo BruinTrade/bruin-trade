@@ -19,7 +19,9 @@ const UserServices = {
 
     unfollow: unfollow,
 
-    getAllFollowings: getAllFollowings
+    getAllFollowings: getAllFollowings,
+
+    getItemsBelongToUser: getItemsBelongToUser,
 }
 
 async function useLogin(dispatch, username, password) {
@@ -122,6 +124,21 @@ async function getItemsInCart(token)
     return http.get("/placeholder/cart", config)
 }
 
+async function getItemsBelongToUser(username)
+{
+    const res = await http.get(`/items?owner=${username}`)
+    if (res.status !== 200)
+    {
+        return { status: res.status, data: res.data };
+    }
+    const data = res.data.filter((item) => {
+        return item.owner === username
+    })
+    // console.log("data:")
+    // console.log(data)
+    return { status: res.status, data: data };
+}
+
 async function follow(token, target_user_id)
 {
     const config = {
@@ -154,6 +171,8 @@ async function getAllFollowings(token)
    
     return http.get("/followings", config)
 }
+
+
 
 export default UserServices;
 
