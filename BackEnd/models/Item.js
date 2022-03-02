@@ -169,6 +169,9 @@ class Item {
   }
 
   static async findItemsById(item_id_array) {
+    
+    item_id_array = item_id_array === undefined ? [] : item_id_array
+
     return new Promise(async (resolve, reject) => {
       let ObjectId_array = [];
       item_id_array.forEach((element) => {

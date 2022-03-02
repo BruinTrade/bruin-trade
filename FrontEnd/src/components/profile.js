@@ -70,7 +70,7 @@ function PreviewProfileItems(props) {
     return (
         <div className='w-full h-full grid grid-rows-1 grid-flow-col gap-x-9px overflow-x-auto'>
             {items.map((element) => (
-                <ConcisePreview itemid={element.id} img={element.src} text={element.text}/>
+                <ConcisePreview itemid={element.id} img={element.src} text={element.text} key={element.id}/>
             ))}
         </div>
     );
