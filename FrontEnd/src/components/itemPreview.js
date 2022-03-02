@@ -172,7 +172,7 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
                             </StatusLabel>
                             <div id="buttons" className="flex flex-row justify-end space-x-15px mb-5px">
                                 {
-                                    hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); console.log("bob") ;deleteItemHandler()}}>Delete Item</button>
+                                    hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); deleteItemHandler()}}>Delete Item</button>
                                     : 
                                     <div></div>
                                 }
