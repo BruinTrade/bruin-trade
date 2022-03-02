@@ -6,6 +6,7 @@ import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
 import { useNavigate } from "react-router-dom";
+
 //import commentServices from '../backend_services/comment_services';
 
 // TO-DO:
@@ -186,6 +187,7 @@ export default function ProfileDetails() {
       <div className="h-817px w-310px mr-30px rounded-25px pt-40px bg-white drop-shadow-md flex flex-col items-center">
         <UserProfile />
         <div className="flex flex-col items-start mb-38px mt-29px">
+          <SelectTab name="Watch List" selected={true} selectCallBack={() => {}}/>
           <div className="font-roboto-reg text-18px mb-5px text-gray-600">
             My Account
           </div>
@@ -277,3 +279,12 @@ export default function ProfileDetails() {
           ))}
         </div>
 */
+
+
+function SelectTab({ name, selected, selectCallBack }) {
+  return (
+    <div onClick={() => selectCallBack()} className={`flex items-center w-260px h-30px px-10px py-7px rounded-6px ${selected ? "bg-blue-50 text-blue-500" : "bg-white text-gray-500"} text-14px hover:bg-gray-100 leading-none`}>
+      {name}
+    </div>
+  );
+}

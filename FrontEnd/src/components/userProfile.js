@@ -1,14 +1,22 @@
 import React from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom';
 
-export default function UserProfile() {
-    const username = useSelector((state) => state.userInfo.username)
+export default function UserProfile(props) {
+    let username = useSelector((state) => state.userInfo.username)
+    username = props.username ? props.username : username
     const profileImage = useSelector((state) => state.userInfo.profileImage)
     const rating = useSelector((state) => state.userInfo.rating);
 
+    const navigate = useNavigate()
+    
+    function handleOnClick() {
+        navigate(`/profile/${username}`)
+    }
+
     return (
-        <div className='flex flex-col justify-start items-center w-80px'>
+        <div onClick={() => handleOnClick()} className='flex flex-col justify-start items-center w-80px'>
             <div id="profileImg" className="w-full h-80px rounded-full overflow-hidden bg-blue-100">
                 <img src={profileImage} className="w-full h-full object-cover" />
             </div>

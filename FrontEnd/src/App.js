@@ -5,6 +5,7 @@ import NavBar from "./components/navbar.js";
 import PageHome from "./pages/Home.js";
 import PageAbout from "./pages/About.js";
 import PagePostIndex from "./pages/Post.js";
+import PageProfile from "./pages/Profile.js";
 import PageSignup from "./pages/Signup.js";
 import PageLogin from "./pages/Login.js";
 import PageCreatePost from "./pages/CreatePost.js";
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/" element={<PageHome />} />
             <Route path="/post/*" element={<PagePostIndex />} />
             <Route path="/about" element={<PageAbout />} />
+            <Route path="/profile/*" element={<PageProfile />} />
             <Route path="/signup" element={<PageSignup />} />
             <Route path="/login" element={<PageLogin />} />
             <Route path="/components" element={<PageComponentGallery />} />

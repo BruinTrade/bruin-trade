@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import { setCartChange } from '../redux/slices/cartChangeFlag';
 
+import UserProfile from "./userProfile.js";
 
 // IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
 // will appear cutoff and may or may not overflow.
@@ -124,7 +125,7 @@ function ItemDetails(props) {
       //console.log("data", data)
     })
     const data = res.data
-    //console.log(data)
+    console.log(data)
     setName(data.title)
     setDesc(data.description)
     setPrice(data.price)
@@ -269,16 +270,8 @@ function ItemDetails(props) {
                 </div>
               </div>
 
-              <div className="flex flex-col">
-                <div className="w-163px h-128px mb-20px">
-                  {/* Image is just there as a placeholder */}
-                  <img
-                    className="h-80px w-80px rounded-full m-auto"
-                    alt="Oops, currently no image available."
-                    src="https://monstar-lab.com/global/wp-content/uploads/sites/11/2019/04/male-placeholder-image.jpeg"
-                  ></img>
-                  {/* Profile Component */}
-                </div>
+              <div className="flex flex-col items-center w-160px">
+                <UserProfile username={itemOwner}/>
                 <button
                   onClick={executeScroll}
                   id="contact"
