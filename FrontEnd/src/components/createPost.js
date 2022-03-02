@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const conditions = ["Great", "Good", "Poor"];
-const categories = ["Books", "Music", "Fashion", "Computers", "Audios", "Toys", "Other"]
+const categories = ["Books", "Music", "Fashion", "Computers", "Audios", "Toys", "Furnitures", "Electronics", "Other"]
 
 export default function CreatePost() {
     const alert = useAlert()
@@ -16,7 +16,7 @@ export default function CreatePost() {
     const [title, setTitleState] = useState("");
     const [location, setLocationState] = useState("");
     const [price, setPriceState] = useState("");
-    const [categoryTag, setCategoryTagState] = useState(categories[6]);
+    const [categoryTag, setCategoryTagState] = useState(categories[8]);
     const [description, setDescriptionState] = useState("");
     const [condition, setConditionState] = useState(conditions[0]);
     const [images, setImages] = useState([]);

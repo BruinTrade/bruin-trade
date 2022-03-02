@@ -33,8 +33,6 @@ const comments = [
 export default function PageComponentGallery() {
     return (
         <div className="flex flex-col space-y-10">
-            <ItemPreview.Short />
-            <ItemPreview.Long />
             <ConcisePreview />
             <SignUp/>
             <SignIn/>
