@@ -283,6 +283,7 @@ function ItemDetails(props) {
                 >
                   Contact Seller
                 </button>
+                {/*
                 <button
                   onClick={sellerProfile}
                   id="sellerProfile"
@@ -290,6 +291,7 @@ function ItemDetails(props) {
                 >
                   Seller Profile
                 </button>
+                */}
                 {
                  
                   cart.includes(props.id) ? <button

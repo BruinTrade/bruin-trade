@@ -105,6 +105,8 @@ export function ItemPreviewShort({ id, title, price, image, itemOwner, hasDelete
 
 export function ItemPreviewLong({ id, title, price, images, itemOwner, condition, location, description, hasDeleteButton, token}) {
 
+    const username = useSelector((state) => state.userInfo.username)
+
     const navigate = useNavigate()
     const alert = useAlert()
     const dispatch = useDispatch()
@@ -120,6 +122,16 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
             }
             dispatch(setSellingItemsChange())
         })
+    }
+
+    let local_hasDeleteButton
+    if (username === itemOwner)
+    {   
+        local_hasDeleteButton = hasDeleteButton
+    }
+    else
+    {
+        local_hasDeleteButton = false
     }
 
     // const buttonsMyPost = [
@@ -172,7 +184,7 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
                             </StatusLabel>
                             <div id="buttons" className="flex flex-row justify-end space-x-15px mb-5px">
                                 {
-                                    hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); deleteItemHandler()}}>Delete Item</button>
+                                    local_hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); deleteItemHandler()}}>Delete Item</button>
                                     : 
                                     <div></div>
                                 }
