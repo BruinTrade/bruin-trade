@@ -60,8 +60,8 @@ export default function PageHome() {
     ]
 
     return (
-      <div className="flex flex-row">
-        <div className="mt-63px ml-80px flex flex-col space-y-30px">
+      <div className="flex flex-row justify-center">
+        <div className="mt-63px flex flex-col space-y-30px">
           <div>
             <div className="pl-25px avenir-med text-gray-500 text-20px mb-10px">
               Trending Items
@@ -76,7 +76,7 @@ export default function PageHome() {
             <TradingItems items={suggests} />
           </div>
         </div>
-        <div className="w-357px h-817px mt-20px ml-40px mr-80px bg-white pr-25px pl-25px flex flex-row justify-between rounded-25px">
+        <div className="w-357px h-817px mt-20px ml-40px bg-white pr-25px pl-25px flex flex-row justify-between rounded-25px">
           <ProfilePage />
         </div>
       </div>

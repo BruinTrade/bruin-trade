@@ -1,6 +1,6 @@
 import http from "../axios-http"
 import { login, logout } from '../redux/slices/loginStatus.js';
-import { setLocation, setUsername } from '../redux/slices/userInfo.js';
+import { setLocation, setUsername, setEmail } from '../redux/slices/userInfo.js';
 
 const UserServices = {
     login : useLogin,
@@ -39,6 +39,7 @@ async function useLogin(dispatch, username, password) {
             dispatch(login(data.token));
             //set user info
             dispatch(setUsername(data.username));
+            dispatch(setEmail(data.email));
             dispatch(setLocation(data.location));
             return { status: 200 }
     //process failed

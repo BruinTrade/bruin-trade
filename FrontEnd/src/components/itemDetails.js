@@ -271,7 +271,11 @@ function ItemDetails(props) {
               </div>
 
               <div className="flex flex-col items-center w-160px">
-                <UserProfile username={itemOwner}/>
+                <div className="mb-20px">
+                  <UserProfile username={itemOwner}/>
+                </div>
+                
+          
                 <button
                   onClick={executeScroll}
                   id="contact"

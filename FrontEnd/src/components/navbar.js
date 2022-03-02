@@ -87,11 +87,11 @@ function NavBar() {
                                 </NavbarLable>
 
                                 <NavbarLable label="Cart">
-                                    <div className="static h-full">
-                                        <div className="absolute w-45px h-45px" onClick={() => {navigate("/about")}}>
+                                    <div className="static h-full" onClick={() => {navigate("/profile", { state: 1 })}}>
+                                        <div className="absolute w-45px h-45px" >
                                             {get_icon(Icons.cart)}
                                         </div>
-                                        <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold" onClick={() => {navigate("/about")}}>
+                                        <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold" >
                                             {numCartItem ?? 0}
                                         </div>
                                     </div>
@@ -160,7 +160,7 @@ function NavbarProfile() {
                     onClick={() => callBackFunction()}
                     className={`${
                     active ? 'bg-blue-50' : ''
-                    } group flex rounded-md items-center w-full text-14px text-gray-500'`}
+                    } group flex rounded-md items-center w-full text-14px text-gray-500`}
                 >
                     <div className="h-40px">
                         <div className="w-full h-full flex items-center px-12px">
@@ -204,8 +204,8 @@ function NavbarProfile() {
                 >
                     <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
                         <DropdownMenuItem label="Create New Post" callBackFunction={() => navigate('/create-post')}/>
-                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/about')}/>
-                        <DropdownMenuItem label="Cart" callBackFunction={() => navigate('/about')}/> 
+                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/profile', { state: 7 })}/>
+                        <DropdownMenuItem label="Cart" callBackFunction={() => navigate('/profile', { state: 1 })}/> 
                         <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>
                     </Menu.Items>
                 </Transition>

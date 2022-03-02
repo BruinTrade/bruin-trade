@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import UserProfile from "./userProfile";
+import UserProfile, { UserProfileSmall } from "./userProfile";
 import Form from "./form";
 import { ItemPreviewList } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
@@ -13,184 +13,330 @@ import { useNavigate } from "react-router-dom";
 // - finish subscriptions and implement subscriptions page function
 // - implement everything else (watch list, orders, sold, location)
 
-export default function ProfileDetails() {
-  const original_username = useSelector((state) => state.userInfo.username);
-  const token = useSelector((state) => state.loginStatus.token);
-  const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
-  const alert = useAlert();
-  const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-  const [state, setState] = useState(0);
-  const [stateTag, setStateTag] = useState("Profile");
-  const [email, setEmail] = useState("theguy@gmail.com");
-  const [subPageNum, setSubPageNum] = useState(1);
-  const [username, setUsername] = useState(original_username);
-  const [watchlistItemIDs, setWatchlistItemIDs] = useState([]);
-  const [myItemIds, setMyItemIds] = useState([]);
-  //const watchlist = [1, 2, 3, 4, 5];
+export default function ProfileDetails({ preSelect, username }) {
+
+  const InfoPages = {
+    watchList : 0,
+    sellingItems : 1,
+    orders : 2,
+    sold : 3,
+    subscriptions : 4,
+  }
+  const SettingPages = {
+    location : 5,
+    profile : 6
+  }
+  const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile"]
+
+  const currentUsername = useSelector((state) => state.userInfo.username);
+  const user_name = username ? username : currentUsername
+  const ownerIsCurrentUser = user_name === currentUsername
+  const [selection, setSelectionState] = useState(preSelect ? preSelect : (ownerIsCurrentUser ? 6 : 1));
+
+  const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold]
+  const settingPages = [SettingPages.location, SettingPages.profile]
 
   useEffect(() => {
-    async function fetchData() {
-      UserServices.getItemsInCart(token).then(async (res) => {
+    setSelectionState(selection)
+  })
+
+  function getMenu(selection) {
+    switch (selection) {
+      case 0: // Watch List
+        return <WatchList />
+      case 1: //Selling Items
+        return <SellingItems username={ user_name } />
+      case 2: // Orders
+        return <Orders />
+      case 3: // Sold
+        return <Sold username={ user_name } />
+      case 4: // Subscriptions
+        return <Subscriptions />
+      case 5: // Location
+        return <Location />
+      case 6: // Profile
+        return <Profile />
+      default: // Profile
+        return <Profile />
+    }
+  }
+
+
+  return (
+    <div className="w-full flex flex-row justify-start mt-40px ml-40px">
+      <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white drop-shadow-md flex flex-col items-center">
+        <UserProfile username={username ? username : currentUsername} />
+        <div className="flex flex-col items-start mt-29px">
+          
+          <div className="font-roboto-reg text-18px mb-20px text-gray-600">
+            My Account
+          </div>
+          <div className="flex flex-col justify-start space-y-5px ">
+            {avaliablePages.map((page) => <SelectTab name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
+          </div>
+          
+        </div>
+        {ownerIsCurrentUser ? 
+          <div className="flex flex-col items-start mt-50px">
+            <div className="font-roboto-reg text-18px mb-20px text-gray-600">
+              Settings
+            </div>
+            <div className="flex flex-col justify-start space-y-5px ">
+              {settingPages.map((page) => <SelectTab name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
+            </div>
+          </div> 
+          : 
+          <SubscriptionButton username={user_name} />
+        }
+      </div>
+      <div className="mt-10px w-1000px">
+        <div className="font-roboto-reg text-16px ml-20px text-gray-500">
+          {PageNames[selection]}
+        </div>
+        <div className="h-5px" />
+        {getMenu(selection)}
+      </div>
+    </div>
+  );
+}
+
+
+function SelectTab({ name, selected, selectCallBack }) {
+  return (
+    <div onClick={() => selectCallBack()} className={`flex items-center w-260px h-30px px-10px py-7px rounded-6px ${selected ? "bg-blue-50 text-blue-500" : "bg-white text-gray-500 hover:text-gray-400 hover:bg-blue-50 "} text-14px  leading-none`}>
+      {name}
+    </div>
+  );
+}
+
+function WatchList() {
+
+  const token = useSelector((state) => state.loginStatus.token);
+
+  const alert = useAlert();
+
+  const [watchlistItemIDs, setWatchlistItemIDs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    UserServices.getItemsInCart(token).then((res) => {
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error);
+      } else {
+        setWatchlistItemIDs(res.data.cart.map((item) => item._id));
+      }
+      setLoading(false)
+    });
+  }, [])
+
+  if(loading) {
+    return <Loading />
+  } else if(watchlistItemIDs.length === 0) {
+    return <div className="flex flex-col justify-between h-100px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md pl-35px pt-40px rounded-25px">Nothing in watch list yet =.=</div>
+  } else {
+    return <ItemPreviewList itemIds={watchlistItemIDs} />
+  }
+}
+
+function Orders() {
+  return <div/>
+}
+
+function SellingItems({ username }) {
+
+  const alert = useAlert();
+  
+  const [myItemIds, setMyItemIds] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    UserServices.getItemsBelongToUser(username).then((res) => {
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error);
+      } else {
+        setMyItemIds(res.data.map((item) => item._id));
+      }
+      setLoading(false)
+    })
+  }, [])
+
+  if(loading) {
+    return <Loading />
+  } else if(myItemIds.length === 0) {
+    return <div className="flex flex-col justify-between h-100px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md pl-35px pt-40px rounded-25px">You have not listed any items yet =.=</div>
+  } else {
+    return <ItemPreviewList itemIds={myItemIds} hasDeleteButton={true}/>
+  }
+
+}
+
+function Sold() {
+  return <div/>
+}
+
+function SubscriptionButton({ username }) {
+  
+  const token = useSelector((state) => state.loginStatus.token);
+  const [subscribed, setSubscribed] = useState(false)
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    UserServices.getAllFollowings(token).then((res) => {
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error);
+      } else {
+        setSubscribed(res.data.users_followed.includes(username))
+        setLoading(false)
+      }
+    })
+  }, [])
+
+  function handleOnClick(username) {
+    if(subscribed) {
+      UserServices.unfollow(token, username).then((res) => {
         if (res.status !== 200) {
           alert.show(res.data.errors ? res.data.errors : res.data.error);
-          navigate("/");
+        } else {
+          setSubscribed(false)
         }
-        const data = res.data;
-        //console.log("data", data)
-        setWatchlistItemIDs(data.cart.map((item) => item._id));
-      });
-
-      const res2 = await UserServices.getItemsBelongToUser(original_username);
-      if (res2.status !== 200) {
-        alert.show(res2.data.errors ? res2.data.errors : res2.data.error);
-        navigate("/");
-      }
-      setMyItemIds(res2.data.map((item) => item._id));
-      setLoading(false);
+      })
+    } else {
+      UserServices.follow(token, username).then((res) => {
+        if (res.status !== 200) {
+          alert.show(res.data.errors ? res.data.errors : res.data.error);
+        } else {
+          setSubscribed(true)
+        }
+      })
     }
+  }
+  if(loading) 
+    return <div />
+  else {
+    return (
+      <div onClick={() => handleOnClick(username)} className={`flex justify-center items-center h-40px w-200px ${subscribed ? "bg-gray-300" : "bg-blue-400"} rounded-12px text-white text-16px mt-200px`}>
+        {subscribed ? "Unsubscribe" : "Subscribe"}
+      </div>
+    )
+  }
+}
 
-    fetchData();
-  }, [sellingItemsChange]);
+function Subscriptions() {
+
+  const token = useSelector((state) => state.loginStatus.token);
+
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  function fetchFollowing() {
+    UserServices.getAllFollowings(token).then((res) => {
+      console.log(res)
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error);
+      } else {
+        setSubscriptions(res.data.users_followed);
+      }
+      setLoading(false);
+    })
+  }
+
+  useEffect(() => {
+    fetchFollowing()
+  }, [])
+
+  if(loading) {
+    return <Loading />
+  } else {
+    return (
+      <div className="flex flex-col space-y-20px">
+        {subscriptions.map((username) => <Subscription username={username} unsubscribeCallback={fetchFollowing}/>)}
+      </div>
+      );
+  }
+}
+
+function Subscription({ username, unsubscribeCallback }) {
+
+  const token = useSelector((state) => state.loginStatus.token);
+
+  function unsubscribe () {
+    UserServices.unfollow(token, username).then((res) => {
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error);
+      } else {
+        unsubscribeCallback()
+      }
+    })
+  }
+
+  return (
+    <div className="w-1000px h-80px pl-31px pr-22px flex bg-white rounded-25px flex-row justify-between items-center ">
+       <UserProfileSmall username={username} />
+      <button
+        onClick={() => unsubscribe()}
+        className="font-roboto-reg text-10px bg-gray-200 text-gray-500 rounded-6px h-24px w-75px hover:bg-gray-300"
+      >
+        Unsubscribe
+      </button>
+    </div>
+  );
+}
+
+function Location() {
+  return <div/>
+}
+
+function Profile() {
 
   function saveChanges() {
     // to be implemented
   }
 
-  function unsubscribe() {
-    // to be implemented
-  }
-
-  function Sub() {
-    return (
-      <div className="w-1000px h-91px pl-31px pr-22px flex bg-white rounded-25px flex-row justify-between items-center overflow-hidden drop-shadow-md">
-        <div className="pt-20px flex flex-row text-gray-400 text-12px font-avenir-reg items-center">
-          <UserProfile />
-          <div className="w-8px" />
-          The_Guy {/* to be implemented */}
-        </div>
-        <button
-          onClick={() => unsubscribe()}
-          className="font-roboto-reg text-10px bg-gray-200 text-gray-500 rounded-6px h-24px w-75px hover:bg-gray-300"
-        >
-          Unsubscribe
-        </button>
-      </div>
-    );
-  }
-  //console.log("watchlistItemIDs", watchlistItemIDs)
-
-  // console.log("myItemIds:");
-  // console.log(myItemIds);
-  // console.log("watchlistItemIDs:");
-  // console.log(watchlistItemIDs);
-
-  let menu;
-  switch (state) {
-    case 1: // Watch List
-      menu =
-        watchlistItemIDs.length === 0 ? (
-          <div className="flex flex-col justify-between h-100px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md pl-35px pt-40px rounded-25px">Nothing in watch list yet =.=</div>
-        ) 
-        : 
-        (
-          <ItemPreviewList itemIds={watchlistItemIDs} />
-        );
-      break;
-    case 2: // Orders
-      menu = (
-        <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
-          work in progress...
-        </div>
-      );
-      break;
-    case 3: // Sold
-      menu = (
-        <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
-          work in progress...
-        </div>
-      );
-      break;
-    case 4: // Subscriptions
-      menu = (
-        <div className="w-1000px h-569px pl-35px pt-25px flex-col flex justify-between">
-          <Sub />
-          <Sub />
-          <Sub />
-          <Sub />
-          <div className="flex-row flex justify-center justify-between font-avenir-reg text-32px ml-400px mr-400px">
-            <button className="rounded-full text-center bg-white hover:bg-gray-100 drop-shadow-md w-50px">
-              &#60;
-            </button>
-            {subPageNum}
-            <button className="rounded-full text-center bg-white hover:bg-gray-100 drop-shadow-md w-50px">
-              &#62;
-            </button>
-          </div>
-        </div>
-      );
-      break;
-    case 5: // Location
-      menu = (
-        <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
-          I was thinking maybe merge Location into Profile?
-        </div>
-      );
-      break;
-    case 6: // My Selling Items
-      menu =
-        myItemIds.length === 0 ? (
-          <div className="flex flex-col justify-between h-100px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md pl-35px pt-40px rounded-25px">You have not listed any items yet =.=</div>
-        ) : (
-          <ItemPreviewList itemIds={myItemIds} hasDeleteButton={true}/>
-        );
-      break;
-    default:
-      // Profile
-      menu = (
-        <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
-          <div className="h-164px flex-col flex justify-between">
-            <Form
-              label="Username"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              type="text"
-              maxLength={20}
-              minLength={3}
-            />
-            <Form
-              label="Email"
-              placeholder="Please enter a valid email address"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              type="email"
-            />
-          </div>
-          <div className="w-200px h-221px text-14px font-avenir-reg mt-49px">
-            Profile Image
-            <div className="h-10px" />
-            <UserProfile />
-          </div>
-          <button
-            onClick={saveChanges}
-            className="absolute text-16px font-roboto-reg text-white ml-775px mt-460px bg-blue-300 h-50px w-150px rounded-full hover:bg-blue-400"
-          >
-            Save Changes
-          </button>
-        </div>
-      );
-  }
+  const [email, setEmail] = useState(useSelector((state) => state.userInfo.email));
+  const [username, setUsername] = useState(useSelector((state) => state.userInfo.username));
 
   return (
-    <div className="w-full flex flex-row justify-start mt-10px ml-80px">
-      <div className="h-817px w-310px mr-30px rounded-25px pt-40px bg-white drop-shadow-md flex flex-col items-center">
+    <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
+      <div className="h-164px flex-col flex justify-between">
+        <Form
+          label="Username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          type="text"
+          maxLength={20}
+          minLength={3}
+        />
+        <Form
+          label="Email"
+          placeholder="Please enter a valid email address"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          type="email"
+        />
+      </div>
+      <div className="w-200px h-221px text-14px font-avenir-reg mt-49px">
+        Profile Image
+        <div className="h-10px" />
         <UserProfile />
-        <div className="flex flex-col items-start mb-38px mt-29px">
-          <SelectTab name="Watch List" selected={true} selectCallBack={() => {}}/>
-          <div className="font-roboto-reg text-18px mb-5px text-gray-600">
-            My Account
-          </div>
+      </div>
+      <button
+        onClick={saveChanges}
+        className="absolute text-16px font-roboto-reg text-white ml-775px mt-460px bg-blue-300 h-50px w-150px rounded-full hover:bg-blue-400"
+      >
+        Save Changes
+      </button>
+    </div>
+  );
+}
+
+function Loading() {
+ return <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Loading...</div> 
+}
+
+/*
+
+
           <div className="w-230px h-100px flex-col flex items-start pl-12px justify-between">
             <button
               onClick={() => {
@@ -210,11 +356,6 @@ export default function ProfileDetails() {
             >
               Watch List
             </button>
-            {/*
-            <button onClick={() => {setState(2); setStateTag("Orders")}} className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med">
-              Orders
-            </button>
-            */}
             <button
               onClick={() => {
                 setState(3);
@@ -234,11 +375,8 @@ export default function ProfileDetails() {
               Subscriptions
             </button>
           </div>
-        </div>
-        <div className="flex flex-col items-start mt-29px">
-          <div className="font-roboto-reg text-18px mb-5px text-gray-600">
-            Settings
-          </div>
+
+
           <div className="w-230px h-50px flex-col flex items-start pl-12px justify-between">
             <button
               onClick={() => {
@@ -259,32 +397,4 @@ export default function ProfileDetails() {
               Profile
             </button>
           </div>
-        </div>
-      </div>
-      <div className="mt-10px">
-        <div className="font-roboto-reg text-16px ml-20px text-gray-500">
-          {stateTag}
-        </div>
-        <div className="h-5px" />
-        {menu}
-      </div>
-    </div>
-  );
-}
-
-/*
-        <div className="flex flex-col space-y-20px">
-          {watchlistItemIDs.map((item_id) => (
-            <ItemPreview.Long />
-          ))}
-        </div>
 */
-
-
-function SelectTab({ name, selected, selectCallBack }) {
-  return (
-    <div onClick={() => selectCallBack()} className={`flex items-center w-260px h-30px px-10px py-7px rounded-6px ${selected ? "bg-blue-50 text-blue-500" : "bg-white text-gray-500"} text-14px hover:bg-gray-100 leading-none`}>
-      {name}
-    </div>
-  );
-}
