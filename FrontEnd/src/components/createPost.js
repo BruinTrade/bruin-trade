@@ -168,7 +168,7 @@ function PhotoUpload(props) {
             <label className='avenir-med text-14px text-left'>
                 Photos:
             </label>
-            <div className='w-390px h-200px bg-white rounded-12px'>
+            <div className='w-390px h-200px bg-white rounded-12px border-solid border-gray-100 border-2'>
                 {props.urls.length != 0 ? <PhotoPreview imgUrl={props.urls[0]} main={true} /> : ''}
             </div>
             <div className="grid grid-cols-3 grid-rows-2 gap-x-28px gap-y-20px mt-16px">
