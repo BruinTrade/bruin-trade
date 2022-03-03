@@ -19,10 +19,7 @@ import { UserProfileSmall } from './userProfile';
 //     Short : (id) => ItemDataProvider(previewTypes.short, id),
 //     Long : (id) => ItemDataProvider(previewTypes.long, id)
 // }
-
-export default ItemDataProvider;
-
-function ItemDataProvider(props) {
+export default function ItemDataProvider(props) {
 
     
     const previewType = props.previewType
@@ -71,7 +68,7 @@ function ItemDataProvider(props) {
     }
     
     if(previewType === "long")
-        return <ItemPreviewLong hasDeleteButton={props.hasDeleteButton} id={item_id} title={title} price={price} description={desc} images={images ? images[0] : null} itemOwner={itemOwner} condition={cond} location={loc} token={token}/>
+        return <ItemPreviewLong itemType={props.itemType} hasDeleteButton={props.hasDeleteButton} id={item_id} title={title} price={price} description={desc} images={images ? images[0] : null} itemOwner={itemOwner} condition={cond} location={loc} token={token}/>
     else if(previewType === "short")
         return <ItemPreviewShort hasDeleteButton={props.hasDeleteButton} id={item_id} title={title} price={price} image={images ? images[0] : null} itemOwner={itemOwner} />
     else
@@ -103,7 +100,17 @@ export function ItemPreviewShort({ id, title, price, image, itemOwner, hasDelete
 }
 
 
-export function ItemPreviewLong({ id, title, price, images, itemOwner, condition, location, description, hasDeleteButton, token}) {
+
+export const itemType = {
+    sellingItem : {name: "sellingItem" , buttons: []},
+    watchList : {name: "watchList" , buttons: []},
+    sold : {name: "sold" , buttons: []},
+    order : {name: "order" , buttons: []}
+}
+
+
+export function ItemPreviewLong({ itemType, id, title, price, images, itemOwner, condition, location, description, hasDeleteButton, token}) {
+
 
     const username = useSelector((state) => state.userInfo.username)
 
@@ -111,9 +118,9 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
     const alert = useAlert()
     const dispatch = useDispatch()
 
-    function editPost() { }
     function removePost() { }
     function addToWatchList() {}
+
     function deleteItemHandler() {
         ItemServices.delete(itemOwner, id, token).then((res) => {
             if (res.status !== 200) {
@@ -182,7 +189,9 @@ export function ItemPreviewLong({ id, title, price, images, itemOwner, condition
                             <StatusLabel title="Description">
                                 <div className="text-12px text-gray-500">{description}</div>
                             </StatusLabel>
+                            
                             <div id="buttons" className="flex flex-row justify-end space-x-15px mb-5px">
+                                {itemType.buttons}
                                 {
                                     local_hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); deleteItemHandler()}}>Delete Item</button>
                                     : 
@@ -218,17 +227,18 @@ function StatusLabel({ title, children }) {
     )
 }
 
-
 export function ItemPreviewList(props) {
-    const type = props.type ? props.type : "long"
+    const previewType = props.type ? props.type : "long"
     const itemIds = props.itemIds ? props.itemIds : []
     return (
-        <div className={`${type === "long" ? "flex flex-col space-y-20px" : "w-955px h-336px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto"}`}>
-            {itemIds.map((id) => {
-                return <ItemDataProvider previewType={type} item_id={id} hasDeleteButton={props.hasDeleteButton}/>
+        <div className={`${previewType === "long" ? "flex flex-col space-y-20px" : "w-955px h-336px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto"}`}>
+            {itemIds.length === 0 ? 
+            <div className='w-full h-200px flex flex-row justify-center items-center text-16px text-gray-300'>{ props.placeholder ? props.placeholder : "No Item Found" }</div>
+            :
+            itemIds.map((id) => {
+                return <ItemDataProvider itemType={props.itemType} previewType={previewType} item_id={id} hasDeleteButton={props.hasDeleteButton}/>
              }
             )}
         </div>
     )
 }
-

@@ -3,10 +3,9 @@ import ProfileDetails from "../components/profileDetails";
 
 export default function PageProfile() {
     const { state } = useLocation();
-    console.log(state)
 
     return <Routes>
-            <Route path="/" element={<PageUserProfile select={state}/>}/>
+            <Route path="/" element={<PageUserProfile select={state ? state.page : null}/>}/>
             <Route path=":userId" element={<PageUserProfile />}/>
         </Routes>;
 }

@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 //import { setQuery } from '../redux/slices/query.js';
 import { useAlert } from 'react-alert'
 
+import { InfoPages, SettingPages } from "./profileDetails.js";
+
 function NavBar() {
     const navigate = useNavigate();
     //const dispatch = useDispatch();
@@ -74,35 +76,28 @@ function NavBar() {
                 {
                     login ? (
                         <div id="logged in" className="w-auto h-full flex flex-row justify-end items-center space-x-45px">
-                            <div className="flex flex-row justify-between items-center space-x-30px">
-                                <NavbarLable label="Location">
-                                    <div className="flex flex-row justify-start items-center space-x-1">
-                                        <div className="w-20px h-20px">
-                                            {get_icon(Icons.location)}
-                                        </div>
-                                        <div className="text-9px text-gray-400 align-middle leading-none">
-                                            <div>{location ?? "No Location"}</div>
-                                        </div>
+                            <NavbarLable label="Location">
+                                <div className="flex flex-row justify-start items-center space-x-1">
+                                    <div className="w-20px h-20px">
+                                        {get_icon(Icons.location)}
                                     </div>
-                                </NavbarLable>
-
-                                <NavbarLable label="Cart">
-                                    <div className="static h-full" onClick={() => {navigate("/profile", { state: 1 })}}>
-                                        <div className="absolute w-45px h-45px" >
-                                            {get_icon(Icons.cart)}
-                                        </div>
-                                        <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold" >
-                                            {numCartItem ?? 0}
-                                        </div>
+                                    <div className="text-9px text-gray-400 align-middle leading-none">
+                                        <div>{location ?? "No Location"}</div>
                                     </div>
-                                </NavbarLable>
-                            </div>
-                            
+                                </div>
+                            </NavbarLable>
 
+                            <NavbarLable label="Watch List">
+                                <div className="static h-full" onClick={() => {navigate("/profile/", { state: { page : InfoPages.watchList } })}}>
+                                    <div className="absolute w-45px h-45px" >
+                                        {get_icon(Icons.cart)}
+                                    </div>
+                                    <div className="absolute w-45px flex flex-row justify-center ml-1 text-gold text-14px leading-none font-semibold" >
+                                        {numCartItem ?? 0}
+                                    </div>
+                                </div>
+                            </NavbarLable>
                             <NavbarProfile />
-                            
-                        
-
                         </div>
                     ) : (
                         <div id="not logged in" className="h-full w-auto flex flex-row items-center justify-end">
@@ -180,7 +175,7 @@ function NavbarProfile() {
         <div className="text-right">
             <Menu as="div" className="relative inline-block text-left">
                 <div>
-                    <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-white rounded-md bg-opacity-20 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                    <Menu.Button className="inline-flex justify-center w-full pr-4 py-2 text-sm font-medium text-white rounded-md bg-opacity-20 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                         <div className="flex flex-row justify-between items-center hover:cursor-pointer">
                             <div id="image" className="w-50px h-50px rounded-25px overflow-hidden">
                                 <img src={profileImage} className="w-full h-full object-cover" />
@@ -204,8 +199,8 @@ function NavbarProfile() {
                 >
                     <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
                         <DropdownMenuItem label="Create New Post" callBackFunction={() => navigate('/create-post')}/>
-                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/profile', { state: 7 })}/>
-                        <DropdownMenuItem label="Cart" callBackFunction={() => navigate('/profile', { state: 1 })}/> 
+                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/profile/', { state: { page : SettingPages.profile }})}/>
+                        <DropdownMenuItem label="Watch List" callBackFunction={() => navigate('/profile/', { state: { page : InfoPages.watchList }})}/> 
                         <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>
                     </Menu.Items>
                 </Transition>

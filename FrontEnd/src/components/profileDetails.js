@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import UserProfile, { UserProfileSmall } from "./userProfile";
 import Form from "./form";
-import { ItemPreviewList } from "./itemPreview";
+import { ItemPreviewList, itemType } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
@@ -13,33 +13,29 @@ import { useNavigate } from "react-router-dom";
 // - finish subscriptions and implement subscriptions page function
 // - implement everything else (watch list, orders, sold, location)
 
+export const InfoPages = {
+  watchList : 0,
+  sellingItems : 1,
+  orders : 2,
+  sold : 3,
+  subscriptions : 4,
+}
+export const SettingPages = {
+  location : 5,
+  profile : 6
+}
+const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile"]
+
 
 export default function ProfileDetails({ preSelect, username }) {
-
-  const InfoPages = {
-    watchList : 0,
-    sellingItems : 1,
-    orders : 2,
-    sold : 3,
-    subscriptions : 4,
-  }
-  const SettingPages = {
-    location : 5,
-    profile : 6
-  }
-  const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile"]
 
   const currentUsername = useSelector((state) => state.userInfo.username);
   const user_name = username ? username : currentUsername
   const ownerIsCurrentUser = user_name === currentUsername
-  const [selection, setSelectionState] = useState(preSelect ? preSelect : (ownerIsCurrentUser ? 6 : 1));
+  const [selection, setSelectionState] = useState(preSelect !== null ? preSelect : (ownerIsCurrentUser ? 6 : 1));
 
   const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold]
   const settingPages = [SettingPages.location, SettingPages.profile]
-
-  useEffect(() => {
-    setSelectionState(selection)
-  })
 
   function getMenu(selection) {
     switch (selection) {
@@ -92,7 +88,7 @@ export default function ProfileDetails({ preSelect, username }) {
       </div>
       <div className="mt-10px w-1000px">
         <div className="font-roboto-reg text-16px ml-20px text-gray-500">
-          {PageNames[selection]}
+          {selection >= PageNames.length ? PageNames[PageNames.length-1] : PageNames[selection]}
         </div>
         <div className="h-5px" />
         {getMenu(selection)}
@@ -132,20 +128,26 @@ function WatchList() {
 
   if(loading) {
     return <Loading />
-  } else if(watchlistItemIDs.length === 0) {
-    return <div className="flex flex-col justify-between h-100px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md pl-35px pt-40px rounded-25px">Nothing in watch list yet =.=</div>
   } else {
-    return <ItemPreviewList itemIds={watchlistItemIDs} />
+    return <ItemPreviewList itemType={itemType.watchList} itemIds={watchlistItemIDs} placeholder="Go shop around your community!" />
   }
 }
 
 function Orders() {
-  return <div/>
+
+  const [orders, setOrders] = useState([]);
+  //const [loading, setLoading] = useState(true);
+
+  return <ItemPreviewList itemType={itemType.order} itemIds={orders} hasDeleteButton={true}/>
+
 }
 
 function SellingItems({ username }) {
 
+  const token = useSelector((state) => state.loginStatus.token);
+
   const alert = useAlert();
+  const navigate = useNavigate();
   
   const [myItemIds, setMyItemIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -161,18 +163,26 @@ function SellingItems({ username }) {
     })
   }, [])
 
+
+  const placeholder = (
+    <div className="flex flex-col justify-center items-center space-y-20px cursor-pointer">
+      <div className="text-gray-300 text-16px">You've not posted anything yet.</div>
+      <div onClick={() => navigate("/create-post")} className="w-200px h-40px flex justify-center items-center bg-blue-400 rounded-12px text-white text-16px">Sell An Item</div>
+    </div>
+  );
+
   if(loading) {
     return <Loading />
-  } else if(myItemIds.length === 0) {
-    return <div className="flex flex-col justify-between h-100px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md pl-35px pt-40px rounded-25px">You have not listed any items yet =.=</div>
   } else {
-    return <ItemPreviewList itemIds={myItemIds} hasDeleteButton={true}/>
+    return <ItemPreviewList itemType={itemType.sellingItem} itemIds={myItemIds} hasDeleteButton={true} placeholder={placeholder} />
   }
-
 }
 
 function Sold() {
-  return <div/>
+  const [sold, setSold] = useState([]);
+  //const [loading, setLoading] = useState(true);
+
+  return <ItemPreviewList itemType={itemType.sold} itemIds={sold} hasDeleteButton={true}/>
 }
 
 function SubscriptionButton({ username }) {
@@ -231,7 +241,6 @@ function Subscriptions() {
 
   function fetchFollowing() {
     UserServices.getAllFollowings(token).then((res) => {
-      console.log(res)
       if (res.status !== 200) {
         alert.show(res.data.errors ? res.data.errors : res.data.error);
       } else {
@@ -250,7 +259,10 @@ function Subscriptions() {
   } else {
     return (
       <div className="flex flex-col space-y-20px">
-        {subscriptions.map((username) => <Subscription username={username} unsubscribeCallback={fetchFollowing}/>)}
+        {subscriptions.length === 0 ? 
+        <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Subscribe to your friends!</div> 
+        : 
+        subscriptions.map((username) => <Subscription username={username} unsubscribeCallback={fetchFollowing}/>)}
       </div>
       );
   }
