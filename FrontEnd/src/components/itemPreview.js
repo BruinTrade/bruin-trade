@@ -19,25 +19,22 @@ import { UserProfileSmall } from './userProfile';
 //     Short : (id) => ItemDataProvider(previewTypes.short, id),
 //     Long : (id) => ItemDataProvider(previewTypes.long, id)
 // }
-export default function ItemDataProvider(props) {
 
+function useItemDataProvider({item_id}) {
     
-    const previewType = props.previewType
-    const item_id = props.item_id
-    
+    console.log(item_id)
+
     const token = useSelector((state) => state.loginStatus.token)
-    const [loading, setLoading] = useState(true);
+
     const [title, setTitle] = useState("");
     const [price, setPrice] = useState(0);
-    const [desc, setDesc] = useState("");
+    const [description, setDesc] = useState("");
     const [images, setImages] = useState([])
     const [itemOwner, setItemOwner] = useState("")
-    const [loc, setLoc] = useState("")
-    const [cond, setCond] = useState("")
+    const [location, setLoc] = useState("")
+    const [condition, setCond] = useState("")
     const [category, setCategory] = useState("")
-    //const [tags, setTags] = useState([])
-  
-    //console.log(item_id)
+
 
     useEffect(() => {
         ItemServices.getItemDetailsById(item_id, token).then((res) => {
@@ -56,33 +53,30 @@ export default function ItemDataProvider(props) {
             setCond(data.condition)
             setCategory(data.tags)
             setLoc(data.location)
-            setLoading(false);
         })
     }, [item_id])
 
-    
+    return { title, price, description, images, itemOwner, location, condition, category }
+}
 
-    if(loading) 
-    {
-        return <div></div>
-    }
-    
-    if(previewType === "long")
-        return <ItemPreviewLong itemType={props.itemType} hasDeleteButton={props.hasDeleteButton} id={item_id} title={title} price={price} description={desc} images={images ? images[0] : null} itemOwner={itemOwner} condition={cond} location={loc} token={token}/>
-    else if(previewType === "short")
-        return <ItemPreviewShort hasDeleteButton={props.hasDeleteButton} id={item_id} title={title} price={price} image={images ? images[0] : null} itemOwner={itemOwner} />
-    else
-        return <div/>
+function ItemPreviewLoading() {
+    return <div className='w-258px h-288px flex flex-col item-center justify-center bg-white rounded-12px px-15px text-gray-300'>Loading...</div>
 }
 
 
-export function ItemPreviewShort({ id, title, price, image, itemOwner, hasDeleteButton }) {
+export function ItemPreviewShort({ item_id }) {
+
+    const { title, price, _, images, itemOwner, __, ___, ____ } = useItemDataProvider({item_id : item_id})
+    
+    if(title === null) {
+        return <ItemPreviewLoading />
+    } 
     return (
-        <Link to={`post/${id}`}>
+        <Link to={`post/${item_id}`}>
             <div className='w-258px h-288px flex flex-col item-center justify-between bg-white rounded-12px px-15px'>
                 <div>
                     <div className='w-full h-137px rounded-12px mt-10px mx-auto overflow-hidden'>
-                        <img className='object-cover' src={image} />
+                        <img className='object-cover' src={images ? images[0] : null} />
                     </div>
                     <div className='w-full text-12px mx-auto mt-15px test-gray-700'>
                         {title}
@@ -100,18 +94,13 @@ export function ItemPreviewShort({ id, title, price, image, itemOwner, hasDelete
 }
 
 
+export function ItemPreviewLong({ item_id }) {
 
-export const itemType = {
-    sellingItem : {name: "sellingItem" , buttons: []},
-    watchList : {name: "watchList" , buttons: []},
-    sold : {name: "sold" , buttons: []},
-    order : {name: "order" , buttons: []}
-}
+    const { title, price, description, images, itemOwner, location, condition, _ } = useItemDataProvider({item_id : item_id})
 
+    const hasDeleteButton = false;
 
-export function ItemPreviewLong({ itemType, id, title, price, images, itemOwner, condition, location, description, hasDeleteButton, token}) {
-
-
+    const token = useSelector((state) => state.loginStatus.token)
     const username = useSelector((state) => state.userInfo.username)
 
     const navigate = useNavigate()
@@ -122,7 +111,7 @@ export function ItemPreviewLong({ itemType, id, title, price, images, itemOwner,
     function addToWatchList() {}
 
     function deleteItemHandler() {
-        ItemServices.delete(itemOwner, id, token).then((res) => {
+        ItemServices.delete(itemOwner, item_id, token).then((res) => {
             if (res.status !== 200) {
                 alert.show(res.data.errors ? res.data.errors : res.data.error);
                 navigate("/");
@@ -140,19 +129,9 @@ export function ItemPreviewLong({ itemType, id, title, price, images, itemOwner,
     {
         local_hasDeleteButton = false
     }
-
-    // const buttonsMyPost = [
-    //     <button type="button" className="text-12px text-red-500" onClick={() => editPost()}>edit</button>,
-    //     <button className="text-12px text-gray-400" onClick={() => removePost()}>remove</button>
-    // ]
-
-    // const buttonsOthersPost = [
-    //     <button type="button" className="text-blue-400 text-14px border border-1 border-blue-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); console.log("bob") ;addToWatchList()}}>Add to Watch List</button>
-    // ]
-
   
     return (
-        <Link to={`/post/${id}`}>
+        <Link to={`/post/${item_id}`}>
             <div className='w-1000px h-288px flex flex-row items-center justify-start bg-white rounded-12px pl-15px pr-30px'>
                 <div id="image" className="flex-shrink-0 flex flex-col justify-center items-center w-260px h-260px border border-1px border-gray-100 rounded-12px object-cover overflow-hidden">
                     <img src={images} />
@@ -191,7 +170,7 @@ export function ItemPreviewLong({ itemType, id, title, price, images, itemOwner,
                             </StatusLabel>
                             
                             <div id="buttons" className="flex flex-row justify-end space-x-15px mb-5px">
-                                {itemType.buttons}
+                                
                                 {
                                     local_hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); deleteItemHandler()}}>Delete Item</button>
                                     : 
@@ -207,16 +186,6 @@ export function ItemPreviewLong({ itemType, id, title, price, images, itemOwner,
         </Link>
     )
 }
-
-
-function Status({ num, type }) {
-    return (
-        <div className="flex flex-row justify-end text-gray-400 text-12px">
-            {num} {type}
-        </div>
-    );
-}
-
 
 function StatusLabel({ title, children }) {
     return (
@@ -235,10 +204,15 @@ export function ItemPreviewList(props) {
             {itemIds.length === 0 ? 
             <div className='w-full h-200px flex flex-row justify-center items-center text-16px text-gray-300'>{ props.placeholder ? props.placeholder : "No Item Found" }</div>
             :
+            previewType === "long" ?
             itemIds.map((id) => {
-                return <ItemDataProvider itemType={props.itemType} previewType={previewType} item_id={id} hasDeleteButton={props.hasDeleteButton}/>
+                return <ItemPreviewLong item_id={id} />
+             })
+             :
+            itemIds.map((id) => {
+                return <ItemPreviewShort item_id={id} />
+             })
              }
-            )}
         </div>
     )
 }

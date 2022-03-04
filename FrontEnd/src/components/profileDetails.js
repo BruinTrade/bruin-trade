@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import UserProfile, { UserProfileSmall } from "./userProfile";
 import Form from "./form";
-import { ItemPreviewList, itemType } from "./itemPreview";
+import { ItemPreviewList } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
@@ -129,7 +129,7 @@ function WatchList() {
   if(loading) {
     return <Loading />
   } else {
-    return <ItemPreviewList itemType={itemType.watchList} itemIds={watchlistItemIDs} placeholder="Go shop around your community!" />
+    return <ItemPreviewList itemIds={watchlistItemIDs} placeholder="Go shop around your community!" />
   }
 }
 
@@ -138,7 +138,7 @@ function Orders() {
   const [orders, setOrders] = useState([]);
   //const [loading, setLoading] = useState(true);
 
-  return <ItemPreviewList itemType={itemType.order} itemIds={orders} hasDeleteButton={true}/>
+  return <ItemPreviewList itemIds={orders} hasDeleteButton={true}/>
 
 }
 
@@ -174,7 +174,7 @@ function SellingItems({ username }) {
   if(loading) {
     return <Loading />
   } else {
-    return <ItemPreviewList itemType={itemType.sellingItem} itemIds={myItemIds} hasDeleteButton={true} placeholder={placeholder} />
+    return <ItemPreviewList itemIds={myItemIds} hasDeleteButton={true} placeholder={placeholder} />
   }
 }
 
@@ -182,7 +182,7 @@ function Sold() {
   const [sold, setSold] = useState([]);
   //const [loading, setLoading] = useState(true);
 
-  return <ItemPreviewList itemType={itemType.sold} itemIds={sold} hasDeleteButton={true}/>
+  return <ItemPreviewList itemIds={sold} hasDeleteButton={true}/>
 }
 
 function SubscriptionButton({ username }) {
