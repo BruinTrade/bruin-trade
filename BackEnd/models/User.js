@@ -124,6 +124,10 @@ class User {
     return new Promise(async (resolve, reject) => {
       this.findUserByName(input_username)
         .then(async (user) => {
+          if (!user.cart)
+          {
+            resolve([])
+          }
           Item.findItemsById(user.cart)
             .then((result) => {
               resolve(result);

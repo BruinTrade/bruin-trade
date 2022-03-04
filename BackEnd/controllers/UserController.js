@@ -17,7 +17,7 @@ export default class UserController {
               location: temp_user.data.location,
             },
             "scretekeygeneratedbyajshawn",
-            { expiresIn: "24h" }
+            { expiresIn: "7d" }
           );
         } catch (error) {
           res.status(201).json({ errors: error });
@@ -54,7 +54,7 @@ export default class UserController {
               followings: user_info.followings,
             },
             "scretekeygeneratedbyajshawn",
-            { expiresIn: "24h" }
+            { expiresIn: "7d" }
           );
         } catch (error) {
           res.status(201).json({ errors: error });
