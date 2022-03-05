@@ -13,6 +13,7 @@ import PageComponentGallery from "./pages/ComponentGallery";
 import Loading from "./components/loading.js";
 import Search from "./pages/Search.js";
 import NotFound from "./pages/NotFound.js";
+import Tags from "./pages/Tags.js";
 
 const App = () => (
   <div className="flex flex-row justify-center bg-bg_blue min-h-screen h-max">
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/components" element={<PageComponentGallery />} />
             <Route path="/create-post" element={<PageCreatePost />} />
             <Route path="/search/*" element={<Search />} />
+            <Route path="/tags/*" element={<Tags />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

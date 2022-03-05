@@ -32,7 +32,6 @@ const comments = [
 export default function PageComponentGallery() {
     return (
         <div className="flex flex-col space-y-10">
-            <UserProfileSmall />
             <ConcisePreview />
             <SignUp/>
             <SignIn/>

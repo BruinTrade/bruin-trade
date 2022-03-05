@@ -438,10 +438,10 @@ function Location() {
     <div className="rounded-12px overflow-hidden">
       <Map latitude={latitude} longitude={longitude}/>
     </div>
-    <div className="absolute left-0 bottom-0 flex flex-row justify-end space-x-20px">
+    <div className="absolute left-10px bottom-10px flex flex-col justify-end space-y-10px">
       <button
           onClick={updateLocation}
-          className="px-12px py-10px text-14px text-white bg-blue-400 rounded-12px hover:bg-blue-400"
+          className="px-12px py-10px text-14px text-gray-500 border border-1 border-gray-500 rounded-12px hover:bg-blue-400"
         >
           Set Location
         </button>
