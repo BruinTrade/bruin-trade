@@ -434,11 +434,11 @@ function Location() {
   return loading? 
   <div/>
   :
-  <div className="flex flex-col space-y-20px">
+  <div className="relative flex flex-col space-y-20px">
     <div className="rounded-12px overflow-hidden">
       <Map latitude={latitude} longitude={longitude}/>
     </div>
-    <div className="flex flex-row justify-end space-x-20px">
+    <div className="absolute left-0 bottom-0 flex flex-row justify-end space-x-20px">
       <button
           onClick={updateLocation}
           className="px-12px py-10px text-14px text-white bg-blue-400 rounded-12px hover:bg-blue-400"

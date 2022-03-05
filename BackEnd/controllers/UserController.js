@@ -151,6 +151,21 @@ export default class UserController {
     });
   }
 
+  static async getLocationByUsername(req, res, next) {
+    if (!req.params.username)
+    {
+      res.status(201).json({ errors: "No username provided" });
+      return
+    }
+    User.getLocation(req.params.username)
+    .then((location) => {
+      res.json({ location: location });
+    })
+    .catch((error_message) => {
+      res.status(201).json({ errors: error_message });
+    });
+  }
+
   static async findUserById(req, res, next) {}
 
   //static async getPostedItems(req, res, next) {}
