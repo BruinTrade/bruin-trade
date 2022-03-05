@@ -163,27 +163,27 @@ function PhotoUpload(props) {
 
     // const images = props.urls.map((url) => (<PhotoPreview imgUrl={url} />))
     const arr = [0, 1, 2, 3, 4, 5]
+    const [select, setSelected] = useState(0)
     return (
         <div>
             <label className='avenir-med text-14px text-left'>
                 Photos:
             </label>
             <div className='w-390px h-200px bg-white rounded-12px border-solid border-gray-100 border-2'>
-                {props.urls.length != 0 ? <PhotoPreview imgUrl={props.urls[0]} main={true} /> : ''}
+                {props.urls.length != 0 ? <PhotoPreview imgUrl={props.urls[select]} main={true} /> : ''}
             </div>
             <div className="grid grid-cols-3 grid-rows-2 gap-x-28px gap-y-20px mt-16px">
                 {/*images*/}
                 {arr.map((element) => (
                     element === props.urls.length ?
-                        <div className='w-112px h-80px bg-gray-100 rounded-8px overflow-hidden grid items-center justify-center'>
-                            <UploadImage handleUploadImage={(event) => props.handleUploadImage(event)} />
+                        <div className='w-112px h-80px bg-gray-100 rounded-8px overflow-hidden grid items-center justify-center' key={element}>
+                            <UploadImage handleUploadImage={(event) => props.handleUploadImage(event)}/>
                         </div> :
-                        <div className='w-112px h-80px bg-gray-100 rounded-8px overflow-hidden grid items-center justify-center'>
+                        <div type='button' onClick={() => setSelected(element)} className='w-112px h-80px bg-gray-100 rounded-8px overflow-hidden grid items-center justify-center hover:bg-blue-100' key={element}>
                             {element < props.urls.length ? <PhotoPreview imgUrl={props.urls[element]} main={false} /> : ""}
-                        </div>
+                        </div> 
                 ))}
             </div>
-            {console.log(props.urls)}
         </div>
     );
 }
