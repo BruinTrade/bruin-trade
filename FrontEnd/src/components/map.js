@@ -12,7 +12,7 @@ function Map(props)
       lng: props.longitude
     };
 
-    console.log(center)
+    //console.log(center)
   
     const { isLoaded } = useJsApiLoader({
       id: 'google-map-script',

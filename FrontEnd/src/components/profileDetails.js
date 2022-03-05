@@ -16,9 +16,10 @@ import { useAlert } from "react-alert";
 
 
 export default function ProfileDetails({ preSelect, username }) {
+  //console.log(preSelect)
 
   const InfoPages = {
-    watchList : 0,
+    watchList : 7,
     sellingItems : 1,
     orders : 2,
     sold : 3,
@@ -28,7 +29,7 @@ export default function ProfileDetails({ preSelect, username }) {
     location : 5,
     profile : 6
   }
-  const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile"]
+  const PageNames = ["placeholder", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "Watch List"]
 
   const currentUsername = useSelector((state) => state.userInfo.username);
   const user_name = username ? username : currentUsername
@@ -44,7 +45,7 @@ export default function ProfileDetails({ preSelect, username }) {
 
   function getMenu(selection) {
     switch (selection) {
-      case 0: // Watch List
+      case 7: // Watch List
         return <WatchList />
       case 1: //Selling Items
         return <SellingItems username={ user_name } />
@@ -74,7 +75,7 @@ export default function ProfileDetails({ preSelect, username }) {
             My Account
           </div>
           <div className="flex flex-col justify-start space-y-5px ">
-            {avaliablePages.map((page) => <SelectTab name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
+            {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
           </div>
           
         </div>
@@ -84,7 +85,7 @@ export default function ProfileDetails({ preSelect, username }) {
               Settings
             </div>
             <div className="flex flex-col justify-start space-y-5px ">
-              {settingPages.map((page) => <SelectTab name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
+              {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
             </div>
           </div> 
           : 
@@ -251,7 +252,7 @@ function Subscriptions() {
   } else {
     return (
       <div className="flex flex-col space-y-20px">
-        {subscriptions.map((username) => <Subscription username={username} unsubscribeCallback={fetchFollowing}/>)}
+        {subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing}/>)}
       </div>
       );
   }
@@ -292,6 +293,7 @@ function Location() {
   const [latitude, setLatitude] = useState("")
   const [longitude, setLongitude] = useState("")
   const [locationChangeFlag, setLocationChangeFlag] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     UserServices.getLocation(token).then((res) => {
@@ -308,6 +310,7 @@ function Location() {
           setLatitude(res.data.location.latitude)
           setLongitude(res.data.location.longitude)
         }
+        setLoading(false)
       }
     })
   }, [locationChangeFlag])
@@ -339,7 +342,10 @@ function Location() {
     setLocationChangeFlag(!locationChangeFlag)
   }
   
-  return <div>
+  return loading? 
+  <div/>
+  :
+  <div>
     <div className="flex flex-col h-200px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md rounded-25px">
     <button
         onClick={updateLocation}
@@ -358,6 +364,8 @@ function Location() {
       <Map latitude={latitude} longitude={longitude}/>
     </div>
   </div>
+  
+
 }
 
 function Profile() {

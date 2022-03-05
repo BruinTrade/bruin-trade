@@ -11,6 +11,7 @@ export default function CommentList(props) {
       {comments.map((element) => {
         return (
           <Comment
+            key={element._id}
             author={element.author}
             targetUser={element.target_user}
             commentBody={element.content}

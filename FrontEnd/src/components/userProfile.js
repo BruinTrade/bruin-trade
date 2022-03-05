@@ -97,9 +97,9 @@ function UserRating(props) {
     const rating = props.rating;
     const roundedRating = Math.round(rating)
     const stars = [1, 2, 3, 4, 5].map((i) => {
-        if(i < roundedRating || i === rating) return <Star proportion={1} />
-        else if(i > roundedRating) return <Star proportion={0} />
-        else return <Star proportion={rating - Math.round(rating)}/>
+        if(i < roundedRating || i === rating) return <Star key={i} proportion={1} />
+        else if(i > roundedRating) return <Star key={i} proportion={0} />
+        else return <Star key={i} proportion={rating - Math.round(rating)}/>
     });
 
     return (

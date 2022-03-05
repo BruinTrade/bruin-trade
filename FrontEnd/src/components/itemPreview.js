@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import { setSellingItemsChange } from '../redux/slices/sellingItemsChange';
 import { UserProfileSmall } from './userProfile';
+import { useStateIfMounted } from "use-state-if-mounted"
 
 
 // const previewTypes = {
@@ -29,15 +30,15 @@ function ItemDataProvider(props) {
     const item_id = props.item_id
     
     const token = useSelector((state) => state.loginStatus.token)
-    const [loading, setLoading] = useState(true);
-    const [title, setTitle] = useState("");
-    const [price, setPrice] = useState(0);
-    const [desc, setDesc] = useState("");
-    const [images, setImages] = useState([])
-    const [itemOwner, setItemOwner] = useState("")
-    const [loc, setLoc] = useState("")
-    const [cond, setCond] = useState("")
-    const [category, setCategory] = useState("")
+    const [loading, setLoading] = useStateIfMounted(true);
+    const [title, setTitle] = useStateIfMounted("");
+    const [price, setPrice] = useStateIfMounted(0);
+    const [desc, setDesc] = useStateIfMounted("");
+    const [images, setImages] = useStateIfMounted([])
+    const [itemOwner, setItemOwner] = useStateIfMounted("")
+    const [loc, setLoc] = useStateIfMounted("")
+    const [cond, setCond] = useStateIfMounted("")
+    const [category, setCategory] = useStateIfMounted("")
     //const [tags, setTags] = useState([])
   
     //console.log(item_id)
@@ -225,7 +226,7 @@ export function ItemPreviewList(props) {
     return (
         <div className={`${type === "long" ? "flex flex-col space-y-20px" : "w-955px h-336px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto"}`}>
             {itemIds.map((id) => {
-                return <ItemDataProvider previewType={type} item_id={id} hasDeleteButton={props.hasDeleteButton}/>
+                return <ItemDataProvider key={id} previewType={type} item_id={id} hasDeleteButton={props.hasDeleteButton}/>
              }
             )}
         </div>
