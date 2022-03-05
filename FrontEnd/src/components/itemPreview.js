@@ -22,8 +22,6 @@ import { useStateIfMounted } from "use-state-if-mounted"
 // }
 
 function useItemDataProvider({item_id}) {
-    
-    console.log(item_id)
 
     const token = useSelector((state) => state.loginStatus.token)
 

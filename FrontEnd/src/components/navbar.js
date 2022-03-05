@@ -77,7 +77,7 @@ function NavBar() {
                     login ? (
                         <div id="logged in" className="w-auto h-full flex flex-row justify-end items-center space-x-45px">
                             <NavbarLable label="Location">
-                                <div className="flex flex-row justify-start items-center space-x-1">
+                                <div className="flex flex-row justify-start items-center space-x-1" onClick={() => {navigate("/profile/", { state: { page : SettingPages.location } })}}>
                                     <div className="w-20px h-20px">
                                         {get_icon(Icons.location)}
                                     </div>
@@ -200,8 +200,8 @@ function NavbarProfile() {
                 >
                     <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
                         <DropdownMenuItem label="Create New Post" callBackFunction={() => navigate('/create-post')}/>
-                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/profile', { state: 8 })}/>
-                        <DropdownMenuItem label="Cart" callBackFunction={() => navigate('/profile', { state: 7 })}/> 
+                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/profile', {  state: { page : SettingPages.pprofile }  })}/>
+                        <DropdownMenuItem label="Cart" callBackFunction={() => navigate('/profile', { state: { page : InfoPages.watchList } })}/> 
                         <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>
                     </Menu.Items>
                 </Transition>

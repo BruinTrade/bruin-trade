@@ -25,7 +25,9 @@ const UserServices = {
 
     updateLocation: updateLocation,
 
-    getLocation: getLocation
+    getLocation: getLocation,
+
+    getLocationByUsername: getLocationByUsername
 }
 
 async function useLogin(dispatch, username, password) {
@@ -201,6 +203,16 @@ async function getLocation(token)
         }
     }
     return http.get("/getLocation", config)
+}
+
+async function getLocationByUsername(token, username)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    return http.get(`/${username}/getLocationByUsername`, config)
 }
 
 

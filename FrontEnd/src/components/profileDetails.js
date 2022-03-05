@@ -6,6 +6,7 @@ import { ItemPreviewList } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
+import { useNavigate } from "react-router-dom";
 
 
 //import commentServices from '../backend_services/comment_services';
@@ -20,40 +21,41 @@ export const InfoPages = {
   orders : 2,
   sold : 3,
   subscriptions : 4,
+  OtherUserLocation: 7,
 }
 export const SettingPages = {
   location : 5,
   profile : 6
 }
-const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile"]
+const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "User Location"]
 
 export default function ProfileDetails({ preSelect, username }) {
-  //console.log(preSelect)
+  console.log(preSelect)
 
-  const InfoPages = {
-    watchList : 7,
-    sellingItems : 1,
-    orders : 2,
-    sold : 3,
-    subscriptions : 4,
-  }
-  const SettingPages = {
-    location : 5,
-    profile : 6
-  }
-  const PageNames = ["placeholder", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "Watch List"]
+  // const InfoPages = {
+  //   watchList : 7,
+  //   sellingItems : 1,
+  //   orders : 2,
+  //   sold : 3,
+  //   subscriptions : 4,
+  // }
+  // const SettingPages = {
+  //   location : 5,
+  //   profile : 6
+  // }
+  // const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "OtherUserLocation"]
 
   const currentUsername = useSelector((state) => state.userInfo.username);
   const user_name = username ? username : currentUsername
   const ownerIsCurrentUser = (user_name === currentUsername)
   const [selection, setSelectionState] = useState(preSelect ? preSelect : (ownerIsCurrentUser ? 6 : 1));
 
-  const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold]
+  const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
 
   function getMenu(selection) {
     switch (selection) {
-      case 7: // Watch List
+      case 0: // Watch List
         return <WatchList />
       case 1: //Selling Items
         return <SellingItems username={ user_name } />
@@ -67,6 +69,8 @@ export default function ProfileDetails({ preSelect, username }) {
         return <Location />
       case 6: // Profile
         return <Profile />
+      case 7: //other user location
+        return <OtherUserLocation other_username={username}/>
       default: // Profile
         return <Profile />
     }
@@ -255,10 +259,7 @@ function Subscriptions() {
 
   function fetchFollowing() {
     UserServices.getAllFollowings(token).then((res) => {
-<<<<<<< HEAD
-=======
-      //console.log(res)
->>>>>>> 05872bfc3a102c4d374b04564caac39281c556df
+
       if (res.status !== 200) {
         alert.show(res.data.errors ? res.data.errors : res.data.error);
       } else {
@@ -277,14 +278,10 @@ function Subscriptions() {
   } else {
     return (
       <div className="flex flex-col space-y-20px">
-<<<<<<< HEAD
         {subscriptions.length === 0 ? 
         <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Subscribe to your friends!</div> 
         : 
-        subscriptions.map((username) => <Subscription username={username} unsubscribeCallback={fetchFollowing}/>)}
-=======
-        {subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing}/>)}
->>>>>>> 05872bfc3a102c4d374b04564caac39281c556df
+        subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing}/>)}
       </div>
       );
   }
@@ -317,6 +314,65 @@ function Subscription({ username, unsubscribeCallback }) {
   );
 }
 
+function OtherUserLocation(props) {
+  const token = useSelector((state) => state.loginStatus.token);
+  const alert = useAlert()
+  const [latitude, setLatitude] = useState("")
+  const [longitude, setLongitude] = useState("")
+  const [hasLocation, setHasLocation] = useState(true)
+  const [locationChangeFlag, setLocationChangeFlag] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    UserServices.getLocationByUsername(token, props.other_username).then((res) => {
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error);
+      } else {
+        if (res.data.location === null)
+        {
+          setLatitude(0)
+          setLongitude(0)
+          setHasLocation(false)
+        }
+        else
+        {
+          setLatitude(res.data.location.latitude)
+          setLongitude(res.data.location.longitude)
+        }
+        setLoading(false)
+      }
+    })
+  }, [locationChangeFlag])
+
+  function viewLocation() {
+    setLocationChangeFlag(!locationChangeFlag)
+  }
+
+  return loading? 
+  <div/>
+  : 
+  (
+    hasLocation ? 
+    <div>
+    <div className="flex flex-col h-200px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md rounded-25px">
+      <button
+        onClick={viewLocation}
+        className="mt-25px ml-350px text-16px font-roboto-reg text-white bg-blue-300 h-50px w-300px rounded-full hover:bg-blue-400"
+      >
+        {`View Location In ${props.other_username}'s Profile`}
+      </button>
+    </div>
+    <div className="mt-10px">
+      <Map latitude={latitude} longitude={longitude}/>
+    </div>
+    </div>
+    :
+    <div className="flex flex-col justify-center items-center space-y-20px">
+      <div className="text-gray-500 text-16px">The user has not provided detailed location yet</div>
+    </div>
+    
+  )
+}
 
 
 function Location() {
@@ -349,6 +405,7 @@ function Location() {
 
 
   function updateLocation() {
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function(location) {
@@ -377,28 +434,29 @@ function Location() {
   return loading? 
   <div/>
   :
-  <div>
-    <div className="flex flex-col h-200px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md rounded-25px">
-    <button
-        onClick={updateLocation}
-        className="mt-40px ml-350px text-16px font-roboto-reg text-white bg-blue-400 h-50px w-300px rounded-full hover:bg-blue-400"
-      >
-        Use Current Location In Profile
-      </button>
-      <button
-        onClick={viewLocation}
-        className="mt-25px ml-350px text-16px font-roboto-reg text-white bg-blue-300 h-50px w-300px rounded-full hover:bg-blue-400"
-      >
-        View Location In Profile
-      </button>
-    </div>
-    <div className="mt-10px">
+  <div className="flex flex-col space-y-20px">
+    <div className="rounded-12px overflow-hidden">
       <Map latitude={latitude} longitude={longitude}/>
+    </div>
+    <div className="flex flex-row justify-end space-x-20px">
+      <button
+          onClick={updateLocation}
+          className="px-12px py-10px text-14px text-white bg-blue-400 rounded-12px hover:bg-blue-400"
+        >
+          Set Location
+        </button>
+        <button
+        onClick={viewLocation}
+        className="px-12px py-10px text-14px text-white bg-blue-400 rounded-12px hover:bg-blue-400"
+      >
+        Current Location
+      </button>
     </div>
   </div>
   
 
 }
+
 
 function Profile() {
 

@@ -25,6 +25,8 @@ function PageUserProfile({ select }) {
 
     const { userId } = useParams()
 
+    console.log(select)
+
     return (
         <div className="flex flex-row justify-center">
             <ProfileDetails preSelect={select} username={userId} />
