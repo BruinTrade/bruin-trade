@@ -33,6 +33,8 @@ BackEndRouter.post("/:username/:item_id/delete", ItemListController.deleteItem);
 BackEndRouter.post("/:username/:item_id/addToCart", UserController.addItemToCart);
 BackEndRouter.post("/:username/:item_id/removeFromCart", UserController.removeItemFromCart);
 BackEndRouter.get("/:username/cart", UserController.getItemsInCart);
+BackEndRouter.post("/updateLocation", UserController.updateLocation);
+BackEndRouter.get("/getLocation", UserController.getLocation);
 
 //About comments
 BackEndRouter.post("/post_comment/:item_id", CommentsController.postComment);

@@ -17,7 +17,7 @@ export default class UserController {
               location: temp_user.data.location,
             },
             "scretekeygeneratedbyajshawn",
-            { expiresIn: "24h" }
+            { expiresIn: "7d" }
           );
         } catch (error) {
           res.status(201).json({ errors: error });
@@ -54,7 +54,7 @@ export default class UserController {
               followings: user_info.followings,
             },
             "scretekeygeneratedbyajshawn",
-            { expiresIn: "24h" }
+            { expiresIn: "7d" }
           );
         } catch (error) {
           res.status(201).json({ errors: error });
@@ -125,9 +125,33 @@ export default class UserController {
       });
   }
 
-  static async findUserById(req, res, next) {}
+  static async updateLocation(req, res, next) {
+    const location = req.body.location
+    if (!location)
+    {
+      res.status(201).json({ errors: "no location provided" });
+      return
+    }
+    User.updateLocation(req.user_info.username, location)
+      .then((message) => {
+        res.json({ status: message });
+      })
+      .catch((error_message) => {
+        res.status(201).json({ errors: error_message });
+      });
+  }
 
-  //static async findUserById(req, res, next) {}
+  static async getLocation(req, res, next) {
+    User.getLocation(req.user_info.username)
+    .then((location) => {
+      res.json({ location: location });
+    })
+    .catch((error_message) => {
+      res.status(201).json({ errors: error_message });
+    });
+  }
+
+  static async findUserById(req, res, next) {}
 
   //static async getPostedItems(req, res, next) {}
 

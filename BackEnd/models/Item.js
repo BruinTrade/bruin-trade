@@ -171,6 +171,10 @@ class Item {
   static async findItemsById(item_id_array) {
     return new Promise(async (resolve, reject) => {
       let ObjectId_array = [];
+      if (!item_id_array)
+      {
+        return [];
+      }
       item_id_array.forEach((element) => {
         try {
           ObjectId_array.push(new ObjectId(element));

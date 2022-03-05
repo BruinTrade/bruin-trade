@@ -3,9 +3,15 @@ import Home from "../components/tradingItems";
 import ProfilePage from "../components/profile";
 import TradingItems from "../components/tradingItems";
 import Categories from "../components/categories";
+import { Navigate } from "react-router-dom";
+import { useSelector } from 'react-redux'
 
 export default function PageHome() {
-
+  const login = useSelector((state) => state.loginStatus.login)
+  if (!login)
+  {
+    return <Navigate to="/login" />;
+  }
 
     // Pesdo Code
     const items = [{

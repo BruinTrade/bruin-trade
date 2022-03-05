@@ -22,6 +22,10 @@ const UserServices = {
     getAllFollowings: getAllFollowings,
 
     getItemsBelongToUser: getItemsBelongToUser,
+
+    updateLocation: updateLocation,
+
+    getLocation: getLocation
 }
 
 async function useLogin(dispatch, username, password) {
@@ -172,6 +176,33 @@ async function getAllFollowings(token)
    
     return http.get("/followings", config)
 }
+
+async function updateLocation(token, latitude, longitude)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    const data = {
+        location: {
+            latitude: latitude,
+		    longitude: longitude
+        }
+    }
+    return http.post("/updateLocation", data, config)
+}
+
+async function getLocation(token)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    return http.get("/getLocation", config)
+}
+
 
 
 

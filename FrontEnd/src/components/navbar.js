@@ -97,6 +97,7 @@ function NavBar() {
                                     </div>
                                 </div>
                             </NavbarLable>
+
                             <NavbarProfile />
                         </div>
                     ) : (
@@ -199,8 +200,8 @@ function NavbarProfile() {
                 >
                     <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
                         <DropdownMenuItem label="Create New Post" callBackFunction={() => navigate('/create-post')}/>
-                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/profile/', { state: { page : SettingPages.profile }})}/>
-                        <DropdownMenuItem label="Watch List" callBackFunction={() => navigate('/profile/', { state: { page : InfoPages.watchList }})}/> 
+                        <DropdownMenuItem label="My Profile" callBackFunction={() => navigate('/profile', { state: 8 })}/>
+                        <DropdownMenuItem label="Cart" callBackFunction={() => navigate('/profile', { state: 7 })}/> 
                         <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>
                     </Menu.Items>
                 </Transition>

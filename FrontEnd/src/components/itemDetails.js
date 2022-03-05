@@ -125,7 +125,7 @@ function ItemDetails(props) {
       //console.log("data", data)
     })
     const data = res.data
-    console.log(data)
+    //console.log(data)
     setName(data.title)
     setDesc(data.description)
     setPrice(data.price)
