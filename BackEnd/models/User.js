@@ -155,6 +155,7 @@ class User {
             location: temp_user.data.location,
             cart: temp_user.data.cart,
             followings: temp_user.data.followings,
+            gps_location: temp_user.data.gps_location
             //more info here
           };
           resolve(temp_user);
@@ -312,6 +313,45 @@ class User {
         });
     });
   }
+
+  static async updateLocation(username, location) {
+    return new Promise(async (resolve, reject) => {
+      userCollection
+        .findOneAndUpdate(
+          { username: username },
+          {
+            $set: {
+              gps_location: location,
+            },
+          }
+        )
+        .then(() => {
+          resolve("successfully updated location");
+        })
+        .catch(() => {
+          reject("failed to update location");
+        });
+    });
+  }
+
+  static async getLocation(username) {
+    return new Promise(async (resolve, reject) => {
+      let current_user_info;
+      try {
+        current_user_info = await this.findUserByName(username);
+        //console.log(current_user_info)
+        if (!current_user_info.gps_location) {
+          current_user_info.gps_location = null;
+        }
+        resolve(current_user_info.gps_location);
+      } catch {
+        reject("failed to find current user");
+        return;
+      }
+    });
+  }
+
+
 }
 
 export default User;
