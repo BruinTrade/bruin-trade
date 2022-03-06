@@ -383,7 +383,7 @@ function Location() {
   const [locationChangeFlag, setLocationChangeFlag] = useState(false)
   const [loading, setLoading] = useState(true)
   const [fetchingLocation, setFetchingLocation] = useState(false)
-  const [fetchingLocationSuccess, setfetchingLocationSuccess] = useState(false)
+  const [permissionDenied, setPermissionDenied] = useState(false)
 
   useEffect(() => {
     UserServices.getLocation(token).then((res) => {
@@ -403,31 +403,38 @@ function Location() {
         setLoading(false)
       }
     })
-  }, [locationChangeFlag, fetchingLocation, fetchingLocationSuccess])
+  }, [locationChangeFlag, fetchingLocation, permissionDenied])
 
 
   function updateLocation() {
     setFetchingLocation(true)
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        function(location) {
-          UserServices.updateLocation(token, location.coords.latitude, location.coords.longitude).then((res) => {
-            if (res.status !== 200) {
-              alert.show(res.data.errors ? res.data.errors : res.data.error);
-            } else {
-              alert.show(res.data.status)
-              setFetchingLocation(false)
-              setfetchingLocationSuccess(true)
-              setLocationChangeFlag(!locationChangeFlag)
-            }
-          })
-        },
-        function(errors) {
-          alert.show(errors)
-        }
-      )
-    } else {
+    try{
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          function(location) {
+            UserServices.updateLocation(token, location.coords.latitude, location.coords.longitude).then((res) => {
+              if (res.status !== 200) {
+                alert.show(res.data.errors ? res.data.errors : res.data.error);
+              } else {
+                alert.show(res.data.status)
+                setFetchingLocation(false)
+                setPermissionDenied(false)
+                setLocationChangeFlag(!locationChangeFlag)
+              }
+            })
+          },
+          function(error) {
+            if (error.code == error.PERMISSION_DENIED)
+              setPermissionDenied(true)
+          }
+        )
+      } else {
+        alert.show("Sorry, geolocation is not available")
+      }
+    }
+    catch{
       alert.show("Sorry, geolocation is not available")
+      setPermissionDenied(true)
     }
   }
 
@@ -435,7 +442,8 @@ function Location() {
     setLocationChangeFlag(!locationChangeFlag)
   }
 
-  return loading?
+  return (!permissionDenied) ?
+  (loading?
   <div/>
   :
   (fetchingLocation ? 
@@ -464,7 +472,10 @@ function Location() {
         </div>
       </button>
   </div>
-  )
+  )) : 
+  <div className="flex flex-col justify-center items-center space-y-20px">
+  <div className="text-gray-500 text-16px">Sorry, geolocation is not available right now. Please give your permission.</div>
+  </div>
 }
 
 
