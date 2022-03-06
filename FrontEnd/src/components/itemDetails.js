@@ -125,7 +125,7 @@ function ItemDetails(props) {
       //console.log("data", data)
     })
     const data = res.data
-    //console.log(data)
+    // console.log(data)
     setName(data.title)
     setDesc(data.description)
     setPrice(data.price)
@@ -134,6 +134,7 @@ function ItemDetails(props) {
     setRelatedComments(data.relatedComments)
     setCond(data.condition)
     setCategory(data.tags)
+    setTags([data.tags])
     setLoc(data.location)
     setLoading(false)
   }, [changeFlag])
@@ -144,6 +145,7 @@ function ItemDetails(props) {
     const imgLen = images ? images.length : 0
     let totItems = what === 'tags' ? totTags : imgLen
     for (let k = 0; k < totItems; k++) {
+      console.log(tags)
       if (what === 'tags') {
         out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
       }
@@ -243,7 +245,7 @@ function ItemDetails(props) {
             <h1 className="w-638px h-81px text-32px font-roboto-reg leading-none break-words overflow-hidden">
               {name}
             </h1>
-            <div className="h-20px m-w-638px mb-20px">{init('tags')}</div>
+            <div className="h-20px m-w-638px mb-20px">{init('tags')} {console.log("ahhhhhh")}</div>
 
             <div className="flex flex-row justify-between">
               <div className="flex-col justify-between">

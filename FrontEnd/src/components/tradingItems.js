@@ -8,27 +8,46 @@ export default function TradingItems() {
 
     useEffect(() => {
         ItemServices.get_all().then(res => {
-            setResults(res.data.slice(0, 9).map(item => item._id))
-        })
+            const start = getRandomInt(res.data.length-5)
+            console.log(start)
+            setResults(res.data.slice(start, start+5).map(item => item._id));
+        });
+        setResults(shuffle(results))
     }, [])
 
+    console.log(shuffle(results))
     return (
-        results.length ? 
-        <div className='mt-20px flex flex-row justify-center'>
-            <ItemPreviewList type="short" itemIds={results} />
-        </div>
-        :
-        <div className='mt-20px flex flex-row justify-center font-avenir-med text-300px text-gray-500'>
-            No items found, try another keyword =...=
-        </div>
+        results.length ?
+            <div className='mt-20px flex flex-row justify-center'>
+                <ItemPreviewList type="short" itemIds={results} />
+            </div>
+            :
+            <div className='mt-20px flex flex-row justify-center font-avenir-med text-300px text-gray-500'>
+                No items found, try another keyword =...=
+            </div>
 
     );
 }
 
-{/* <div>
-<div className='w-955px h-336px pt-25px pb-23px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto'>
-    {items.map((element) => (
-        <ItemPreview.Short itemid={element.id} img={element.src} text={element.text} price={element.price}/>
-    ))}
-</div>
-</div> */}
+
+function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
