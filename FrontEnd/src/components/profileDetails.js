@@ -7,7 +7,8 @@ import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
 import { useNavigate } from 'react-router';
-
+import UploadImage from "./uploadImage";
+import imageUpload from "../backend_services/firebase/imageUpload.js"
 
 //import commentServices from '../backend_services/comment_services';
 
@@ -79,16 +80,16 @@ export default function ProfileDetails({ preSelect, username }) {
       <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white drop-shadow-md flex flex-col items-center">
         <UserProfile username={username ? username : currentUsername} />
         <div className="flex flex-col items-start mt-29px">
-          
+
           <div className="font-roboto-reg text-18px mb-20px text-gray-600">
             My Account
           </div>
           <div className="flex flex-col justify-start space-y-5px ">
             {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
           </div>
-          
+
         </div>
-        {ownerIsCurrentUser ? 
+        {ownerIsCurrentUser ?
           <div className="flex flex-col items-start mt-50px">
             <div className="font-roboto-reg text-18px mb-20px text-gray-600">
               Settings
@@ -96,8 +97,8 @@ export default function ProfileDetails({ preSelect, username }) {
             <div className="flex flex-col justify-start space-y-5px ">
               {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
             </div>
-          </div> 
-          : 
+          </div>
+          :
           <SubscriptionButton username={user_name} />
         }
       </div>
@@ -163,7 +164,7 @@ function SellingItems({ username }) {
 
   const alert = useAlert();
   const navigate = useNavigate();
-  
+
   const [myItemIds, setMyItemIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -201,7 +202,7 @@ function Sold() {
 }
 
 function SubscriptionButton({ username }) {
-  
+
   const token = useSelector((state) => state.loginStatus.token);
   const [subscribed, setSubscribed] = useState(false)
   const [loading, setLoading] = useState(true);
@@ -236,7 +237,7 @@ function SubscriptionButton({ username }) {
       })
     }
   }
-  if(loading) 
+  if(loading)
     return <div />
   else {
     return (
@@ -364,8 +365,8 @@ function Location() {
   function viewLocation() {
     setLocationChangeFlag(!locationChangeFlag)
   }
-  
-  return loading? 
+
+  return loading?
   <div/>
   :
   <div>
@@ -387,7 +388,7 @@ function Location() {
       <Map latitude={latitude} longitude={longitude}/>
     </div>
   </div>
-  
+
 
 }
 
@@ -421,9 +422,9 @@ function Profile() {
       </div>
       <div className="w-200px h-221px text-14px font-avenir-reg mt-49px">
         Profile Image
-        <div className="h-10px" />
-        <UserProfile />
+        <PhotoUpload />
       </div>
+      
       <button
         onClick={saveChanges}
         className="absolute text-16px font-roboto-reg text-white ml-775px mt-460px bg-blue-300 h-50px w-150px rounded-full hover:bg-blue-400"
@@ -434,8 +435,29 @@ function Profile() {
   );
 }
 
+function PhotoUpload(props) {
+
+  const [profileImgUrl, setProfileImgUrl] = useState(useSelector((state) => state.userInfo.profileImage));
+
+  function handleUploadImage(event) {
+    imageUpload([...event.target.files][0]).then((url) => {
+      setProfileImgUrl(url)
+    })
+
+  }
+
+  return (
+      <div className='relative flex flex-col justify-start items-center w-100px h-100px'>
+          <input type="file" onChange={(event) => handleUploadImage(event)} className="absolute block opacity-0 z-20 w-full h-full left-0 top-0" />
+          <div id="profileImg" className="z-10 w-full h-full rounded-full overflow-hidden bg-blue-100">
+            <img src={profileImgUrl}/>
+          </div>
+      </div>
+  );
+}
+
 function Loading() {
- return <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Loading...</div> 
+ return <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Loading...</div>
 }
 
 /*
