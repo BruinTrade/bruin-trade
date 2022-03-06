@@ -27,7 +27,9 @@ const UserServices = {
 
     getLocation: getLocation,
 
-    getLocationByUsername: getLocationByUsername
+    getLocationByUsername: getLocationByUsername,
+
+    updateUserInfo: updateUserInfo
 }
 
 async function useLogin(dispatch, username, password) {
@@ -215,8 +217,19 @@ async function getLocationByUsername(token, username)
     return http.get(`/${username}/getLocationByUsername`, config)
 }
 
-
-
+async function updateUserInfo(token, email, icon_url, location) {
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    const data = {
+        email: email,
+        icon_url: icon_url,
+        location: location
+    }
+    return http.post("/updateUserInfo", data, config)
+}
 
 export default UserServices;
 

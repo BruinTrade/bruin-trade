@@ -7,6 +7,7 @@ import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
 import { useNavigate } from "react-router-dom";
+import get_icon, { Icons } from "./icons_SVG";
 
 
 //import commentServices from '../backend_services/comment_services';
@@ -48,7 +49,7 @@ export default function ProfileDetails({ preSelect, username }) {
   const currentUsername = useSelector((state) => state.userInfo.username);
   const user_name = username ? username : currentUsername
   const ownerIsCurrentUser = (user_name === currentUsername)
-  const [selection, setSelectionState] = useState(preSelect ? preSelect : (ownerIsCurrentUser ? 6 : 1));
+  const [selection, setSelectionState] = useState(preSelect !== undefined ? preSelect : (ownerIsCurrentUser ? 6 : 1));
 
   const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
@@ -108,7 +109,7 @@ export default function ProfileDetails({ preSelect, username }) {
         <div className="font-roboto-reg text-16px ml-20px text-gray-500">
           {selection >= PageNames.length ? PageNames[PageNames.length-1] : PageNames[selection]}
         </div>
-        <div className="h-5px" />
+        <div className="" />
         {getMenu(selection)}
       </div>
     </div>
@@ -162,11 +163,9 @@ function Orders() {
 
 function SellingItems({ username }) {
 
-  const token = useSelector((state) => state.loginStatus.token);
-
+  const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
   const alert = useAlert();
   const navigate = useNavigate();
-  
   const [myItemIds, setMyItemIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -179,7 +178,7 @@ function SellingItems({ username }) {
       }
       setLoading(false)
     })
-  }, [])
+  }, [sellingItemsChange])
 
 
   const placeholder = (
@@ -382,6 +381,8 @@ function Location() {
   const [longitude, setLongitude] = useState("")
   const [locationChangeFlag, setLocationChangeFlag] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [fetchingLocation, setFetchingLocation] = useState(false)
+  const [fetchingLocationSuccess, setfetchingLocationSuccess] = useState(false)
 
   useEffect(() => {
     UserServices.getLocation(token).then((res) => {
@@ -401,11 +402,11 @@ function Location() {
         setLoading(false)
       }
     })
-  }, [locationChangeFlag])
+  }, [locationChangeFlag, fetchingLocation, fetchingLocationSuccess])
 
 
   function updateLocation() {
-
+    setFetchingLocation(true)
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function(location) {
@@ -414,6 +415,8 @@ function Location() {
               alert.show(res.data.errors ? res.data.errors : res.data.error);
             } else {
               alert.show(res.data.status)
+              setFetchingLocation(false)
+              setfetchingLocationSuccess(true)
               setLocationChangeFlag(!locationChangeFlag)
             }
           })
@@ -434,27 +437,33 @@ function Location() {
   return loading? 
   <div/>
   :
+  (fetchingLocation ? 
+  <div className="flex flex-col justify-center items-center space-y-20px">
+    <div className="text-gray-500 text-16px">Fetching your current location...</div>
+  </div>
+  :
   <div className="relative flex flex-col space-y-20px">
     <div className="rounded-12px overflow-hidden">
       <Map latitude={latitude} longitude={longitude}/>
     </div>
-    <div className="absolute left-10px bottom-10px flex flex-col justify-end space-y-10px">
+    <div className="absolute left-10px top-40px flex flex-col justify-end space-y-10px">
       <button
           onClick={updateLocation}
-          className="px-12px py-10px text-14px text-gray-500 border border-1 border-gray-500 rounded-12px hover:bg-blue-400"
+          className="px-12px py-10px text-16px text-gray-700 bg-white rounded-2px hover:bg-gray-100"
         >
           Set Location
         </button>
-        <button
-        onClick={viewLocation}
-        className="px-12px py-10px text-14px text-white bg-blue-400 rounded-12px hover:bg-blue-400"
-      >
-        Current Location
-      </button>
     </div>
+    <button
+        onClick={viewLocation}
+        className="absolute right-10px top-40px p-5px bg-white rounded-2px"
+      >
+        <div className="w-30px h-30px">
+          { get_icon(Icons.location) }
+        </div>
+      </button>
   </div>
-  
-
+  )
 }
 
 
@@ -477,6 +486,7 @@ function Profile() {
           type="text"
           maxLength={20}
           minLength={3}
+          disabled="true"
         />
         <Form
           label="Email"

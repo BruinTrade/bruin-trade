@@ -93,11 +93,9 @@ export function ItemPreviewShort({ item_id }) {
 }
 
 
-export function ItemPreviewLong({ item_id }) {
+export function ItemPreviewLong({ item_id, hasDeleteButton }) {
 
     const { title, price, description, images, itemOwner, location, condition, _ } = useItemDataProvider({item_id : item_id})
-
-    const hasDeleteButton = false;
 
     const token = useSelector((state) => state.loginStatus.token)
     const username = useSelector((state) => state.userInfo.username)
@@ -128,6 +126,8 @@ export function ItemPreviewLong({ item_id }) {
     {
         local_hasDeleteButton = false
     }
+
+    
   
     return (
         <Link to={`/post/${item_id}`}>
@@ -205,7 +205,7 @@ export function ItemPreviewList(props) {
             :
             previewType === "long" ?
             itemIds.map((id) => {
-                return <ItemPreviewLong item_id={id} />
+                return <ItemPreviewLong item_id={id} hasDeleteButton={props.hasDeleteButton} />
              })
              :
             itemIds.map((id) => {

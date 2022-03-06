@@ -7,7 +7,6 @@ import UserServices from './../backend_services/user_services.js';
 import { useNavigate } from "react-router-dom";
 //import { setQuery } from '../redux/slices/query.js';
 import { useAlert } from 'react-alert'
-
 import { InfoPages, SettingPages } from "./profileDetails.js";
 
 function NavBar() {

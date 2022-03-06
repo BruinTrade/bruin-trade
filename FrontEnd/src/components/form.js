@@ -20,7 +20,7 @@ export default function Form(props) {
                 { required ? <label className="h-full text-red-500 inline-block ">*</label> : null }
             </span>
             {formType === "input" ? 
-            <InputField label={props.label} placeholder={props.placeholder} width={props.width} height={props.height} minLength={props.minLength} maxLength={props.maxLength} value={props.value} type={props.type} onChange={props.onChange}/> 
+            <InputField  disabled={props.disabled} label={props.label} placeholder={props.placeholder} width={props.width} height={props.height} minLength={props.minLength} maxLength={props.maxLength} value={props.value} type={props.type} onChange={props.onChange}/> 
             : null}
 
             {formType === "selection" ? 
@@ -39,26 +39,29 @@ export function InputField(props) {
     const value = props.value;
     const type = props.type ?? "text";
     const onChange = props.onChange ?? ((_) => {})
+    const disabled = props.disabled ?? false
 
     return (
         <div className={`w-${width}px h-${height}px flex flex-row justify-start items-center`}>
             {
                 height > 40 ? 
-                <textarea id={props.label}className="h-full w-full px-12px py-12px bg-gray-100 rounded-12px text-14px text-gray-500 placeholder-shown:text-12px placeholder-gray-300 align-middle focus:outline-none resize-none"
+              <textarea id={props.label} className={ `${disabled ? "cursor-not-allowed" : "" } h-full w-full px-12px py-12px bg-gray-100 rounded-12px text-14px text-gray-500 placeholder-shown:text-12px placeholder-gray-300 align-middle focus:outline-none resize-none cursor-not-allowed`}
                     type={type} 
                     placeholder={props.placeholder} 
                     value={value} 
                     onChange={onChange} 
                     maxLength={maxLength} 
-                    minLength={minLength}/>
+                    minLength={minLength}
+                    disabled={disabled}/>
                 : 
-                <input id={props.label}className="h-full w-full px-12px py-12px bg-gray-100 rounded-12px text-14px text-gray-500 placeholder-shown:text-12px placeholder-gray-300 align-middle focus:outline-none resize-none"
+                <input id={props.label}className={ `${disabled ? "cursor-not-allowed" : "" } h-full w-full px-12px py-12px bg-gray-100 rounded-12px text-14px text-gray-500 placeholder-shown:text-12px placeholder-gray-300 align-middle focus:outline-none resize-none`}
                     type={type} 
                     placeholder={props.placeholder} 
                     value={value} 
                     onChange={onChange} 
                     maxLength={maxLength} 
-                    minLength={minLength}/>
+                    minLength={minLength}
+                    disabled={disabled}/>
             }
         </div>
     );

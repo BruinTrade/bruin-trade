@@ -166,6 +166,34 @@ export default class UserController {
     });
   }
 
+  static async updateUserInfo(req, res, next) {
+    const new_email = req.body.email;
+    const new_icon_url = req.body.icon_url;
+    const new_location = req.body.location;
+    if (!new_email)
+    {
+      res.status(201).json({ errors: "No new email provided" });
+      return
+    }
+    if (!new_icon_url)
+    {
+      res.status(201).json({ errors: "No new icon" });
+      return
+    }
+    if (!new_location)
+    {
+      res.status(201).json({ errors: "No new location" });
+      return
+    }
+    User.updateUserInfo(req.user_info.username, new_email, new_icon_url, new_location)
+    .then((message) => {
+      res.json({ status: message });
+    })
+    .catch((error_message) => {
+      res.status(201).json({ errors: error_message });
+    });
+  }
+
   static async findUserById(req, res, next) {}
 
   //static async getPostedItems(req, res, next) {}

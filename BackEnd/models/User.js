@@ -5,7 +5,7 @@ let userCollection;
 
 class User {
   constructor(input_data) {
-    this.data = { ...input_data, username: input_data.username };
+    this.data = { ...input_data, username: input_data.username, icon_url: null };
     this.errors = [];
   }
 
@@ -348,6 +348,28 @@ class User {
         reject("failed to find current user");
         return;
       }
+    });
+  }
+
+  static async updateUserInfo(username, new_email, new_icon_url, new_location) {
+    return new Promise(async (resolve, reject) => {
+      userCollection
+      .findOneAndUpdate(
+        { username: username },
+        {
+          $set: {
+            email: new_email,
+            icon_url: new_icon_url,
+            location: new_location
+          },
+        }
+      )
+      .then(() => {
+        resolve("successfully updated user info");
+      })
+      .catch(() => {
+        reject("failed to updated user info");
+      });
     });
   }
 }

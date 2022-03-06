@@ -15,24 +15,29 @@ export const userInfo = createSlice({
     reducers: {
         setUsername: (state, action) => {
             //set username
-            Cookies.set('username', action.payload, { expires: 7 });
+            Cookies.set('username', action.payload, { expires: 1 });
             state.username = action.payload;
         },
         setEmail: (state, action) => {
             //set username
-            Cookies.set('email', action.payload, { expires: 7 });
+            Cookies.set('email', action.payload, { expires: 1 });
             state.email = action.payload;
         },
         setLocation: (state, action) => {
             //set location
-            Cookies.set('location', action.payload, { expires: 7 });
+            Cookies.set('location', action.payload, { expires: 1 });
             state.location = action.payload;
+        },
+        setProfileImage: (state, action) => {
+            //set location
+            Cookies.set('profileImg', action.payload, { expires: 1 });
+            state.profileImage = action.payload;
         }
     }
 })
 
 //actions
-export const { setUsername, setLocation, setEmail } = userInfo.actions;
+export const { setUsername, setLocation, setEmail, setProfileImage } = userInfo.actions;
 
 //reducer
 export default userInfo.reducer;
