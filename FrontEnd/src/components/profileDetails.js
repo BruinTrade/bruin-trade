@@ -6,6 +6,7 @@ import { ItemPreviewList } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
+import { useNavigate } from 'react-router';
 
 
 //import commentServices from '../backend_services/comment_services';
@@ -118,7 +119,7 @@ function SelectTab({ name, selected, selectCallBack }) {
       {name}
     </div>
   );
-}
+  }
 
 function WatchList() {
 
@@ -255,10 +256,7 @@ function Subscriptions() {
 
   function fetchFollowing() {
     UserServices.getAllFollowings(token).then((res) => {
-<<<<<<< HEAD
-=======
       //console.log(res)
->>>>>>> 05872bfc3a102c4d374b04564caac39281c556df
       if (res.status !== 200) {
         alert.show(res.data.errors ? res.data.errors : res.data.error);
       } else {
@@ -277,14 +275,7 @@ function Subscriptions() {
   } else {
     return (
       <div className="flex flex-col space-y-20px">
-<<<<<<< HEAD
-        {subscriptions.length === 0 ? 
-        <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Subscribe to your friends!</div> 
-        : 
-        subscriptions.map((username) => <Subscription username={username} unsubscribeCallback={fetchFollowing}/>)}
-=======
         {subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing}/>)}
->>>>>>> 05872bfc3a102c4d374b04564caac39281c556df
       </div>
       );
   }
