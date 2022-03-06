@@ -1,6 +1,6 @@
 import http from "../axios-http"
 import { login, logout } from '../redux/slices/loginStatus.js';
-import { setLocation, setUsername, setEmail } from '../redux/slices/userInfo.js';
+import { setLocation, setUsername, setEmail, setProfileImage } from '../redux/slices/userInfo.js';
 
 const UserServices = {
     login : useLogin,
@@ -25,7 +25,13 @@ const UserServices = {
 
     updateLocation: updateLocation,
 
-    getLocation: getLocation
+    getLocation: getLocation,
+
+    getLocationByUsername: getLocationByUsername,
+
+    updateUserInfo: updateUserInfo,
+
+    getUserIconByUsername: getUserIconByUsername
 }
 
 async function useLogin(dispatch, username, password) {
@@ -45,6 +51,14 @@ async function useLogin(dispatch, username, password) {
             dispatch(setUsername(data.username));
             dispatch(setEmail(data.email));
             dispatch(setLocation(data.location));
+            if (data.icon_url)
+            {
+                dispatch(setProfileImage(data.icon_url));
+            }
+            else
+            {
+                dispatch(setProfileImage(null));
+            }
             return { status: 200 }
     //process failed
         } catch {
@@ -203,8 +217,38 @@ async function getLocation(token)
     return http.get("/getLocation", config)
 }
 
+async function getLocationByUsername(token, username)
+{
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    return http.get(`/${username}/getLocationByUsername`, config)
+}
 
+async function updateUserInfo(token, email, icon_url, location) {
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    const data = {
+        email: email,
+        icon_url: icon_url,
+        location: location
+    }
+    return http.post("/updateUserInfo", data, config)
+}
 
+async function getUserIconByUsername(token, username) {
+    const config = {
+        headers: {
+            access_control: token,
+        }
+    }
+    return http.get(`/${username}/getUserIconByUsername`, config)
+}
 
 export default UserServices;
 

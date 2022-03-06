@@ -6,9 +6,11 @@ import { ItemPreviewList } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
-import { useNavigate } from 'react-router';
-import UploadImage from "./uploadImage";
-import imageUpload from "../backend_services/firebase/imageUpload.js"
+import { useNavigate } from "react-router-dom";
+import get_icon, { Icons } from "./icons_SVG";
+import uploadImage from "../backend_services/firebase/imageUpload";
+import { useDispatch } from "react-redux";
+import { setProfileImage, setLocation } from "../redux/slices/userInfo";
 
 //import commentServices from '../backend_services/comment_services';
 
@@ -22,40 +24,41 @@ export const InfoPages = {
   orders : 2,
   sold : 3,
   subscriptions : 4,
+  OtherUserLocation: 7,
 }
 export const SettingPages = {
   location : 5,
   profile : 6
 }
-const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile"]
+const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "User Location"]
 
 export default function ProfileDetails({ preSelect, username }) {
   //console.log(preSelect)
 
-  const InfoPages = {
-    watchList : 7,
-    sellingItems : 1,
-    orders : 2,
-    sold : 3,
-    subscriptions : 4,
-  }
-  const SettingPages = {
-    location : 5,
-    profile : 6
-  }
-  const PageNames = ["placeholder", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "Watch List"]
+  // const InfoPages = {
+  //   watchList : 7,
+  //   sellingItems : 1,
+  //   orders : 2,
+  //   sold : 3,
+  //   subscriptions : 4,
+  // }
+  // const SettingPages = {
+  //   location : 5,
+  //   profile : 6
+  // }
+  // const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "OtherUserLocation"]
 
   const currentUsername = useSelector((state) => state.userInfo.username);
   const user_name = username ? username : currentUsername
   const ownerIsCurrentUser = (user_name === currentUsername)
-  const [selection, setSelectionState] = useState(preSelect ? preSelect : (ownerIsCurrentUser ? 6 : 1));
+  const [selection, setSelectionState] = useState(preSelect !== undefined ? preSelect : (ownerIsCurrentUser ? 6 : 1));
 
-  const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold]
+  const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
 
   function getMenu(selection) {
     switch (selection) {
-      case 7: // Watch List
+      case 0: // Watch List
         return <WatchList />
       case 1: //Selling Items
         return <SellingItems username={ user_name } />
@@ -69,6 +72,8 @@ export default function ProfileDetails({ preSelect, username }) {
         return <Location />
       case 6: // Profile
         return <Profile />
+      case 7: //other user location
+        return <OtherUserLocation other_username={username}/>
       default: // Profile
         return <Profile />
     }
@@ -106,7 +111,7 @@ export default function ProfileDetails({ preSelect, username }) {
         <div className="font-roboto-reg text-16px ml-20px text-gray-500">
           {selection >= PageNames.length ? PageNames[PageNames.length-1] : PageNames[selection]}
         </div>
-        <div className="h-5px" />
+        <div className="" />
         {getMenu(selection)}
       </div>
     </div>
@@ -160,11 +165,9 @@ function Orders() {
 
 function SellingItems({ username }) {
 
-  const token = useSelector((state) => state.loginStatus.token);
-
+  const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
   const alert = useAlert();
   const navigate = useNavigate();
-
   const [myItemIds, setMyItemIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -177,7 +180,7 @@ function SellingItems({ username }) {
       }
       setLoading(false)
     })
-  }, [])
+  }, [sellingItemsChange])
 
 
   const placeholder = (
@@ -257,7 +260,6 @@ function Subscriptions() {
 
   function fetchFollowing() {
     UserServices.getAllFollowings(token).then((res) => {
-      //console.log(res)
       if (res.status !== 200) {
         alert.show(res.data.errors ? res.data.errors : res.data.error);
       } else {
@@ -276,7 +278,10 @@ function Subscriptions() {
   } else {
     return (
       <div className="flex flex-col space-y-20px">
-        {subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing}/>)}
+        {subscriptions.length === 0 ? 
+        <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Subscribe to your friends!</div> 
+        : 
+        subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing}/>)}
       </div>
       );
   }
@@ -309,6 +314,65 @@ function Subscription({ username, unsubscribeCallback }) {
   );
 }
 
+function OtherUserLocation(props) {
+  const token = useSelector((state) => state.loginStatus.token);
+  const alert = useAlert()
+  const [latitude, setLatitude] = useState("")
+  const [longitude, setLongitude] = useState("")
+  const [hasLocation, setHasLocation] = useState(true)
+  const [locationChangeFlag, setLocationChangeFlag] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    UserServices.getLocationByUsername(token, props.other_username).then((res) => {
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error);
+      } else {
+        if (res.data.location === null)
+        {
+          setLatitude(0)
+          setLongitude(0)
+          setHasLocation(false)
+        }
+        else
+        {
+          setLatitude(res.data.location.latitude)
+          setLongitude(res.data.location.longitude)
+        }
+        setLoading(false)
+      }
+    })
+  }, [locationChangeFlag])
+
+  function viewLocation() {
+    setLocationChangeFlag(!locationChangeFlag)
+  }
+
+  return loading? 
+  <div/>
+  : 
+  (
+    hasLocation ? 
+      <div className="relative flex flex-col space-y-20px">
+        <div className="rounded-12px overflow-hidden">
+          <Map latitude={latitude} longitude={longitude}/>
+        </div>
+        <button
+            onClick={viewLocation}
+            className="absolute right-10px top-40px p-5px bg-white rounded-2px"
+          >
+            <div className="w-30px h-30px">
+              { get_icon(Icons.location) }
+            </div>
+          </button>
+      </div>
+    :
+    <div className="flex flex-col justify-center items-center space-y-20px">
+      <div className="text-gray-500 text-16px">The user has not provided detailed location yet</div>
+    </div>
+    
+  )
+}
 
 
 function Location() {
@@ -318,6 +382,8 @@ function Location() {
   const [longitude, setLongitude] = useState("")
   const [locationChangeFlag, setLocationChangeFlag] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [fetchingLocation, setFetchingLocation] = useState(false)
+  const [fetchingLocationSuccess, setfetchingLocationSuccess] = useState(false)
 
   useEffect(() => {
     UserServices.getLocation(token).then((res) => {
@@ -337,10 +403,11 @@ function Location() {
         setLoading(false)
       }
     })
-  }, [locationChangeFlag])
+  }, [locationChangeFlag, fetchingLocation, fetchingLocationSuccess])
 
 
   function updateLocation() {
+    setFetchingLocation(true)
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function(location) {
@@ -349,6 +416,8 @@ function Location() {
               alert.show(res.data.errors ? res.data.errors : res.data.error);
             } else {
               alert.show(res.data.status)
+              setFetchingLocation(false)
+              setfetchingLocationSuccess(true)
               setLocationChangeFlag(!locationChangeFlag)
             }
           })
@@ -369,37 +438,94 @@ function Location() {
   return loading?
   <div/>
   :
-  <div>
-    <div className="flex flex-col h-200px w-1000px bg-white font-avenir-reg text-20px text-center text-gray-500 drop-shadow-md rounded-25px">
-    <button
-        onClick={updateLocation}
-        className="mt-40px ml-350px text-16px font-roboto-reg text-white bg-blue-400 h-50px w-300px rounded-full hover:bg-blue-400"
-      >
-        Use Current Location In Profile
-      </button>
-      <button
-        onClick={viewLocation}
-        className="mt-25px ml-350px text-16px font-roboto-reg text-white bg-blue-300 h-50px w-300px rounded-full hover:bg-blue-400"
-      >
-        View Location In Profile
-      </button>
-    </div>
-    <div className="mt-10px">
+  (fetchingLocation ? 
+  <div className="flex flex-col justify-center items-center space-y-20px">
+    <div className="text-gray-500 text-16px">Fetching your current location...</div>
+  </div>
+  :
+  <div className="relative flex flex-col space-y-20px">
+    <div className="rounded-12px overflow-hidden">
       <Map latitude={latitude} longitude={longitude}/>
     </div>
+    <div className="absolute left-10px top-40px flex flex-col justify-end space-y-10px">
+      <button
+          onClick={updateLocation}
+          className="px-12px py-10px text-16px text-gray-700 bg-white rounded-2px hover:bg-gray-100"
+        >
+          Set Location
+        </button>
+    </div>
+    <button
+        onClick={viewLocation}
+        className="absolute right-10px top-40px p-5px bg-white rounded-2px"
+      >
+        <div className="w-30px h-30px">
+          { get_icon(Icons.location) }
+        </div>
+      </button>
   </div>
-
-
+  )
 }
 
+
 function Profile() {
-
-  function saveChanges() {
-    // to be implemented
-  }
-
+  const dispatch = useDispatch()
+  const token = useSelector((state) => state.loginStatus.token)
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState(useSelector((state) => state.userInfo.email));
   const [username, setUsername] = useState(useSelector((state) => state.userInfo.username));
+  const [userLocation, setUserLocation] = useState(useSelector((state) => state.userInfo.location));
+  const [profileImgUrl, setProfileImgUrl] = useState(useSelector((state) => state.userInfo.profileImage));
+  const [profileImgFile, setProfileImgFile] = useState();
+  const alert = useAlert()
+
+  async function saveChanges() {
+
+    if (userLocation === "")
+    {
+      alert.show("Must Provide a Location")
+    }
+    if (email === "")
+    {
+      alert.show("Must Provide an Email")
+    }
+
+    if (profileImgFile)
+    {
+      const url = await uploadImage(profileImgFile)
+      setProfileImgUrl(url)
+      const res = await UserServices.updateUserInfo(token, email, url, userLocation)
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error)
+        setLoading(false)
+      }
+      else
+      {
+        dispatch(setLocation(userLocation))
+        dispatch(setProfileImage(url))
+        alert.show("Successfully updated user profile")
+        setLoading(false)
+      }
+    } else {
+      const res = await UserServices.updateUserInfo(token, email, null, userLocation)
+      if (res.status !== 200) {
+        alert.show(res.data.errors ? res.data.errors : res.data.error)
+        setLoading(false)
+      }
+      else
+      {
+        dispatch(setLocation(userLocation))
+        alert.show("Successfully updated user profile")
+        setLoading(false)
+      }
+    }
+  }
+
+  function handleUploadImage(event) {
+    const file = [...event.target.files][0]
+    setProfileImgFile(file)
+    setProfileImgUrl(URL.createObjectURL(file))
+  }
 
   return (
     <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
@@ -411,6 +537,7 @@ function Profile() {
           type="text"
           maxLength={20}
           minLength={3}
+          disabled={true}
         />
         <Form
           label="Email"
@@ -419,10 +546,22 @@ function Profile() {
           onChange={(event) => setEmail(event.target.value)}
           type="email"
         />
+        <Form
+          label="Location"
+          placeholder="Please enter a new location"
+          value={userLocation}
+          onChange={(event) => setUserLocation(event.target.value)}
+          type="text"
+        />
       </div>
       <div className="w-200px h-221px text-14px font-avenir-reg mt-49px">
         Profile Image
-        <PhotoUpload />
+        <div className='relative flex flex-col justify-start items-center w-100px h-100px'>
+          <input type="file" onChange={(event) => handleUploadImage(event)} className="absolute block opacity-0 z-20 w-full h-full left-0 top-0" />
+          <div id="profileImg" className="z-10 w-full h-full rounded-full overflow-hidden bg-blue-100">
+            <img src={profileImgUrl} className="w-full h-full object-cover" />
+          </div>
+        </div>
       </div>
       
       <button
@@ -431,96 +570,20 @@ function Profile() {
       >
         Save Changes
       </button>
+      {
+        loading ? 
+        <div className="absolute left-0 top-0 w-full h-full backdrop-opacity-10 bg-white-10 z-40">
+          <Loading />
+        </div> 
+        :
+        null
+      }
     </div>
   );
 }
 
-function PhotoUpload(props) {
-
-  const [profileImgUrl, setProfileImgUrl] = useState(useSelector((state) => state.userInfo.profileImage));
-
-  function handleUploadImage(event) {
-    imageUpload([...event.target.files][0]).then((url) => {
-      setProfileImgUrl(url)
-    })
-
-  }
-
-  return (
-      <div className='relative flex flex-col justify-start items-center w-100px h-100px'>
-          <input type="file" onChange={(event) => handleUploadImage(event)} className="absolute block opacity-0 z-20 w-full h-full left-0 top-0" />
-          <div id="profileImg" className="z-10 w-full h-full rounded-full overflow-hidden bg-blue-100">
-            <img src={profileImgUrl}/>
-          </div>
-      </div>
-  );
-}
 
 function Loading() {
  return <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Loading...</div>
 }
 
-/*
-
-
-          <div className="w-230px h-100px flex-col flex items-start pl-12px justify-between">
-            <button
-              onClick={() => {
-                setState(6);
-                setStateTag("My Selling Items");
-              }}
-              className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med"
-            >
-              My Selling Items
-            </button>
-            <button
-              onClick={() => {
-                setState(1);
-                setStateTag("Watch List");
-              }}
-              className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med"
-            >
-              Watch List
-            </button>
-            <button
-              onClick={() => {
-                setState(3);
-                setStateTag("Sold");
-              }}
-              className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med"
-            >
-              Sold
-            </button>
-            <button
-              onClick={() => {
-                setState(4);
-                setStateTag("Subscriptions");
-              }}
-              className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med"
-            >
-              Subscriptions
-            </button>
-          </div>
-
-
-          <div className="w-230px h-50px flex-col flex items-start pl-12px justify-between">
-            <button
-              onClick={() => {
-                setState(5);
-                setStateTag("Location");
-              }}
-              className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med"
-            >
-              Location
-            </button>
-            <button
-              onClick={() => {
-                setState(0);
-                setStateTag("Profile");
-              }}
-              className="text-gray-500 font-avenir-reg text-14px hover:font-avenir-med"
-            >
-              Profile
-            </button>
-          </div>
-*/

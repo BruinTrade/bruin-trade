@@ -35,6 +35,9 @@ BackEndRouter.post("/:username/:item_id/removeFromCart", UserController.removeIt
 BackEndRouter.get("/:username/cart", UserController.getItemsInCart);
 BackEndRouter.post("/updateLocation", UserController.updateLocation);
 BackEndRouter.get("/getLocation", UserController.getLocation);
+BackEndRouter.get("/:username/getLocationByUsername", UserController.getLocationByUsername);
+BackEndRouter.get("/:username/getUserIconByUsername", UserController.getUserIconByUsername);
+BackEndRouter.post("/updateUserInfo", UserController.updateUserInfo);
 
 //About comments
 BackEndRouter.post("/post_comment/:item_id", CommentsController.postComment);

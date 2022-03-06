@@ -148,6 +148,10 @@ class User {
         if (user_info) {
           let temp_user = new User(user_info);
           //clean up sensitive information
+          if (!temp_user.data.icon_url)
+          {
+            temp_user.data.icon_url = null
+          }
           temp_user = {
             _id: temp_user.data._id,
             username: temp_user.data.username,
@@ -155,7 +159,8 @@ class User {
             location: temp_user.data.location,
             cart: temp_user.data.cart,
             followings: temp_user.data.followings,
-            gps_location: temp_user.data.gps_location
+            gps_location: temp_user.data.gps_location,
+            icon_url: temp_user.data.icon_url
             //more info here
           };
           resolve(temp_user);
@@ -351,7 +356,44 @@ class User {
     });
   }
 
+  static async updateUserInfo(username, new_email, new_icon_url, new_location) {
+    return new Promise(async (resolve, reject) => {
+      userCollection
+      .findOneAndUpdate(
+        { username: username },
+        {
+          $set: {
+            email: new_email,
+            icon_url: new_icon_url,
+            location: new_location
+          },
+        }
+      )
+      .then(() => {
+        resolve("successfully updated user info");
+      })
+      .catch(() => {
+        reject("failed to updated user info");
+      });
+    });
+  }
 
+  static async getUserIconByUsername(username) {
+    return new Promise(async (resolve, reject) => {
+      let current_user_info;
+      try {
+        current_user_info = await this.findUserByName(username);
+        //console.log(current_user_info)
+        if (!current_user_info.icon_url) {
+          current_user_info.icon_url = null;
+        }
+        resolve(current_user_info.icon_url);
+      } catch {
+        reject("failed to find current user");
+        return;
+      }
+    });
+  }
 }
 
 export default User;

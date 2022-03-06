@@ -4,7 +4,7 @@ function Map(props)
   {
     const containerStyle = {
       width: '1000px',
-      height: '365px'
+      height: '580px'
     };
     
     const center = {
@@ -35,7 +35,7 @@ function Map(props)
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}
-          zoom={17}
+          defaultZoom={20}
           onLoad={onLoad}
           onUnmount={onUnmount}
         />

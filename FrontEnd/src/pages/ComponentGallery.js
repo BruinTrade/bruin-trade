@@ -9,7 +9,6 @@ import CreatePost from "../components/createPost.js";
 import CreateComment from "../components/createComment.js";
 import CommentList from "../components/commentList.js";
 import { UserProfileSmall } from "../components/userProfile.js";
-import PhotoUpload from "../components/addPhoto.js";
 
 const comments = [
     {
@@ -33,7 +32,6 @@ const comments = [
 export default function PageComponentGallery() {
     return (
         <div className="flex flex-col space-y-10">
-            <UserProfileSmall />
             <ConcisePreview />
             <SignUp/>
             <SignIn/>
@@ -43,7 +41,6 @@ export default function PageComponentGallery() {
             <CreatePost />
             <CreateComment/>
             <CommentList comments={comments}/>
-            <PhotoUpload/>
         </div>
     )
 }

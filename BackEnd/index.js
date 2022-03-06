@@ -14,6 +14,7 @@ const client = mongodb.MongoClient;
 const port = process.env.BACKENDPORT || 8000;
 
 client.connect(process.env.CONNECTSTRING).then(async (client) => {
+
   await User.getUserCollection(client);
   await Item.getItemCollection(client);
   await Comment.getCommentCollection(client);
