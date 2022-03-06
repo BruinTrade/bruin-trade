@@ -475,6 +475,7 @@ function Profile() {
 
   const [email, setEmail] = useState(useSelector((state) => state.userInfo.email));
   const [username, setUsername] = useState(useSelector((state) => state.userInfo.username));
+  const [location, setLocation] = useState(useSelector((state) => state.userInfo.location));
 
   return (
     <div className="w-1000px h-569px bg-white drop-shadow-md pl-35px pt-25px rounded-25px flex-col flex">
@@ -494,6 +495,13 @@ function Profile() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           type="email"
+        />
+        <Form
+          label="Location"
+          placeholder="Please enter a new location"
+          value={location}
+          onChange={(event) => setLocation(event.target.value)}
+          type="text"
         />
       </div>
       <div className="w-200px h-221px text-14px font-avenir-reg mt-49px">
