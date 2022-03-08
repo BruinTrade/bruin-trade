@@ -25,7 +25,7 @@ function PageUserProfile({ select }) {
 
     const { userId } = useParams()
 
-    console.log(select)
+    //console.log(select)
 
     return (
         <div className="flex flex-row justify-center">

@@ -358,23 +358,45 @@ class User {
 
   static async updateUserInfo(username, new_email, new_icon_url, new_location) {
     return new Promise(async (resolve, reject) => {
-      userCollection
-      .findOneAndUpdate(
-        { username: username },
-        {
-          $set: {
-            email: new_email,
-            icon_url: new_icon_url,
-            location: new_location
-          },
-        }
-      )
-      .then(() => {
-        resolve("successfully updated user info");
-      })
-      .catch(() => {
-        reject("failed to updated user info");
-      });
+      if (new_icon_url)
+      {
+        userCollection
+        .findOneAndUpdate(
+          { username: username },
+          {
+            $set: {
+              email: new_email,
+              icon_url: new_icon_url,
+              location: new_location
+            },
+          }
+        )
+        .then(() => {
+          resolve("successfully updated user info");
+        })
+        .catch(() => {
+          reject("failed to updated user info");
+        });
+      }
+      else
+      {
+        userCollection
+        .findOneAndUpdate(
+          { username: username },
+          {
+            $set: {
+              email: new_email,
+              location: new_location
+            },
+          }
+        )
+        .then(() => {
+          resolve("successfully updated user info");
+        })
+        .catch(() => {
+          reject("failed to updated user info");
+        });
+      }
     });
   }
 

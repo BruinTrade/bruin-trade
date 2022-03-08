@@ -87,6 +87,7 @@ function ItemDetails(props) {
   const alert = useAlert()
   const dispatch = useDispatch()
   const token = useSelector((state) => state.loginStatus.token)
+  const user_location = useSelector((state) => state.userInfo.location)
   const navigate = useNavigate()
   const myRef = useRef(null)
   const executeScroll = () => {
@@ -134,7 +135,7 @@ function ItemDetails(props) {
     setRelatedComments(data.relatedComments)
     setCond(data.condition)
     setCategory(data.tags)
-    setLoc(data.location)
+    setLoc(user_location)
     setLoading(false)
   }, [changeFlag])
 

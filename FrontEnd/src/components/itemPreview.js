@@ -24,6 +24,7 @@ import { useStateIfMounted } from "use-state-if-mounted"
 function useItemDataProvider({item_id}) {
 
     const token = useSelector((state) => state.loginStatus.token)
+    const user_location = useSelector((state) => state.userInfo.location)
 
     const [title, setTitle] = useState("");
     const [price, setPrice] = useState(0);
@@ -51,7 +52,7 @@ function useItemDataProvider({item_id}) {
             setItemOwner(data.owner)
             setCond(data.condition)
             setCategory(data.tags)
-            setLoc(data.location)
+            setLoc(user_location)
         })
     }, [item_id])
 
