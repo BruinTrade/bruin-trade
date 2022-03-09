@@ -4,7 +4,7 @@ function Map(props)
   {
     const containerStyle = {
       width: '1000px',
-      height: '365px'
+      height: '580px'
     };
     
     const center = {

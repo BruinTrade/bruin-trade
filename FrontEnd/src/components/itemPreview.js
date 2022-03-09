@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from "react-router-dom";
 import get_icon, { Icons } from "./icons_SVG";
 import ItemServices from "../backend_services/item_services";
+import UserServices from '../backend_services/user_services';
 import {useAlert} from "react-alert";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
@@ -24,19 +25,27 @@ import { useStateIfMounted } from "use-state-if-mounted"
 function useItemDataProvider({item_id}) {
 
     const token = useSelector((state) => state.loginStatus.token)
+    const user_location = useSelector((state) => state.userInfo.location)
+    const navigate = useNavigate()
+    const alert = useAlert()
 
-    const [title, setTitle] = useState("");
-    const [price, setPrice] = useState(0);
-    const [description, setDesc] = useState("");
-    const [images, setImages] = useState([])
-    const [itemOwner, setItemOwner] = useState("")
-    const [location, setLoc] = useState("")
-    const [condition, setCond] = useState("")
-    const [category, setCategory] = useState("")
+    const [title, setTitle] = useStateIfMounted("");
+    const [price, setPrice] = useStateIfMounted(0);
+    const [description, setDesc] = useStateIfMounted("");
+    const [images, setImages] = useStateIfMounted([])
+    const [itemOwner, setItemOwner] = useStateIfMounted("")
+    const [location, setLoc] = useStateIfMounted("")
+    const [condition, setCond] = useStateIfMounted("")
+    const [category, setCategory] = useStateIfMounted("")
 
 
     useEffect(() => {
         ItemServices.getItemDetailsById(item_id, token).then((res) => {
+            if (res.status !== 200)
+            {
+            alert.show(res.data.errors ? res.data.errors : res.data.error)
+            navigate("/")
+            }
             const data = res.data
             //console.log("data", data)
             setTitle(data.title)
@@ -51,7 +60,15 @@ function useItemDataProvider({item_id}) {
             setItemOwner(data.owner)
             setCond(data.condition)
             setCategory(data.tags)
-            setLoc(data.location)
+            UserServices.getVerbolLocationByUsername(token, data.owner).then((res) => {
+                if (res.status !== 200)
+                {
+                alert.show(res.data.errors ? res.data.errors : res.data.error)
+                navigate("/")
+                }
+                //console.log(res)
+                setLoc(res.data.location)
+              })
         })
     }, [item_id])
 
@@ -93,11 +110,9 @@ export function ItemPreviewShort({ item_id }) {
 }
 
 
-export function ItemPreviewLong({ item_id }) {
+export function ItemPreviewLong({ item_id, hasDeleteButton }) {
 
     const { title, price, description, images, itemOwner, location, condition, _ } = useItemDataProvider({item_id : item_id})
-
-    const hasDeleteButton = false;
 
     const token = useSelector((state) => state.loginStatus.token)
     const username = useSelector((state) => state.userInfo.username)
@@ -128,6 +143,8 @@ export function ItemPreviewLong({ item_id }) {
     {
         local_hasDeleteButton = false
     }
+
+    
   
     return (
         <Link to={`/post/${item_id}`}>
@@ -198,18 +215,48 @@ function StatusLabel({ title, children }) {
 export function ItemPreviewList(props) {
     const previewType = props.type ? props.type : "long"
     const itemIds = props.itemIds ? props.itemIds : []
+    const autoScroll = props.autoScroll ?? false;
+    const refs = {}
+
+    function moveToItem(id) {
+        setTimeout(() => {
+            console.log("move to ", id)
+            refs[itemIds[id]].current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center'
+              });
+            id += 1
+            moveToItem(id % itemIds.length)
+        }, 3000)
+    }
+
+    useEffect(() => {
+        console.log(autoScroll)
+        if(previewType !== "long" && autoScroll) {
+            moveToItem(0)
+        }
+    }, [])
+
     return (
         <div className={`${previewType === "long" ? "flex flex-col space-y-20px" : "w-955px h-336px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto"}`}>
             {itemIds.length === 0 ? 
             <div className='w-full h-200px flex flex-row justify-center items-center text-16px text-gray-300'>{ props.placeholder ? props.placeholder : "No Item Found" }</div>
             :
-            previewType === "long" ?
             itemIds.map((id) => {
-                return <ItemPreviewLong item_id={id} />
-             })
-             :
-            itemIds.map((id) => {
-                return <ItemPreviewShort item_id={id} />
+                console.log(refs)
+                if(previewType === "long")
+                    return <ItemPreviewLong key={id} item_id={id} hasDeleteButton={props.hasDeleteButton} />
+                else {
+                    let ref = null;
+                    if(autoScroll) {
+                        ref = React.createRef()
+                        refs[id] = ref
+                    }
+                    return <div ref={ref} key={id}>
+                        <ItemPreviewShort key={id} item_id={id} />
+                        </div>
+                }
              })
              }
         </div>

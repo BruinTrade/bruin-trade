@@ -2,24 +2,24 @@ import React, { useEffect, useState } from "react";
 import { ItemPreviewList } from "./itemPreview";
 import ItemServices from "../backend_services/item_services";
 
-export default function TradingItems() {
+export default function TradingItems({ autoScroll }) {
 
     const [results, setResults] = useState([]);
 
     useEffect(() => {
         ItemServices.get_all().then(res => {
-            const start = getRandomInt(res.data.length-5)
-            console.log(start)
-            setResults(res.data.slice(start, start+5).map(item => item._id));
+            const start = getRandomInt(res.data.length-7)
+            //console.log(start)
+            setResults(res.data.slice(start, start+7).map(item => item._id));
         });
         setResults(shuffle(results))
     }, [])
 
-    console.log(shuffle(results))
+    //console.log(shuffle(results))
     return (
         results.length ?
             <div className='mt-20px flex flex-row justify-center'>
-                <ItemPreviewList type="short" itemIds={results} />
+                <ItemPreviewList type="short" itemIds={results} autoScroll={autoScroll} />
             </div>
             :
             <div className='mt-20px flex flex-row justify-center font-avenir-med text-300px text-gray-500'>

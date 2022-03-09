@@ -24,7 +24,7 @@ export default function SignIn() {
             alert.show(res.data.errors);
             console.log(res.data.errors);
         } else {
-            console.log("login successful");
+            //console.log("login successful");
             navigate('/')
         }
     }

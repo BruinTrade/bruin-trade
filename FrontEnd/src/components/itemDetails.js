@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import ItemServices from "../backend_services/item_services.js"
 import UserServices from '../backend_services/user_services.js';
 import CommentList from "../components/commentList.js"
@@ -8,6 +8,7 @@ import { useAlert } from 'react-alert'
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import { setCartChange } from '../redux/slices/cartChangeFlag';
+import { useStateIfMounted } from "use-state-if-mounted"
 
 import UserProfile from "./userProfile.js";
 
@@ -87,25 +88,25 @@ function ItemDetails(props) {
   const alert = useAlert()
   const dispatch = useDispatch()
   const token = useSelector((state) => state.loginStatus.token)
+  //const user_location = useSelector((state) => state.userInfo.location)
   const navigate = useNavigate()
   const myRef = useRef(null)
   const executeScroll = () => {
     myRef.current.scrollIntoView();
   }
-  const [loading, setLoading] = useState(true);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState(0);
-  const [desc, setDesc] = useState("");
-  const [images, setImages] = useState([])
-  const [imgState, setImgState] = useState(0);
-  const [tags, setTags] = useState([])
-  const [category, setCategory] = useState("")
-  const [itemOwner, setItemOwner] = useState("")
-  const [loc, setLoc] = useState("")
-  const [cond, setCond] = useState("")
-  const [relatedComments, setRelatedComments] = useState([])
-  const [cart, setCart] = useState([])
-  const [changeFlag, setChangeFlag] = useState(true)
+  const [loading, setLoading] = useStateIfMounted(true);
+  const [name, setName] = useStateIfMounted("");
+  const [price, setPrice] = useStateIfMounted(0);
+  const [desc, setDesc] = useStateIfMounted("");
+  const [images, setImages] = useStateIfMounted([])
+  const [imgState, setImgState] = useStateIfMounted(0);
+  const [tags, setTags] = useStateIfMounted([])
+  const [itemOwner, setItemOwner] = useStateIfMounted("")
+  const [loc, setLoc] = useStateIfMounted("")
+  const [cond, setCond] = useStateIfMounted("")
+  const [relatedComments, setRelatedComments] = useStateIfMounted([])
+  const [cart, setCart] = useStateIfMounted([])
+  const [changeFlag, setChangeFlag] = useStateIfMounted(true)
   const totTags = tags.length;
 
   useEffect(async () => {
@@ -115,15 +116,6 @@ function ItemDetails(props) {
       alert.show(res.data.errors ? res.data.errors : res.data.error)
       navigate("/")
     }
-    UserServices.getItemsInCart(token).then((res) => {
-      if (res.status !== 200)
-      {
-      alert.show(res.data.errors ? res.data.errors : res.data.error)
-      navigate("/")
-      }
-      setCart(res.data.cart.map(item => item._id)) 
-      //console.log("data", data)
-    })
     const data = res.data
     // console.log(data)
     setName(data.title)
@@ -133,10 +125,27 @@ function ItemDetails(props) {
     setItemOwner(data.owner)
     setRelatedComments(data.relatedComments)
     setCond(data.condition)
-    setCategory(data.tags)
     setTags([data.tags])
-    setLoc(data.location)
-    setLoading(false)
+    UserServices.getVerbolLocationByUsername(token, data.owner).then((res) => {
+      if (res.status !== 200)
+      {
+      alert.show(res.data.errors ? res.data.errors : res.data.error)
+      navigate("/")
+      }
+      console.log(res)
+      setLoc(res.data.location)
+      setLoading(false)
+    })
+    UserServices.getItemsInCart(token).then((res) => {
+      if (res.status !== 200)
+      {
+      alert.show(res.data.errors ? res.data.errors : res.data.error)
+      navigate("/")
+      }
+      setCart(res.data.cart.map(item => item._id)) 
+      //console.log("data", data)
+    })
+    
   }, [changeFlag])
 
   // initialization function for tags and images
@@ -145,9 +154,9 @@ function ItemDetails(props) {
     const imgLen = images ? images.length : 0
     let totItems = what === 'tags' ? totTags : imgLen
     for (let k = 0; k < totItems; k++) {
-      console.log(tags)
+      //console.log(tags)
       if (what === 'tags') {
-        out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
+        //out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
       }
       else {
         out.push(<ImageTile img={images[k]} key={k.toString()} id={k}/>);
@@ -186,13 +195,15 @@ function ItemDetails(props) {
     );
   }
 
-  function Tag(props) {
-    return (
-      <button onClick={() => console.log(props.tag.toString())} className='hover:bg-blue-500 w-auto px-9px py-4px mr-10px bg-blue-400 text-gray-100 font-avenir-med text-10px rounded-8px'>
-        {props.tag}
-      </button>
-    )
-  }
+  // function Tag(props) {
+  //   return 
+  //     {/*
+  //       <button className='hover:bg-blue-500 w-auto px-9px py-4px mr-10px bg-blue-400 text-gray-100 font-avenir-med text-10px rounded-8px'>
+  //       {props.tag}
+  //       </button>
+  //     */}
+  //     <div></div>
+  // }
 
   function handleContactSeller() {
   }
@@ -231,7 +242,7 @@ function ItemDetails(props) {
   } else {
     return (
       <div className="flex flex-col space-y-30px">
-        <div className="w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md mt-40px">
+        <div className="w-1354px h-max bg-white pt-52px pr-25px pl-51px pb-40px flex flex-row justify-between rounded-25px drop-shadow-md mt-40px">
           <div id="image" className="flex-col">
             <img
               src={images ? images[imgState] : null}
@@ -242,26 +253,31 @@ function ItemDetails(props) {
           </div>
 
           <div className="flex-col">
-            <h1 className="w-638px h-81px text-32px font-roboto-reg leading-none break-words overflow-hidden">
+            <h1 className="w-638px h-max text-32px leading-none break-words _overflow-y-scroll">
               {name}
             </h1>
-            <div className="h-20px m-w-638px mb-20px">{init('tags')} {console.log("ahhhhhh")}</div>
+            <div className="h-20px m-w-638px mb-20px">{init('tags')}</div>
 
             <div className="flex flex-row justify-between">
               <div className="flex-col justify-between">
-                <div className="h-52px w-105px flex-col">
+                <div className="h-max w-105px flex-col">
                   {header("Price")}
-                  <div className="text-28px mb-20px font-avenir-reg text-gold">
+                  <div className="text-28px mb-20px font-avenir-reg text-gold overflow-y-scroll">
                     ${price}
                   </div>
 
                   {header("Condition")}
-                  <div className="text-14px mb-20px font-avenir-reg text-gray-500">
+                  <div className="text-14px mb-20px font-avenir-reg text-gray-500 overflow-y-scroll">
                     {cond}
                   </div>
 
+                  {header("Category")}
+                  <div className="text-14px mb-20px font-avenir-reg text-gray-500 overflow-y-scroll">
+                    {tags[0]}
+                  </div>
+
                   {header("Location")}
-                  <div className="text-14px mb-20px font-avenir-reg text-gray-500">
+                  <div className="text-14px mb-20px font-avenir-reg text-gray-500 overflow-y-scroll">
                     {loc}
                   </div>
 

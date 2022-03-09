@@ -10,13 +10,13 @@ let checkLogin = (req, res, next) => {
     try{
         if (!req.headers.access_control)
         {
-            res.json({error: "no access"})
+            res.status(201).json({error: "no access"})
             return
         }
         const token = req.headers.access_control.split(' ')[1]
         if (!token)
         {
-            res.json({error: "no access"})
+            res.status(201).json({error: "no access"})
             return
         }
         const decoded = jwt.verify(token, "scretekeygeneratedbyajshawn")
@@ -25,7 +25,7 @@ let checkLogin = (req, res, next) => {
     }
     catch(error)
     {
-    res.json({error: "no access"})
+    res.status(201).json({error: "no access"})
        return
     }
 }

@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import ConcisePreview from './itemConcisePreview';
 import UserProfile from "../components/userProfile.js";
 import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
-
+import { InfoPages, SettingPages, PageNames } from './profileDetails';
 
 
 export default function ProfilePage(props) {
@@ -85,29 +85,10 @@ function ViewMore(props) {
     );
 }
 
-export const InfoPages = {
-    watchList: 0,
-    sellingItems: 1,
-    orders: 2,
-    sold: 3,
-    subscriptions: 4,
-    OtherUserLocation: 7,
-}
-export const SettingPages = {
-    location: 5,
-    profile: 6
-}
-const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "User Location"]
-
-
-
-export function NewProfilePage({ preSelect, username }) {
+export function NewProfilePage({ username }) {
     const currentUsername = useSelector((state) => state.userInfo.username);
-    const user_name = username ? username : currentUsername
-    const ownerIsCurrentUser = (user_name === currentUsername)
-    const [selection, setSelectionState] = useState(preSelect ? preSelect : (ownerIsCurrentUser ? 6 : 1));
 
-    const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
+    const avaliablePages = [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions]
     const settingPages = [SettingPages.location, SettingPages.profile]
 
     return (
@@ -119,7 +100,7 @@ export function NewProfilePage({ preSelect, username }) {
                     My Account
                 </div>
                 <div className="flex flex-col justify-start space-y-5px ">
-                    {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)} />)}
+                    {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} />)}
                 </div>
 
             </div>
@@ -128,18 +109,18 @@ export function NewProfilePage({ preSelect, username }) {
                     Settings
                 </div>
                 <div className="flex flex-col justify-start space-y-5px ">
-                    {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)} />)}
+                    {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} />)}
                 </div>
             </div>
         </div>
     );
 }
 
-function SelectTab({ name, selected, selectCallBack }) {
+function SelectTab({ name, page }) {
     const navigate = useNavigate();
     return (
         <div
-            onClick={() => { navigate("/profile/", { state: { page: InfoPages.watchList } }) }}
+            onClick={() => { navigate("/profile/", { state: { page: page } }) }}
             className={`flex items-center w-260px h-30px px-10px py-7px rounded-6px bg-white text-gray-500 hover:text-gray-400 hover:bg-blue-50 text-14px  leading-none`}
         >
             {name}

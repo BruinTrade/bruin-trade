@@ -19,7 +19,7 @@ export default function PageHome() {
           <div className="pl-25px avenir-med text-gray-500 text-20px mb-10px">
             Trending Items
           </div>
-          <TradingItems />
+          <TradingItems autoScroll={true} />
         </div>
         <Categories />
         <div>

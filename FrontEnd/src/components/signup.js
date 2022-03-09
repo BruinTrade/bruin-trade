@@ -20,7 +20,7 @@ export default function SignUp() {
         event.preventDefault();
         const res = await UserServices.register(dispatch, username, password, email, location);
         if(res.status === 200) {
-            console.log("successful signup");
+            //("successful signup");
             navigate('/')
         } else {
             alert.show(res.data.errors)

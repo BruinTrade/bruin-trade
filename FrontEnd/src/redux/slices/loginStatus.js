@@ -21,6 +21,10 @@ export const loginStatus = createSlice({
         logout: (state) => {
             //remove the token cookie
             Cookies.remove('token');
+            Cookies.remove('username');
+            Cookies.remove('email');
+            Cookies.remove('location');
+            Cookies.remove('profileImg');
             state.login = false;
             state.token = null;
             state.replyTarget = null;

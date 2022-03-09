@@ -1,16 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
+import UserServices from "../backend_services/user_services.js"
 
 export default function UserProfile(props) {
     let username = useSelector((state) => state.userInfo.username)
-    let profileImage = useSelector((state) => state.userInfo.profileImage)
+    const [profileImage, setProfileImage] = useState(useSelector((state) => state.userInfo.profileImage))
     let rating = useSelector((state) => state.userInfo.rating);
+
+    const token = useSelector((state) => state.loginStatus.token)
 
     if(props.username) {
         username = props.username
-        profileImage = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
+        UserServices.getUserIconByUsername(token, username).then((res) => {
+            if (res.data.icon_url===null)
+            {
+                res.data.icon_url = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"
+            }
+            setProfileImage(res.data.icon_url)
+        })//"https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
         rating = 5 //TODO getRating
     }
 
@@ -38,12 +47,21 @@ export default function UserProfile(props) {
 export function UserProfileSmall(props) {
 
     let username = useSelector((state) => state.userInfo.username)
-    let profileImage = useSelector((state) => state.userInfo.profileImage)
+    const [profileImage, setProfileImage] = useState(useSelector((state) => state.userInfo.profileImage))
     let rating = useSelector((state) => state.userInfo.rating);
+
+    const token = useSelector((state) => state.loginStatus.token)
 
     if(props.username) {
         username = props.username
-        profileImage = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
+        UserServices.getUserIconByUsername(token, username).then((res) => {
+            //console.log("res", res)
+            if (res.data.icon_url===null)
+            {
+                res.data.icon_url = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"
+            }
+            setProfileImage(res.data.icon_url)
+        }) //"https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
         rating = 5 //TODO getRating
     }
 
@@ -96,6 +114,7 @@ function UserRating(props) {
     const small = props.small ? props.small : false;
     const rating = props.rating;
     const roundedRating = Math.round(rating)
+
     const stars = [1, 2, 3, 4, 5].map((i) => {
         if(i < roundedRating || i === rating) return <Star key={i} proportion={1} />
         else if(i > roundedRating) return <Star key={i} proportion={0} />

@@ -31,7 +31,7 @@ function TagResult() {
             })
         }
         else {
-            console.log(tags);
+            //console.log(tags);
             ItemServices.getByQuery("tags", tags).then(res => {
                 // setResults(res.data.map(item => item._tags))
                 setResults(res.data.filter

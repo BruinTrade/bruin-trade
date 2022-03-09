@@ -61,12 +61,18 @@ export default class UserController {
           return;
         }
 
+        if (!user_info.icon_url)
+        {
+          user_info.icon_url = null
+        }
+
         res.json({
           username: user_info.username,
           email: user_info.email,
           location: user_info.location,
           cart: user_info.cart,
           followings: user_info.followings,
+          icon_url: user_info.icon_url,
           token: token,
         });
       })
@@ -74,7 +80,7 @@ export default class UserController {
         res.status(201).json({ errors: error_message });
       });
 
-      console.log("login from backend");
+      //console.log("login from backend");
     //.then(() => {
     //req.session.user = temp
     //});
@@ -166,6 +172,74 @@ export default class UserController {
     });
   }
 
+  static async getVerbolLocationByUsername(req, res, next) {
+    if (!req.params.username)
+    {
+      res.status(201).json({ errors: "No username provided" });
+      return
+    }
+    User.getVerbolLocationByUsername(req.params.username)
+    .then((location) => {
+      res.json({ location: location });
+    })
+    .catch((error_message) => {
+      res.status(201).json({ errors: error_message });
+    });
+  }
+
+  static async updateUserInfo(req, res, next) {
+    const new_email = req.body.email;
+    const new_icon_url = req.body.icon_url;
+    const new_location = req.body.location;
+    if (!new_email)
+    {
+      res.status(201).json({ errors: "No new email provided" });
+      return
+    }
+    if (!new_location)
+    {
+      res.status(201).json({ errors: "No new location" });
+      return
+    }
+    if (new_icon_url)
+    {
+      User.updateUserInfo(req.user_info.username, new_email, new_icon_url, new_location)
+      .then((message) => {
+        res.json({ status: message });
+      })
+      .catch((error_message) => {
+        res.status(201).json({ errors: error_message });
+      });
+    }
+    else
+    {
+      User.updateUserInfo(req.user_info.username, new_email, null, new_location)
+      .then((message) => {
+        res.json({ status: message });
+      })
+      .catch((error_message) => {
+        res.status(201).json({ errors: error_message });
+      });
+    }
+  }
+  
+  static async getUserIconByUsername(req, res, next) {
+    if (!req.params.username)
+    {
+      res.status(201).json({ errors: "No username provided" });
+      return
+    }
+    User.getUserIconByUsername(req.params.username)
+    .then((url) => {
+      res.json({ icon_url: url });
+    })
+    .catch((error_message) => {
+      res.status(201).json({ errors: error_message });
+    });
+  }
+
+  
+  
   static async findUserById(req, res, next) {}
 
   //static async getPostedItems(req, res, next) {}
