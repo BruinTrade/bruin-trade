@@ -13,7 +13,7 @@ After the installation completes, run the command
 ## Step 5:
 Open a new terminal and get into the `FrontEnd` directory.
 ## Step 6:
-run the command
+Run the command
 >npm install
 ## Step 7:
 After the installation completes, run the command
