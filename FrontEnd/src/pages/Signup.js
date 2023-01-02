@@ -3,7 +3,7 @@ import SignUp from "../components/signup";
 
 export default function PageSignup() {
     return (
-        <div className="ml-235px mt-125px">
+        <div className="flex flex-row justify-center mt-125px">
             <SignUp />
         </div>
     );

@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import Form from "./form.js";
-import UserServices from './../backend_services/user_services.js'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { useAlert } from 'react-alert';
 
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db, storage } from "../firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
+
 export default function SignUp() {
     const alert = useAlert()
+
+    const [err, setErr] = useState(false);
 
     const [username, setUsernameState] = useState("");
     const [password, setPasswordState] = useState("");
@@ -18,14 +24,20 @@ export default function SignUp() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-        const res = await UserServices.register(dispatch, username, password, email, location);
-        if(res.status === 200) {
-            //("successful signup");
-            navigate('/')
-        } else {
-            alert.show(res.data.errors)
-            console.log("Error: " + res.data.errors);
-        }
+        console.log(username, email, password)
+        try {
+            //Create user
+            const res = await createUserWithEmailAndPassword(auth, email, password);
+      
+            //Create a unique image name
+            const date = new Date().getTime();
+
+            // Navigate to Home
+            navigate("/login")
+          } catch (err) {
+            console.log(err.code)
+            setErr(true);
+          }
     }
 
     return (
@@ -35,7 +47,12 @@ export default function SignUp() {
                 <Form label="Email" placeholder="Please enter a valid email address" value={email} onChange={(event) => setEmailState(event.target.value)} type="email" />
                 <Form label="Password" placeholder="At least 8 characters" value={password} onChange={(event) => setPasswordState(event.target.value)} type="password" minLength={8} />
                 <Form label="Location" placeholder="Default location" value={location} onChange={(event) => setLocationState(event.target.value)} type="text" />
-                <button className="font-avenir-med mb-30px mt-61px text-white text-16px rounded-25px drop-shadow h-40px bg-gradient-to-r from-blue-400 to-blue-500 hover:cursor-pointer hover:drop-shadow-md" type="submit" value="Sign Up">Sign Up</button>
+                <input
+                    className="font-avenir-med mb-30px mt-61px text-white text-16px rounded-25px drop-shadow h-40px bg-gradient-to-r from-blue-400 to-blue-500 hover:cursor-pointer hover:drop-shadow-md" 
+                    type="submit" 
+                    value={err ? "Email address has been used..." : "Sign Up"}
+                >
+                </input>
             </form>
         </div>
     );
