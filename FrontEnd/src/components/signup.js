@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { useAlert } from 'react-alert';
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, db, storage } from "../firebase";
+import { db, auth,  storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 
 export default function SignUp() {
     const alert = useAlert()
@@ -24,16 +24,34 @@ export default function SignUp() {
 
     async function handleSubmit(event) {
         event.preventDefault();
+        setErr(false)
         console.log(username, email, password)
         try {
             //Create user
             const res = await createUserWithEmailAndPassword(auth, email, password);
+            console.log(res)
       
             //Create a unique image name
             const date = new Date().getTime();
-
-            // Navigate to Home
-            navigate("/login")
+            try {
+                const displayName = username
+                // Update Profile
+                await updateProfile(res.user, {
+                    displayName,
+                    location: location,
+                });
+                await setDoc(doc(db, "users", res.user.uid), {
+                    uid: res.user.uid,
+                    displayName,
+                    email: email,
+                    location: location,
+                  });
+                // Navigate to Home
+                 navigate("/login")
+            } catch (err) {
+                console.log(err)
+                setErr(true);
+            }
           } catch (err) {
             console.log(err.code)
             setErr(true);
