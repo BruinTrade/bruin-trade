@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { useContext, Fragment, useState, useEffect } from "react";
 import get_icon, { Icons } from "./icons_SVG.js"
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from "react-router-dom";
@@ -9,6 +9,10 @@ import { useNavigate } from "react-router-dom";
 import { useAlert } from 'react-alert'
 import { InfoPages, SettingPages } from "./profileDetails.js";
 import { setSellingItemsChange } from "../redux/slices/sellingItemsChange.js";
+
+import { AuthContext } from "../context/AuthContext";
+import { signOut } from "firebase/auth"
+import { auth } from '../firebase'
 
 function NavBar() {
     const navigate = useNavigate();
@@ -22,18 +26,20 @@ function NavBar() {
     const [searchValue, setSearchValue] = useState("");
     const [numCartItem, setNumCartItem] = useState(0);
 
+    const { currentUser } = useContext(AuthContext);
+
     useEffect(() => {
-        if (login)
+        if (currentUser)
         {
-            UserServices.getItemsInCart(token).then((res) => {
-                if (res.status !== 200)
-                {
-                    alert.show(res.data.errors ? res.data.errors : res.data.error)
-                }
-                const data = res.data
-                //console.log("data", data)
-                setNumCartItem(data.cart.length)
-            })
+            // UserServices.getItemsInCart(token).then((res) => {
+            //     if (res.status !== 200)
+            //     {
+            //         alert.show(res.data.errors ? res.data.errors : res.data.error)
+            //     }
+            //     const data = res.data
+            //     //console.log("data", data)
+            //     setNumCartItem(data.cart.length)
+            // })
         }
     }, [cartChange])
     
@@ -74,7 +80,7 @@ function NavBar() {
                 </div>
             
                 {
-                    login ? (
+                    currentUser ? (
                         <div id="logged in" className="w-auto h-full flex flex-row justify-end items-center space-x-45px">
                             <NavbarLable label="Location">
                                 <div className="flex flex-row justify-start items-center space-x-1" onClick={() => {
@@ -143,15 +149,10 @@ function NavbarProfile() {
 
     async function logout() {
 
-        const res = await UserServices.logout(dispatch);
-
-        if(res.status !== 200) {
-            //error handle
-            console.log("Error: " + res);
-        } else {
-            //console.log("logout successful");
-            navigate('/')
-        }
+        signOut(auth).catch((err) => {
+            console.log(err)
+        });
+        navigate('/')
     }
 
     function DropdownMenuItem({ label, callBackFunction }) {
@@ -218,35 +219,3 @@ function NavbarProfile() {
 
 export default NavBar;
 
-
-/*
-
- return (
-        <Menu>
-            <Menu.Button>
-                <div className="flex flex-row justify-between items-center hover:cursor-pointer">
-                    <div id="image" className="w-50px h-50px rounded-25px overflow-hidden">
-                        <img src={profileImage ?? "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"} className="w-full h-full object-cover" />
-                    </div>
-                    <div id="text" className="flex flex-col text-gray-500 font-semibold text-10px mx-1">
-                        <div>Hello,</div>
-                        <div>{username}</div>
-                    </div>
-                    {get_icon(Icons.dropdown)}
-                </div>
-            </Menu.Button>
-            <Menu.Items>
-                <Menu.Item>
-                    {({ active }) => (
-                    <a
-                    className={`${active && 'bg-blue-500'}`}
-                    href="/account-settings"
-                    >
-                    Logout
-                    </a>
-                    )}
-                </Menu.Item>
-            </Menu.Items>
-        </Menu>
-        
-        */

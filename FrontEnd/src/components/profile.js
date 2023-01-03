@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import ConcisePreview from './itemConcisePreview';
 import UserProfile from "../components/userProfile.js";
 import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { InfoPages, SettingPages, PageNames } from './profileDetails';
+
+import { AuthContext } from '../context/AuthContext';
 
 
 export default function ProfilePage(props) {
@@ -86,8 +88,8 @@ function ViewMore(props) {
 }
 
 export function NewProfilePage({ username }) {
-    const currentUsername = useSelector((state) => state.userInfo.username);
-
+    const {currentUser} = useContext(AuthContext)
+    const currentUsername = currentUser ? currentUser.displayName: null;
     const avaliablePages = [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions]
     const settingPages = [SettingPages.location, SettingPages.profile]
 

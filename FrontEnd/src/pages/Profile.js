@@ -3,10 +3,15 @@ import ProfileDetails from "../components/profileDetails";
 import { Navigate } from "react-router-dom";
 import { useAlert } from 'react-alert'
 import { useSelector } from 'react-redux'
-import { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
+
+import { AuthContext } from '../context/AuthContext'
+
+
 
 export default function PageProfile() {
-    const login = useSelector((state) => state.loginStatus.login)
+    const {currentUser} = useContext(AuthContext)
+    const login = currentUser? true : false
     const { state } = useLocation();
     const alert = useAlert()
 
@@ -27,7 +32,8 @@ function PageUserProfile({ select }) {
 
     const { userId } = useParams()
 
-    //console.log(select)
+    // console.log(select)
+    console.log("userI: ", userId)
 
     return (
         <div className="flex flex-row justify-center">
