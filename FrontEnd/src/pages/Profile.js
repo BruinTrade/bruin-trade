@@ -24,7 +24,7 @@ export default function PageProfile() {
 
     return <Routes>
             <Route path="/" element={<PageUserProfile select={state ? state.page : null}/>}/>
-            <Route path=":userId" element={<PageUserProfile />}/>
+            <Route path=":userId" element={<PageUserProfile/>}/>
         </Routes>;
 }
 
@@ -34,10 +34,11 @@ function PageUserProfile({ select }) {
 
     // console.log(select)
     console.log("userI: ", userId)
+    console.log("select: ", select)
 
     return (
         <div className="flex flex-row justify-center">
-            <ProfileDetails preSelect={select} username={userId} />
+            <ProfileDetails preSelect={select} userId={userId} />
         </div>
     );
 }

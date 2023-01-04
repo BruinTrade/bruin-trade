@@ -95,7 +95,7 @@ export function NewProfilePage({ username }) {
 
     return (
         <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white flex flex-col items-center">
-            <UserProfile username={username ? username : currentUsername} />
+            <UserProfile username={username != null ? username : currentUsername} photoURL={currentUser ? currentUser.photoURL : null} />
             <div className="flex flex-col items-start mt-29px">
 
                 <div className="font-roboto-reg text-18px mb-20px text-gray-600">

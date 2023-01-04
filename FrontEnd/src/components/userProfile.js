@@ -1,27 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import UserServices from "../backend_services/user_services.js"
 
+
+
 export default function UserProfile(props) {
-    let username = useSelector((state) => state.userInfo.username)
-    const [profileImage, setProfileImage] = useState(useSelector((state) => state.userInfo.profileImage))
+    let username = props.username
+    const [profileImage, setProfileImage] = useState(props.photoURL ? props.photoURL : "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg")
     let rating = useSelector((state) => state.userInfo.rating);
+    console.log("props: ", props)
+    console.log(username, profileImage)
+
+    useEffect(() => {
+        setProfileImage(props.photoURL)
+    })
+    
 
     const token = useSelector((state) => state.loginStatus.token)
-
-    if(props.username) {
-        username = props.username
-        UserServices.getUserIconByUsername(token, username).then((res) => {
-            if (res.data.icon_url===null)
-            {
-                res.data.icon_url = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"
-            }
-            setProfileImage(res.data.icon_url)
-        })//"https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
-        rating = 5 //TODO getRating
-    }
 
     const navigate = useNavigate()
     

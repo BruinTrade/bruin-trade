@@ -40,27 +40,50 @@ export const SettingPages = {
 
 export const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "User Location"];
 
-export default function ProfileDetails({ preSelect, username }) {
+export default function ProfileDetails(props) {
 
+  const preSelect = props.preSelect;
   const { currentUser } = useContext(AuthContext)
   const currentUsername = currentUser ? currentUser.displayName : null
-  const user_name = username ? username : currentUsername
-  const ownerIsCurrentUser = (user_name === currentUsername)
+  const userId = props.userId ? props.userId : currentUsername.uid
+  const ownerIsCurrentUser = userId === currentUser.uid ? true : false
   const [selection, setSelectionState] = useState(preSelect !== undefined ? preSelect : (ownerIsCurrentUser ? 6 : 1));
+  const [username, setUsername] = useState(currentUsername)
+  const [photoURL, setPhotoURL] = useState(currentUser.photoURL)
 
   const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
+
+  useEffect(() => {
+    // If not currentUser, then fetch that user's name and photo
+    if (!ownerIsCurrentUser) {
+      (async () => {
+        await getDoc(doc(db, "users", userId)).then((docSnap) => {
+          if (docSnap.data()) {
+            console.log(docSnap.data())
+            setUsername(docSnap.data().displayName)
+            setPhotoURL(docSnap.data().photoURL)
+            console.log(photoURL)
+          } else {
+            console.log("No Such User exists")
+          }
+        }).catch((err) => {
+          console.log(err)
+        });
+      })();
+    }
+  },[])
 
   function getMenu(selection) {
     switch (selection) {
       case 0: // Watch List
         return <WatchList />
       case 1: //Selling Items
-        return <SellingItems username={user_name} />
+        return <SellingItems username={userId} />
       case 2: // Orders
         return <Orders />
       case 3: // Sold
-        return <Sold username={user_name} />
+        return <Sold username={userId} />
       case 4: // Subscriptions
         return <Subscriptions />
       case 5: // Location
@@ -68,7 +91,7 @@ export default function ProfileDetails({ preSelect, username }) {
       case 6: // Profile
         return <Profile />
       case 7: //other user location
-        return <OtherUserLocation other_username={username} />
+        return <OtherUserLocation other_username={userId} />
       default: // Profile
         return <Profile />
     }
@@ -78,7 +101,8 @@ export default function ProfileDetails({ preSelect, username }) {
   return (
     <div className="w-full flex flex-row justify-start mt-40px ml-40px">
       <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white drop-shadow-md flex flex-col items-center">
-        <UserProfile username={username ? username : currentUsername} />
+        {console.log(photoURL)}
+        <UserProfile username={username} photoURL={photoURL} />
         <div className="flex flex-col items-start mt-29px">
 
           <div className="font-roboto-reg text-18px mb-20px text-gray-600">
@@ -99,7 +123,7 @@ export default function ProfileDetails({ preSelect, username }) {
             </div>
           </div>
           :
-          <SubscriptionButton username={user_name} />
+          <SubscriptionButton username={userId} />
         }
       </div>
       <div className="mt-10px w-1000px">
@@ -556,7 +580,7 @@ function Profile() {
         await setDoc(doc(db, "users", currentUser.uid), {
           displayName: username,
           location: userLocation,
-        }, {merge: true})
+        }, { merge: true })
       } catch (err) {
         console.log(err)
       }

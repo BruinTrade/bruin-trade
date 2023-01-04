@@ -42,12 +42,7 @@ function NavBar() {
             // })
         }
     }, [cartChange])
-    
-    
-    // function search() {
-    //     dispatch(setQuery(searchValue))
-    //     navigate("/search")
-    // }
+
 
     function search() {
         if (searchValue !== "")
@@ -144,6 +139,9 @@ function NavbarLable(props) {
 
 function NavbarProfile() {
 
+    const {currentUser} = useContext(AuthContext)
+    
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -176,8 +174,9 @@ function NavbarProfile() {
         );
     }
 
-    const username = useSelector((state) => state.userInfo.username)
-    const profileImage = useSelector((state) => state.userInfo.profileImage)
+    const username = currentUser.displayName;
+    const profileImage = currentUser.photoURL;
+    const [profileImgFile, setProfileImgFile] = useState();
 
     return (
         <div className="text-right">
@@ -207,7 +206,7 @@ function NavbarProfile() {
                 >
                     <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-40">
                         <DropdownMenuItem label="Create New Post" callBackFunction={() => navigate('/create-post')}/>
-                        <DropdownMenuItem label="My Profile" callBackFunction={() => {dispatch(setSellingItemsChange()); navigate('/profile', {  state: { page : SettingPages.profile }  })}}/>
+                        <DropdownMenuItem label="My Profile" callBackFunction={() => {dispatch(setSellingItemsChange()); navigate(`/profile/${currentUser.uid}`, {  state: { page : SettingPages.profile }  })}}/>
                         <DropdownMenuItem label="Cart" callBackFunction={() => {dispatch(setSellingItemsChange()); navigate('/profile', { state: { page : InfoPages.watchList } })}}/> 
                         <DropdownMenuItem label="Logout" callBackFunction={() => logout()}/>
                     </Menu.Items>
