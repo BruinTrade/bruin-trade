@@ -55,10 +55,16 @@ export default function CreatePost() {
         // create a unique image name
         const date = new Date().getTime();
         const urls = []
+        const pid = `${currentUser.uid + date}`
 
-        const docRef = doc(db, "products", `${currentUser.uid + date}`)
+        await updateDoc(doc(db, "users", currentUser.uid), {
+            sellingItems: arrayUnion(pid),
+        })
+
+        const docRef = doc(db, "products", pid)
         // Add a document
         await setDoc(docRef, {
+            pid: pid,
             seller: currentUser.uid,
             sellerName: currentUser.displayName,
             title: title,
@@ -88,6 +94,7 @@ export default function CreatePost() {
                     console.log(err)
                 })
             });
+
             // Navigate to Home Page
             navigate("/")
         }).catch((err) => {

@@ -37,6 +37,7 @@ export const SettingPages = {
   profile: 6
 }
 
+
 export const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "User Location"];
 
 export default function ProfileDetails(props) {
@@ -49,6 +50,7 @@ export default function ProfileDetails(props) {
   const [selection, setSelectionState] = useState(preSelect !== undefined ? preSelect : (ownerIsCurrentUser ? 6 : 1));
   const [username, setUsername] = useState(currentUsername)
   const [photoURL, setPhotoURL] = useState(currentUser.photoURL)
+  const [itemList, setItemList] = useState([])
 
   const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
@@ -62,7 +64,7 @@ export default function ProfileDetails(props) {
             console.log(docSnap.data())
             setUsername(docSnap.data().displayName)
             setPhotoURL(docSnap.data().photoURL)
-            console.log(photoURL)
+            setItemList(docSnap.data().sellingItems)
           } else {
             console.log("No Such User exists")
           }
@@ -70,6 +72,19 @@ export default function ProfileDetails(props) {
           console.log(err)
         });
       })();
+    } else {
+      (async () => {
+        await getDoc(doc(db, "users", userId)).then((docSnap) => {
+          if (docSnap.data()) {
+            setItemList(docSnap.data().sellingItems)
+          } else {
+            console.log("No Such User exists")
+          }
+        }).catch((err) => {
+          console.log(err)
+        });
+      })();
+
     }
   },[])
 
@@ -78,7 +93,7 @@ export default function ProfileDetails(props) {
       case 0: // Watch List
         return <WatchList />
       case 1: //Selling Items
-        return <SellingItems username={userId} />
+        return <SellingItems username={userId} itemList={itemList} />
       case 2: // Orders
         return <Orders />
       case 3: // Sold
@@ -181,24 +196,20 @@ function Orders() {
 
 }
 
-function SellingItems({ username }) {
+function SellingItems({ userid, itemList }) {
+
+
+
 
   const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
   const alert = useAlert();
   const navigate = useNavigate();
-  const [myItemIds, setMyItemIds] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [myItemIds, setMyItemIds] = useState(itemList);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    UserServices.getItemsBelongToUser(username).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        setMyItemIds(res.data.map((item) => item._id));
-      }
-      setLoading(false)
-    })
-  }, [sellingItemsChange])
+    
+  }, [])
 
 
   const placeholder = (
@@ -211,6 +222,7 @@ function SellingItems({ username }) {
   if (loading) {
     return <Loading />
   } else {
+    // {console.log("My item ids", myItemIds)}
     return <ItemPreviewList itemIds={myItemIds} hasDeleteButton={true} placeholder={placeholder} />
   }
 }

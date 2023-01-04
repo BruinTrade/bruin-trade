@@ -10,8 +10,8 @@ export default function UserProfile(props) {
     let username = props.username
     const [profileImage, setProfileImage] = useState(props.photoURL ? props.photoURL : "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg")
     let rating = useSelector((state) => state.userInfo.rating);
-    console.log("props: ", props)
-    console.log(username, profileImage)
+    // console.log("props: ", props)
+    // console.log(username, profileImage)
 
     useEffect(() => {
         setProfileImage(props.photoURL)
