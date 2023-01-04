@@ -17,7 +17,6 @@ import { AuthContext } from '../context/AuthContext'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updateEmail, updateProfile } from "firebase/auth"
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { async } from "@firebase/util";
 
 //import commentServices from '../backend_services/comment_services';
 

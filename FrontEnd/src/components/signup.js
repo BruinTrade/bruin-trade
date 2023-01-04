@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAlert } from 'react-alert';
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { db, auth,  storage } from "../firebase";
+import { db, auth } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 
@@ -41,6 +41,7 @@ export default function SignUp() {
                     photoURL: "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg",
                 });
                 await setDoc(doc(db, "users", res.user.uid), {
+                    dateCreated: date,
                     uid: res.user.uid,
                     displayName,
                     email: email,
