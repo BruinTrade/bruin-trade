@@ -55,9 +55,9 @@ function useItemDataProvider({ item_id }) {
                     setDesc(temp_description)
                     setPrice(data.price)
                     setImages(data.images)
-                    setItemOwner(data.seller)
+                    setItemOwner(data.sellerName)
                     setCond(data.condition)
-                    setCategory(data.tags)
+                    setCategory(data.categoryTag)
                     setLoc(data.location)
                 }
             })
