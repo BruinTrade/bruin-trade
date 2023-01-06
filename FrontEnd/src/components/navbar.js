@@ -14,12 +14,13 @@ import { AuthContext } from "../context/AuthContext";
 import { signOut } from "firebase/auth"
 import { auth, db } from '../firebase'
 import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from 'firebase/firestore';
+import { setLocation } from "../redux/slices/userInfo.js";
 
 function NavBar() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const login = useSelector((state) => state.loginStatus.login)
-    const location = useSelector((state) => state.userInfo.location)
+    const [location, setLocation] = useState("")
     const cartChange = useSelector((state) => state.cartChange.cartChange)
     const alert = useAlert()
 
@@ -42,6 +43,7 @@ function NavBar() {
         const getCart = () => {
             const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
                 setNumCartItem(doc.data().cart.length);
+                setLocation(doc.data().location)
             });
 
             return () => {
@@ -88,7 +90,7 @@ function NavBar() {
                             <NavbarLable label="Location">
                                 <div className="flex flex-row justify-start items-center space-x-1" onClick={() => {
                                     dispatch(setSellingItemsChange())
-                                    navigate("/profile/", { state: { page: SettingPages.location } })
+                                    navigate(`/profile/${currentUser.uid}`, { state: { page: SettingPages.location } })
                                 }
                                 }>
                                     <div className="w-20px h-20px">
@@ -103,7 +105,7 @@ function NavBar() {
                             <NavbarLable label="Watch List">
                                 <div className="static h-full" onClick={() => {
                                     dispatch(setSellingItemsChange())
-                                    navigate("/profile/", { state: { page: InfoPages.watchList } })
+                                    navigate(`/profile/${currentUser.uid}`, { state: { page: InfoPages.watchList } })
                                 }}>
                                     <div className="absolute w-45px h-45px" >
                                         {get_icon(Icons.cart)}

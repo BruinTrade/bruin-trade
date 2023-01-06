@@ -23,7 +23,7 @@ export default function UserProfile(props) {
     const navigate = useNavigate()
     
     function handleOnClick() {
-        navigate(`/profile/${username}`)
+        navigate(`/profile/${props.userId}`)
     }
 
     return (
