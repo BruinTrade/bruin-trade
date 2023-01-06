@@ -19,17 +19,9 @@ export default function TradingItems({ autoScroll }) {
             });
         })();
         console.log(results)
-
-
-        ItemServices.get_all().then(res => {
-            const start = getRandomInt(res.data.length - 7)
-            //console.log(start)
-            setResults(res.data.slice(start, start + 7).map(item => item._id));
-        });
         setResults(shuffle(results))
     }, [])
 
-    //console.log(shuffle(results))
     return (
         results.length ?
             <div className='mt-20px flex flex-row justify-center'>

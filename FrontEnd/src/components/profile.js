@@ -89,13 +89,14 @@ function ViewMore(props) {
 
 export function NewProfilePage({ username }) {
     const {currentUser} = useContext(AuthContext)
-    const currentUsername = currentUser ? currentUser.displayName: null;
+    const currentUsername = currentUser ? currentUser.displayName: "Please Login First";
     const avaliablePages = [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions]
-    const settingPages = [SettingPages.location, SettingPages.profile]
+    const settingPages = [SettingPages.location, SettingPages.profile];
+    const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
 
     return (
         <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white flex flex-col items-center">
-            <UserProfile username={username != null ? username : currentUsername} photoURL={currentUser ? currentUser.photoURL : null} />
+            <UserProfile username={username != null ? username : currentUsername} photoURL={currentUser ? currentUser.photoURL : defaultPhotoURL} />
             <div className="flex flex-col items-start mt-29px">
 
                 <div className="font-roboto-reg text-18px mb-20px text-gray-600">

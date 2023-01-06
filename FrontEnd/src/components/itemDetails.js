@@ -106,6 +106,7 @@ function ItemDetails(props) {
   const [imgState, setImgState] = useStateIfMounted(0);
   const [tags, setTags] = useStateIfMounted([])
   const [itemOwner, setItemOwner] = useStateIfMounted("")
+  const [itemOwnerId, setItemOwnerId] = useStateIfMounted("")
   const [loc, setLoc] = useStateIfMounted("")
   const [cond, setCond] = useStateIfMounted("")
   const [relatedComments, setRelatedComments] = useStateIfMounted([])
@@ -115,7 +116,7 @@ function ItemDetails(props) {
   const totTags = tags.length;
 
   useEffect(() => {
-
+    // Get Product's data from firebase
     (async () => {
       await getDoc(doc(db, "products", props.id)).then((docSnap) => {
         if (docSnap.data()) {
@@ -125,6 +126,7 @@ function ItemDetails(props) {
           setPrice(data.price)
           setImages(data.images)
           setItemOwner(data.sellerName)
+          setItemOwnerId(data.seller)
           setCond(data.condition)
           // setRelatedComments(data.relatedComments)
           setTags(data.categoryTag)
@@ -135,10 +137,11 @@ function ItemDetails(props) {
     })();
   }, [changeFlag])
 
+  // Get Seller's Profile by Seller's id
   useEffect(() => {
     (async () => {
       if (itemOwner) {
-        await getDoc(doc(db, "users", itemOwner)).then((docSnap) => {
+        await getDoc(doc(db, "users", itemOwnerId)).then((docSnap) => {
           if (docSnap.data()) {
             const data = docSnap.data()
             setOwnerPhotoURL(data.photoURL)
@@ -148,7 +151,7 @@ function ItemDetails(props) {
       }
     }
     )();
-  }, [itemOwner])
+  }, [itemOwnerId])
 
   // initialization function for tags and images
   function init(what) {
