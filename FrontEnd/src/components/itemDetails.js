@@ -1,6 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import ItemServices from "../backend_services/item_services.js"
-import UserServices from '../backend_services/user_services.js';
+import React, { useContext, useEffect, useRef } from "react";
 import CommentList from "../components/commentList.js"
 import CreateComment from "../components/createComment.js"
 import { useSelector } from 'react-redux';
@@ -9,12 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import { setCartChange } from '../redux/slices/cartChangeFlag';
 import { useStateIfMounted } from "use-state-if-mounted"
-import { getDoc, doc, SnapshotMetadata } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
 
 import UserProfile from "./userProfile.js";
-import { async } from "@firebase/util";
+import { AuthContext } from "../context/AuthContext.js";
 
 // IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
 // will appear cutoff and may or may not overflow.
@@ -89,6 +87,7 @@ function ItemDetails(props) {
   // imgState keeps track of which image to show
   // on the big tile
   // default: 0
+  const { currentUser } = useContext(AuthContext);
   const alert = useAlert()
   const dispatch = useDispatch()
   const token = useSelector((state) => state.loginStatus.token)
@@ -116,41 +115,58 @@ function ItemDetails(props) {
   const totTags = tags.length;
 
   useEffect(() => {
-    // Get Product's data from firebase
-    (async () => {
-      await getDoc(doc(db, "products", props.id)).then((docSnap) => {
-        if (docSnap.data()) {
-          const data = docSnap.data();
-          setName(data.title)
-          setDesc(data.description)
-          setPrice(data.price)
-          setImages(data.images)
-          setItemOwner(data.sellerName)
-          setItemOwnerId(data.seller)
-          setCond(data.condition)
-          // setRelatedComments(data.relatedComments)
-          setTags(data.categoryTag)
-          setLoc(data.location)
-          setLoading(false)
-        }
-      })
-    })();
+    // Get Real-time Product Info
+    const getProduct = () => {
+      const unsub = onSnapshot(doc(db, "products", props.id), (doc) => {
+        const data = doc.data();
+        setName(data.title)
+        setDesc(data.description)
+        setPrice(data.price)
+        setImages(data.images)
+        setItemOwner(data.sellerName)
+        setItemOwnerId(data.seller)
+        setCond(data.condition)
+        // setRelatedComments(data.relatedComments)
+        setTags(data.categoryTag)
+        setLoc(data.location)
+        setLoading(false)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    // Get Cart Information of Current User
+    const getCart = () => {
+      const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
+        setCart(doc.data().cart);
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    getProduct();
+    currentUser.uid && getCart();
   }, [changeFlag])
 
-  // Get Seller's Profile by Seller's id
+
   useEffect(() => {
-    (async () => {
-      if (itemOwner) {
-        await getDoc(doc(db, "users", itemOwnerId)).then((docSnap) => {
-          if (docSnap.data()) {
-            const data = docSnap.data()
-            setOwnerPhotoURL(data.photoURL)
-            console.log(ownerPhotoURL)
-          }
-        })
-      }
-    }
-    )();
+    // Get Seller's Profile by Seller's id
+    const getSellerInfo = () => {
+      const unsub = onSnapshot(doc(db, "users", itemOwnerId), (doc) => {
+        const data = doc.data();
+        setOwnerPhotoURL(data.photoURL);
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+    
+    itemOwner && getSellerInfo();
   }, [itemOwnerId])
 
   // initialization function for tags and images
@@ -213,24 +229,32 @@ function ItemDetails(props) {
   function handleContactSeller() {
   }
 
-  function handleAddToCart() {
-    UserServices.addItemToCart(token, props.id).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors)
-      }
-      dispatch(setCartChange())
-      setChangeFlag(!changeFlag)
-    })
+  async function handleAddToCart() {
+    // UserServices.addItemToCart(token, props.id).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors)
+    //   }
+    //   dispatch(setCartChange())
+    //   setChangeFlag(!changeFlag)
+    // })
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      cart: arrayUnion(props.id)
+    });
+    setChangeFlag(!changeFlag)
   }
 
-  function handleRemoveFromCart() {
-    UserServices.removeFromCart(token, props.id).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors)
-      }
-      dispatch(setCartChange())
-      setChangeFlag(!changeFlag)
-    })
+  async function handleRemoveFromCart() {
+    // UserServices.removeFromCart(token, props.id).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors)
+    //   }
+    //   dispatch(setCartChange())
+    //   setChangeFlag(!changeFlag)
+    // })
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      cart: arrayRemove(props.id)
+    });
+    setChangeFlag(!changeFlag)
   }
   function sellerProfile() {
 

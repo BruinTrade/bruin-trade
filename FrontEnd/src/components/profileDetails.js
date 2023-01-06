@@ -16,7 +16,7 @@ import { auth, db, storage } from "../firebase";
 import { AuthContext } from '../context/AuthContext'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updateEmail, updateProfile } from "firebase/auth"
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
 
 //import commentServices from '../backend_services/comment_services';
 
@@ -51,42 +51,28 @@ export default function ProfileDetails(props) {
   const [username, setUsername] = useState(currentUsername)
   const [photoURL, setPhotoURL] = useState(currentUser.photoURL)
   const [itemList, setItemList] = useState([])
+  
 
   const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
 
   useEffect(() => {
-    // If not currentUser, then fetch that user's name and photo
-    if (!ownerIsCurrentUser) {
-      (async () => {
-        await getDoc(doc(db, "users", userId)).then((docSnap) => {
-          if (docSnap.data()) {
-            console.log(docSnap.data())
-            setUsername(docSnap.data().displayName)
-            setPhotoURL(docSnap.data().photoURL)
-            setItemList(docSnap.data().sellingItems)
-          } else {
-            console.log("No Such User exists")
-          }
-        }).catch((err) => {
-          console.log(err)
-        });
-      })();
-    } else {
-      (async () => {
-        await getDoc(doc(db, "users", userId)).then((docSnap) => {
-          if (docSnap.data()) {
-            setItemList(docSnap.data().sellingItems)
-          } else {
-            console.log("No Such User exists")
-          }
-        }).catch((err) => {
-          console.log(err)
-        });
-      })();
+    // fetch that user's name, photo, and selling items
+    const getSellingItems = () => {
+      const unsub = onSnapshot(doc(db, "users", userId), (doc) => {
+        const data = doc.data();
+        setUsername(data.displayName)
+        setPhotoURL(data.photoURL)
+        setItemList(data.sellingItems)
+      });
 
-    }
-  },[])
+      return () => {
+        unsub();
+      };
+    };
+
+    userId && getSellingItems();
+  }, [])
 
   function getMenu(selection) {
     switch (selection) {
@@ -115,7 +101,6 @@ export default function ProfileDetails(props) {
   return (
     <div className="w-full flex flex-row justify-start mt-40px ml-40px">
       <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white drop-shadow-md flex flex-col items-center">
-        {console.log(photoURL)}
         <UserProfile username={username} photoURL={photoURL} />
         <div className="flex flex-col items-start mt-29px">
 
@@ -208,7 +193,7 @@ function SellingItems({ userid, itemList }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    
+
   }, [])
 
 

@@ -11,8 +11,9 @@ import { setSellingItemsChange } from '../redux/slices/sellingItemsChange';
 import { UserProfileSmall } from './userProfile';
 import { useStateIfMounted } from "use-state-if-mounted"
 import { AuthContext } from '../context/AuthContext';
-import { getDoc, doc } from 'firebase/firestore';
+import { getDoc, doc, deleteDoc, onSnapshot, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 
 // const previewTypes = {
@@ -37,61 +38,41 @@ function useItemDataProvider({ item_id }) {
     const [description, setDesc] = useStateIfMounted("");
     const [images, setImages] = useStateIfMounted([])
     const [itemOwner, setItemOwner] = useStateIfMounted("")
+    const [itemOwnerId, setItemOwnerId] = useStateIfMounted("")
     const [location, setLoc] = useStateIfMounted("")
     const [condition, setCond] = useStateIfMounted("")
     const [category, setCategory] = useStateIfMounted("")
 
 
     useEffect(() => {
-        (async () => {
-            await getDoc(doc(db, "products", item_id)).then((docSnap) => {
-                if (docSnap.data()) {
-                    const data = docSnap.data();
-                    setTitle(data.title)
-                    let temp_description = data.description
-                    if (temp_description && temp_description.length > 300) {
-                        temp_description = (temp_description.slice(0, 300)) + "..."
-                    }
-                    setDesc(temp_description)
-                    setPrice(data.price)
-                    setImages(data.images)
-                    setItemOwner(data.sellerName)
-                    setCond(data.condition)
-                    setCategory(data.categoryTag)
-                    setLoc(data.location)
+        // Get RealTime Update from Firestore
+        const getItem = () => {
+            const unsub = onSnapshot(doc(db, "products", item_id), (doc) => {
+                const data = doc.data();
+                setTitle(data.title)
+                let temp_description = data.description
+                if (temp_description && temp_description.length > 300) {
+                    temp_description = (temp_description.slice(0, 300)) + "..."
                 }
-            })
-        })();
-        // ItemServices.getItemDetailsById(item_id, token).then((res) => {
-        //     if (res.status !== 200) {
-        //         alert.show(res.data.errors ? res.data.errors : res.data.error)
-        //         navigate("/")
-        //     }
-        //     const data = res.data
-        //     //console.log("data", data)
-        //     setTitle(data.title)
-        //     let temp_description = data.description
-        //     if (temp_description && temp_description.length > 300) {
-        //         temp_description = (temp_description.slice(0, 300)) + "..."
-        //     }
-        //     setDesc(temp_description)
-        //     setPrice(data.price)
-        //     setImages(data.images)
-        //     setItemOwner(data.owner)
-        //     setCond(data.condition)
-        //     setCategory(data.tags)
-        //     UserServices.getVerbolLocationByUsername(token, data.owner).then((res) => {
-        //         if (res.status !== 200) {
-        //             alert.show(res.data.errors ? res.data.errors : res.data.error)
-        //             navigate("/")
-        //         }
-        //         //console.log(res)
-        //         setLoc(res.data.location)
-        //     })
-        // })
+                setDesc(temp_description)
+                setPrice(data.price)
+                setImages(data.images)
+                setItemOwner(data.sellerName)
+                setItemOwnerId(data.seller)
+                setCond(data.condition)
+                setCategory(data.categoryTag)
+                setLoc(data.location)
+            });
+
+            return () => {
+                unsub();
+            };
+        };
+
+    item_id && getItem();
     }, [item_id])
 
-    return { title, price, description, images, itemOwner, location, condition, category }
+    return { title, price, description, images, itemOwner, itemOwnerId, location, condition, category }
 }
 
 function ItemPreviewLoading() {
@@ -131,9 +112,9 @@ export function ItemPreviewShort({ item_id }) {
 
 export function ItemPreviewLong({ item_id, hasDeleteButton }) {
 
-    const {currentUser} = useContext(AuthContext);
+    const { currentUser } = useContext(AuthContext);
 
-    const { title, price, description, images, itemOwner, location, condition, _ } = useItemDataProvider({ item_id: item_id })
+    const { title, price, description, images, itemOwner, itemOwnerId, location, condition, _ } = useItemDataProvider({ item_id: item_id })
 
     const token = useSelector((state) => state.loginStatus.token)
     const userId = currentUser.uid
@@ -145,18 +126,20 @@ export function ItemPreviewLong({ item_id, hasDeleteButton }) {
     function removePost() { }
     function addToWatchList() { }
 
-    function deleteItemHandler() {
-        ItemServices.delete(itemOwner, item_id, token).then((res) => {
-            if (res.status !== 200) {
-                alert.show(res.data.errors ? res.data.errors : res.data.error);
-                navigate("/");
-            }
-            dispatch(setSellingItemsChange())
-        })
+    async function deleteItemHandler() {
+        await deleteDoc(doc(db, "products", item_id)).then(() => {
+            alert.show(title, " has been DELETED!");
+        }).catch((err) => {
+            console.log(err)
+        });
+
+        await updateDoc(doc(db, "users", itemOwnerId), {
+            sellingItems: arrayRemove(item_id)
+        });
     }
 
     let local_hasDeleteButton
-    if (userId === itemOwner) {
+    if (userId === itemOwnerId) {
         local_hasDeleteButton = hasDeleteButton
     }
     else {
