@@ -20,7 +20,6 @@ function NavBar() {
     const dispatch = useDispatch();
     const login = useSelector((state) => state.loginStatus.login)
     const location = useSelector((state) => state.userInfo.location)
-    const token = useSelector((state) => state.loginStatus.token)
     const cartChange = useSelector((state) => state.cartChange.cartChange)
     const alert = useAlert()
 

@@ -6,7 +6,7 @@ import { ItemPreviewList } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import get_icon, { Icons } from "./icons_SVG";
 import uploadImage from "../backend_services/firebase/imageUpload";
 import { useDispatch } from "react-redux";
@@ -51,7 +51,7 @@ export default function ProfileDetails(props) {
   const [username, setUsername] = useState(currentUsername)
   const [photoURL, setPhotoURL] = useState(currentUser.photoURL)
   const [itemList, setItemList] = useState([])
-  
+
 
   const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
@@ -147,6 +147,8 @@ function SelectTab({ name, selected, selectCallBack }) {
 
 function WatchList() {
 
+  const {userId} = useParams()
+
   const token = useSelector((state) => state.loginStatus.token);
 
   const alert = useAlert();
@@ -155,14 +157,26 @@ function WatchList() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    UserServices.getItemsInCart(token).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        setWatchlistItemIDs(res.data.cart.map((item) => item._id));
-      }
-      setLoading(false)
-    });
+    // UserServices.getItemsInCart(token).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors ? res.data.errors : res.data.error);
+    //   } else {
+    //     setWatchlistItemIDs(res.data.cart.map((item) => item._id));
+    //   }
+    //   setLoading(false)
+    // });
+    const getCart = () => {
+      const unsub = onSnapshot(doc(db, "users", userId), (doc) => {
+        setWatchlistItemIDs(doc.data().cart);
+        setLoading(false)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    userId && getCart();
   }, [])
 
   if (loading) {

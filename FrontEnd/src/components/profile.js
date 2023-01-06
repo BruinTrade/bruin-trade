@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { InfoPages, SettingPages, PageNames } from './profileDetails';
 
 import { AuthContext } from '../context/AuthContext';
+import { current } from '@reduxjs/toolkit';
 
 
 export default function ProfilePage(props) {
@@ -89,6 +90,7 @@ function ViewMore(props) {
 
 export function NewProfilePage({ username }) {
     const {currentUser} = useContext(AuthContext)
+    const userId = currentUser? currentUser.uid : null
     const currentUsername = currentUser ? currentUser.displayName: "Please Login First";
     const avaliablePages = [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions]
     const settingPages = [SettingPages.location, SettingPages.profile];
@@ -103,7 +105,7 @@ export function NewProfilePage({ username }) {
                     My Account
                 </div>
                 <div className="flex flex-col justify-start space-y-5px ">
-                    {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} />)}
+                    {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} userId={userId} />)}
                 </div>
 
             </div>
@@ -112,18 +114,18 @@ export function NewProfilePage({ username }) {
                     Settings
                 </div>
                 <div className="flex flex-col justify-start space-y-5px ">
-                    {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} />)}
+                    {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} userId={userId}/>)}
                 </div>
             </div>
         </div>
     );
 }
 
-function SelectTab({ name, page }) {
+function SelectTab({ name, page, userId }) {
     const navigate = useNavigate();
     return (
         <div
-            onClick={() => { navigate("/profile/", { state: { page: page } }) }}
+            onClick={() => { navigate(`/profile/${userId}`, { state: { page: page } }) }}
             className={`flex items-center w-260px h-30px px-10px py-7px rounded-6px bg-white text-gray-500 hover:text-gray-400 hover:bg-blue-50 text-14px  leading-none`}
         >
             {name}
