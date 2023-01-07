@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ItemPreviewList } from "../components/itemPreview";
-import ItemServices from "../backend_services/item_services";
+// import ItemServices from "../backend_services/item_services";
 import { Routes, Route, useParams } from 'react-router-dom';
 
 import { collection, query, where, onSnapshot } from "firebase/firestore";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ItemPreviewList } from "./itemPreview";
-import ItemServices from "../backend_services/item_services";
+// import ItemServices from "../backend_services/item_services";
 import { query, orderBy, limit, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase";
 

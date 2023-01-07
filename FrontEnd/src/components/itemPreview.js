@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { Link } from "react-router-dom";
 import get_icon, { Icons } from "./icons_SVG";
-import ItemServices from "../backend_services/item_services";
-import UserServices from '../backend_services/user_services';
+// import ItemServices from "../backend_services/item_services";
+// import UserServices from '../backend_services/user_services';
 import { useAlert } from "react-alert";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
@@ -117,7 +117,7 @@ export function ItemPreviewLong({ item_id, hasDeleteButton }) {
     const { title, price, description, images, itemOwner, itemOwnerId, location, condition, _ } = useItemDataProvider({ item_id: item_id })
 
     const token = useSelector((state) => state.loginStatus.token)
-    const userId = currentUser.uid
+    const userId = currentUser ? currentUser.uid : null;
 
     const navigate = useNavigate()
     const alert = useAlert()
@@ -234,7 +234,6 @@ export function ItemPreviewList(props) {
     }
 
     useEffect(() => {
-        console.log(autoScroll)
         if (previewType !== "long" && autoScroll) {
             moveToItem(0)
         }
@@ -246,7 +245,6 @@ export function ItemPreviewList(props) {
                 <div className='w-full h-200px flex flex-row justify-center items-center text-16px text-gray-300'>{props.placeholder ? props.placeholder : "No Item Found"}</div>
                 :
                 itemIds.map((id) => {
-                    console.log(refs)
                     if (previewType === "long")
                         return <ItemPreviewLong key={id} item_id={id} hasDeleteButton={props.hasDeleteButton} />
                     else {

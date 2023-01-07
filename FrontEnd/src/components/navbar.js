@@ -3,7 +3,7 @@ import get_icon, { Icons } from "./icons_SVG.js"
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from "react-router-dom";
 import { Menu, Transition } from '@headlessui/react'
-import UserServices from './../backend_services/user_services.js';
+// import UserServices from './../backend_services/user_services.js';
 import { useNavigate } from "react-router-dom";
 //import { setQuery } from '../redux/slices/query.js';
 import { useAlert } from 'react-alert'
@@ -14,12 +14,10 @@ import { AuthContext } from "../context/AuthContext";
 import { signOut } from "firebase/auth"
 import { auth, db } from '../firebase'
 import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from 'firebase/firestore';
-import { setLocation } from "../redux/slices/userInfo.js";
 
 function NavBar() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const login = useSelector((state) => state.loginStatus.login)
     const [location, setLocation] = useState("")
     const cartChange = useSelector((state) => state.cartChange.cartChange)
     const alert = useAlert()
@@ -30,16 +28,7 @@ function NavBar() {
     const { currentUser } = useContext(AuthContext);
 
     useEffect(() => {
-
-        // UserServices.getItemsInCart(token).then((res) => {
-        //     if (res.status !== 200)
-        //     {
-        //         alert.show(res.data.errors ? res.data.errors : res.data.error)
-        //     }
-        //     const data = res.data
-        //     //console.log("data", data)
-        //     setNumCartItem(data.cart.length)
-        // })
+        // Get number of Products in user's cart
         const getCart = () => {
             const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
                 setNumCartItem(doc.data().cart.length);
