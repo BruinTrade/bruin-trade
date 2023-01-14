@@ -15,10 +15,7 @@ export default function UserProfile(props) {
 
     useEffect(() => {
         setProfileImage(props.photoURL)
-    })
-    
-
-    const token = useSelector((state) => state.loginStatus.token)
+    }, [])
 
     const navigate = useNavigate()
     
@@ -43,30 +40,16 @@ export default function UserProfile(props) {
 
 export function UserProfileSmall(props) {
 
-    let username = useSelector((state) => state.userInfo.username)
-    const [profileImage, setProfileImage] = useState(useSelector((state) => state.userInfo.profileImage))
+    const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
+    let username = props.username
+    const [profileImage, setProfileImage] = useState(props.photoURL ? props.photoURL : defaultPhotoURL )
     let rating = useSelector((state) => state.userInfo.rating);
-
-    const token = useSelector((state) => state.loginStatus.token)
-
-    if(props.username) {
-        username = props.username
-        UserServices.getUserIconByUsername(token, username).then((res) => {
-            //console.log("res", res)
-            if (res.data.icon_url===null)
-            {
-                res.data.icon_url = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"
-            }
-            setProfileImage(res.data.icon_url)
-        }) //"https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
-        rating = 5 //TODO getRating
-    }
 
     const navigate = useNavigate()
     
     function handleOnClick(e) {
         e.preventDefault(); 
-        navigate(`/profile/${username}`)
+        navigate(`/profile/${props.userId}`)
     }
 
     return (

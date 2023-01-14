@@ -17,6 +17,7 @@ import { AuthContext } from '../context/AuthContext'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updateEmail, updateProfile } from "firebase/auth"
 import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
+import { current } from "@reduxjs/toolkit";
 
 //import commentServices from '../backend_services/comment_services';
 
@@ -147,7 +148,7 @@ function SelectTab({ name, selected, selectCallBack }) {
 
 function WatchList() {
 
-  const {userId} = useParams()
+  const { userId } = useParams()
 
   const token = useSelector((state) => state.loginStatus.token);
 
@@ -282,20 +283,26 @@ function SubscriptionButton({ username }) {
 
 function Subscriptions() {
 
-  const token = useSelector((state) => state.loginStatus.token);
+  const { currentUser } = useContext(AuthContext);
+
 
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   function fetchFollowing() {
-    UserServices.getAllFollowings(token).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        setSubscriptions(res.data.users_followed);
-      }
-      setLoading(false);
-    })
+    const getFollowing = () => {
+      const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
+        const data = doc.data();
+        setSubscriptions(data.users_followed)
+        setLoading(false)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    currentUser && getFollowing();
   }
 
   useEffect(() => {
@@ -310,7 +317,7 @@ function Subscriptions() {
         {subscriptions.length === 0 ?
           <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Subscribe to your friends!</div>
           :
-          subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing} />)}
+          subscriptions.map((subscriptions) => <Subscription key={subscriptions} unsubscribeCallback={fetchFollowing} />)}
       </div>
     );
   }
@@ -318,16 +325,14 @@ function Subscriptions() {
 
 function Subscription({ username, unsubscribeCallback }) {
 
-  const token = useSelector((state) => state.loginStatus.token);
-
   function unsubscribe() {
-    UserServices.unfollow(token, username).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        unsubscribeCallback()
-      }
-    })
+    // UserServices.unfollow(token, username).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors ? res.data.errors : res.data.error);
+    //   } else {
+    //     unsubscribeCallback()
+    //   }
+    // })
   }
 
   return (

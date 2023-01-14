@@ -21,12 +21,9 @@ function TagResult() {
     let { tags } = useParams();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
-    //fetch data
-    useEffect(() => {
-        // let fetchMethod = get_all;
-        // if(tags === "get_all_items") {
 
-        // }
+    useEffect(() => {
+        // Get real-time info of products of specific tag
         const q = query(collection(db, "products"), where("categoryTag", "==", tags));
         const getTags = () => {
             const unsub = onSnapshot(q, (querySnapshot) => {
