@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import ItemServices from "../backend_services/item_services.js"
-import UserServices from '../backend_services/user_services.js';
+import React, { useContext, useEffect, useRef } from "react";
 import CommentList from "../components/commentList.js"
 import CreateComment from "../components/createComment.js"
 import { useSelector } from 'react-redux';
@@ -8,8 +6,13 @@ import { useAlert } from 'react-alert'
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import { setCartChange } from '../redux/slices/cartChangeFlag';
+import { useStateIfMounted } from "use-state-if-mounted"
+import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
+
 
 import UserProfile from "./userProfile.js";
+import { AuthContext } from "../context/AuthContext.js";
 
 // IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
 // will appear cutoff and may or may not overflow.
@@ -84,59 +87,87 @@ function ItemDetails(props) {
   // imgState keeps track of which image to show
   // on the big tile
   // default: 0
+  const { currentUser } = useContext(AuthContext);
   const alert = useAlert()
   const dispatch = useDispatch()
   const token = useSelector((state) => state.loginStatus.token)
+  //const user_location = useSelector((state) => state.userInfo.location)
   const navigate = useNavigate()
   const myRef = useRef(null)
   const executeScroll = () => {
     myRef.current.scrollIntoView();
   }
-  const [loading, setLoading] = useState(true);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState(0);
-  const [desc, setDesc] = useState("");
-  const [images, setImages] = useState([])
-  const [imgState, setImgState] = useState(0);
-  const [tags, setTags] = useState([])
-  const [category, setCategory] = useState("")
-  const [itemOwner, setItemOwner] = useState("")
-  const [loc, setLoc] = useState("")
-  const [cond, setCond] = useState("")
-  const [relatedComments, setRelatedComments] = useState([])
-  const [cart, setCart] = useState([])
-  const [changeFlag, setChangeFlag] = useState(true)
+  const [loading, setLoading] = useStateIfMounted(true);
+  const [name, setName] = useStateIfMounted("");
+  const [price, setPrice] = useStateIfMounted(0);
+  const [desc, setDesc] = useStateIfMounted("");
+  const [images, setImages] = useStateIfMounted([])
+  const [imgState, setImgState] = useStateIfMounted(0);
+  const [tags, setTags] = useStateIfMounted([])
+  const [itemOwner, setItemOwner] = useStateIfMounted("")
+  const [itemOwnerId, setItemOwnerId] = useStateIfMounted("")
+  const [loc, setLoc] = useStateIfMounted("")
+  const [cond, setCond] = useStateIfMounted("")
+  const [relatedComments, setRelatedComments] = useStateIfMounted([])
+  const [cart, setCart] = useStateIfMounted([])
+  const [changeFlag, setChangeFlag] = useStateIfMounted(true)
+  const [ownerPhotoURL, setOwnerPhotoURL] = useStateIfMounted("")
   const totTags = tags.length;
 
-  useEffect(async () => {
-    const res = await ItemServices.getItemDetailsById(props.id, token);
-    if (res.status !== 200)
-    {
-      alert.show(res.data.errors ? res.data.errors : res.data.error)
-      navigate("/")
-    }
-    UserServices.getItemsInCart(token).then((res) => {
-      if (res.status !== 200)
-      {
-      alert.show(res.data.errors ? res.data.errors : res.data.error)
-      navigate("/")
-      }
-      setCart(res.data.cart.map(item => item._id)) 
-      //console.log("data", data)
-    })
-    const data = res.data
-    //console.log(data)
-    setName(data.title)
-    setDesc(data.description)
-    setPrice(data.price)
-    setImages(data.images)
-    setItemOwner(data.owner)
-    setRelatedComments(data.relatedComments)
-    setCond(data.condition)
-    setCategory(data.tags)
-    setLoc(data.location)
-    setLoading(false)
+  useEffect(() => {
+    // Get Real-time Product Info
+    const getProduct = () => {
+      const unsub = onSnapshot(doc(db, "products", props.id), (doc) => {
+        const data = doc.data();
+        setName(data.title)
+        setDesc(data.description)
+        setPrice(data.price)
+        setImages(data.images)
+        setItemOwner(data.sellerName)
+        setItemOwnerId(data.seller)
+        setCond(data.condition)
+        // setRelatedComments(data.relatedComments)
+        setTags(data.categoryTag)
+        setLoc(data.location)
+        setLoading(false)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    // Get Cart Information of Current User
+    const getCart = () => {
+      const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
+        setCart(doc.data().cart);
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    getProduct();
+    currentUser.uid && getCart();
   }, [changeFlag])
+
+
+  useEffect(() => {
+    // Get Seller's Profile by Seller's id
+    const getSellerInfo = () => {
+      const unsub = onSnapshot(doc(db, "users", itemOwnerId), (doc) => {
+        const data = doc.data();
+        setOwnerPhotoURL(data.photoURL);
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+    
+    itemOwner && getSellerInfo();
+  }, [itemOwnerId])
 
   // initialization function for tags and images
   function init(what) {
@@ -144,11 +175,12 @@ function ItemDetails(props) {
     const imgLen = images ? images.length : 0
     let totItems = what === 'tags' ? totTags : imgLen
     for (let k = 0; k < totItems; k++) {
+      //console.log(tags)
       if (what === 'tags') {
-        out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
+        //out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
       }
       else {
-        out.push(<ImageTile img={images[k]} key={k.toString()} id={k}/>);
+        out.push(<ImageTile img={images[k]} key={k.toString()} id={k} />);
       }
     }
     return out;
@@ -184,41 +216,47 @@ function ItemDetails(props) {
     );
   }
 
-  function Tag(props) {
-    return (
-      <button onClick={() => console.log(props.tag.toString())} className='hover:bg-blue-500 w-auto px-9px py-4px mr-10px bg-blue-400 text-gray-100 font-avenir-med text-10px rounded-8px'>
-        {props.tag}
-      </button>
-    )
-  }
+  // function Tag(props) {
+  //   return 
+  //     {/*
+  //       <button className='hover:bg-blue-500 w-auto px-9px py-4px mr-10px bg-blue-400 text-gray-100 font-avenir-med text-10px rounded-8px'>
+  //       {props.tag}
+  //       </button>
+  //     */}
+  //     <div></div>
+  // }
 
   function handleContactSeller() {
   }
 
-  function handleAddToCart() {
-    UserServices.addItemToCart(token, props.id).then((res) => {
-      if (res.status !== 200)
-      {
-        alert.show(res.data.errors)
-      }
-      dispatch(setCartChange())
-      setChangeFlag(!changeFlag)
-    })
+  async function handleAddToCart() {
+    // UserServices.addItemToCart(token, props.id).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors)
+    //   }
+    //   dispatch(setCartChange())
+    //   setChangeFlag(!changeFlag)
+    // })
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      cart: arrayUnion(props.id)
+    });
+    setChangeFlag(!changeFlag)
   }
-  
-  function handleRemoveFromCart() 
-  {
-    UserServices.removeFromCart(token, props.id).then((res) => {
-      if (res.status !== 200)
-      {
-        alert.show(res.data.errors)
-      }
-      dispatch(setCartChange())
-      setChangeFlag(!changeFlag)
-    })
+
+  async function handleRemoveFromCart() {
+    // UserServices.removeFromCart(token, props.id).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors)
+    //   }
+    //   dispatch(setCartChange())
+    //   setChangeFlag(!changeFlag)
+    // })
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      cart: arrayRemove(props.id)
+    });
+    setChangeFlag(!changeFlag)
   }
-  function sellerProfile()
-  {
+  function sellerProfile() {
 
   }
 
@@ -229,7 +267,7 @@ function ItemDetails(props) {
   } else {
     return (
       <div className="flex flex-col space-y-30px">
-        <div className="w-1354px h-682px bg-white pt-52px pr-25px pl-51px flex flex-row justify-between rounded-25px drop-shadow-md mt-40px">
+        <div className="w-1354px h-max bg-white pt-52px pr-25px pl-51px pb-40px flex flex-row justify-between rounded-25px drop-shadow-md mt-40px">
           <div id="image" className="flex-col">
             <img
               src={images ? images[imgState] : null}
@@ -240,26 +278,31 @@ function ItemDetails(props) {
           </div>
 
           <div className="flex-col">
-            <h1 className="w-638px h-81px text-32px font-roboto-reg leading-none break-words overflow-hidden">
+            <h1 className="w-638px h-max text-32px leading-none break-words _overflow-y-scroll">
               {name}
             </h1>
             <div className="h-20px m-w-638px mb-20px">{init('tags')}</div>
 
             <div className="flex flex-row justify-between">
               <div className="flex-col justify-between">
-                <div className="h-52px w-105px flex-col">
+                <div className="h-max w-105px flex-col">
                   {header("Price")}
-                  <div className="text-28px mb-20px font-avenir-reg text-gold">
+                  <div className="text-28px mb-20px font-avenir-reg text-gold overflow-y-scroll">
                     ${price}
                   </div>
 
                   {header("Condition")}
-                  <div className="text-14px mb-20px font-avenir-reg text-gray-500">
+                  <div className="text-14px mb-20px font-avenir-reg text-gray-500 overflow-y-scroll">
                     {cond}
                   </div>
 
+                  {header("Category")}
+                  <div className="text-14px mb-20px font-avenir-reg text-gray-500 overflow-y-scroll">
+                    {tags[0]}
+                  </div>
+
                   {header("Location")}
-                  <div className="text-14px mb-20px font-avenir-reg text-gray-500">
+                  <div className="text-14px mb-20px font-avenir-reg text-gray-500 overflow-y-scroll">
                     {loc}
                   </div>
 
@@ -272,10 +315,10 @@ function ItemDetails(props) {
 
               <div className="flex flex-col items-center w-160px">
                 <div className="mb-20px">
-                  <UserProfile username={itemOwner}/>
+                  <UserProfile username={itemOwner} photoURL={ownerPhotoURL} />
                 </div>
-                
-          
+
+
                 <button
                   onClick={executeScroll}
                   id="contact"
@@ -293,28 +336,28 @@ function ItemDetails(props) {
                 </button>
                 */}
                 {
-                 
+
                   cart.includes(props.id) ? <button
-                  onClick={handleRemoveFromCart}
-                  id="watch"
-                  className="w-160px h-50px rounded-full border-red-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-red-400"
-                >
-                  Remove From Cart
-                </button>
-                :
-                <button
-                  onClick={handleAddToCart}
-                  id="watch"
-                  className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
-                >
-                  Add to Watchlist
-                </button>
+                    onClick={handleRemoveFromCart}
+                    id="watch"
+                    className="w-160px h-50px rounded-full border-red-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-red-400"
+                  >
+                    Remove From Cart
+                  </button>
+                    :
+                    <button
+                      onClick={handleAddToCart}
+                      id="watch"
+                      className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
+                    >
+                      Add to Watchlist
+                    </button>
                 }
               </div>
             </div>
           </div>
         </div>
-        <CommentList comments={relatedComments} updateState={() => setChangeFlag(!changeFlag)}/>
+        <CommentList comments={relatedComments} updateState={() => setChangeFlag(!changeFlag)} />
         <div ref={myRef}>
           <CreateComment item_id={props.id} item_owner={itemOwner} updateState={() => setChangeFlag(!changeFlag)} />
         </div>

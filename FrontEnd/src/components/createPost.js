@@ -1,16 +1,20 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Form from "./form.js";
-import ItemServices from "../backend_services/item_services.js";
-import { useSelector } from 'react-redux'
 import { useAlert } from 'react-alert'
 import UploadImage from "./uploadImage.js";
 import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../context/AuthContext.js';
+import { db, storage } from '../firebase';
+import { doc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 
 const conditions = ["Great", "Good", "Poor"];
 const categories = ["Books", "Music", "Fashion", "Computers", "Audios", "Toys", "Furnitures", "Electronics", "Other"]
 
 export default function CreatePost() {
+    const { currentUser } = useContext(AuthContext);
     const alert = useAlert()
     const navigate = useNavigate()
     const [title, setTitleState] = useState("");
@@ -22,9 +26,6 @@ export default function CreatePost() {
     const [images, setImages] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
 
-
-    const username = useSelector((state) => state.userInfo.username)
-    const token = useSelector((state) => state.loginStatus.token)
 
     async function handleCreatePost() {
         let isvalid = true
@@ -51,22 +52,55 @@ export default function CreatePost() {
         if (!isvalid) {
             return
         }
+        // create a unique image name
+        const date = new Date().getTime();
+        const urls = []
+        const pid = `${currentUser.uid + date}`
 
-        // console.log("Create Item")
-        // console.log("token from call: " + token);
-        const res = await ItemServices.create(
-            username,
-            token,
-            title,
-            price,
-            description,
-            images,
-            condition,
-            location,
-            categoryTag
-        );
-        // console.log(res);
-        navigate("/about")
+        await updateDoc(doc(db, "users", currentUser.uid), {
+            sellingItems: arrayUnion(pid),
+        })
+
+        const docRef = doc(db, "products", pid)
+        // Add a document
+        await setDoc(docRef, {
+            pid: pid,
+            seller: currentUser.uid,
+            sellerName: currentUser.displayName,
+            title: title,
+            price: price,
+            description: description,
+            condition: condition,
+            location: location,
+            categoryTag: categoryTag,
+            images: urls,
+        }).then(() => {
+            // Add image urls one at a time
+            // TODO: Optimize from O(n) to O(1)
+            images.map(async (image, idx) => {
+                const storageRef = ref(storage, `${currentUser.uid + date + idx}`);
+                await uploadBytesResumable(storageRef, image).then(() => {
+                    console.log("Sucess! Uploaded to Storage")
+                    getDownloadURL(storageRef).then(async (downloadURL) => {
+                        console.log("url: ", downloadURL);
+                        console.log("urls: ", urls)
+                        await updateDoc(docRef, {
+                            images: arrayUnion(downloadURL)
+                        })
+                    }).catch((err) => {
+                        console.log(err)
+                    })
+                }).catch((err) => {
+                    console.log(err)
+                })
+            });
+
+            // Navigate to Home Page
+            navigate("/")
+        }).catch((err) => {
+            console.log(err)
+        });
+
     }
 
     function handleUploadImage(event) {
@@ -177,11 +211,11 @@ function PhotoUpload(props) {
                 {arr.map((element) => (
                     element === props.urls.length ?
                         <div className='w-112px h-80px bg-gray-100 rounded-8px overflow-hidden grid items-center justify-center' key={element}>
-                            <UploadImage handleUploadImage={(event) => props.handleUploadImage(event)}/>
+                            <UploadImage handleUploadImage={(event) => props.handleUploadImage(event)} />
                         </div> :
                         <div type='button' onClick={() => setSelected(element)} className='w-112px h-80px bg-gray-100 rounded-8px overflow-hidden grid items-center justify-center hover:bg-blue-100' key={element}>
                             {element < props.urls.length ? <PhotoPreview imgUrl={props.urls[element]} main={false} /> : ""}
-                        </div> 
+                        </div>
                 ))}
             </div>
         </div>

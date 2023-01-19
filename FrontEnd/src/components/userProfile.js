@@ -1,23 +1,26 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
+import UserServices from "../backend_services/user_services.js"
+
+
 
 export default function UserProfile(props) {
-    let username = useSelector((state) => state.userInfo.username)
-    let profileImage = useSelector((state) => state.userInfo.profileImage)
+    let username = props.username
+    const [profileImage, setProfileImage] = useState(props.photoURL ? props.photoURL : "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg")
     let rating = useSelector((state) => state.userInfo.rating);
+    // console.log("props: ", props)
+    // console.log(username, profileImage)
 
-    if(props.username) {
-        username = props.username
-        profileImage = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
-        rating = 5 //TODO getRating
-    }
+    useEffect(() => {
+        setProfileImage(props.photoURL)
+    }, [])
 
     const navigate = useNavigate()
     
     function handleOnClick() {
-        navigate(`/profile/${username}`)
+        navigate(`/profile/${props.userId}`)
     }
 
     return (
@@ -37,21 +40,16 @@ export default function UserProfile(props) {
 
 export function UserProfileSmall(props) {
 
-    let username = useSelector((state) => state.userInfo.username)
-    let profileImage = useSelector((state) => state.userInfo.profileImage)
+    const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
+    let username = props.username
+    const [profileImage, setProfileImage] = useState(props.photoURL ? props.photoURL : defaultPhotoURL )
     let rating = useSelector((state) => state.userInfo.rating);
-
-    if(props.username) {
-        username = props.username
-        profileImage = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
-        rating = 5 //TODO getRating
-    }
 
     const navigate = useNavigate()
     
     function handleOnClick(e) {
         e.preventDefault(); 
-        navigate(`/profile/${username}`)
+        navigate(`/profile/${props.userId}`)
     }
 
     return (
@@ -96,6 +94,7 @@ function UserRating(props) {
     const small = props.small ? props.small : false;
     const rating = props.rating;
     const roundedRating = Math.round(rating)
+
     const stars = [1, 2, 3, 4, 5].map((i) => {
         if(i < roundedRating || i === rating) return <Star key={i} proportion={1} />
         else if(i > roundedRating) return <Star key={i} proportion={0} />

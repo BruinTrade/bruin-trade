@@ -1,8 +1,11 @@
 
 import React, { useEffect, useState } from "react";
 import { ItemPreviewList } from "../components/itemPreview";
-import ItemServices from "../backend_services/item_services";
+// import ItemServices from "../backend_services/item_services";
 import { Routes, Route, useParams } from 'react-router-dom';
+
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 //import { useSelector } from 'react-redux'
 
 export default function Tags() {
@@ -18,31 +21,30 @@ function TagResult() {
     let { tags } = useParams();
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
-    //fetch data
+
     useEffect(() => {
-        // let fetchMethod = get_all;
-        // if(tags === "get_all_items") {
-            
-        // }
-        if (tags === "get_all_items") {
-            ItemServices.get_all().then(res => {
-                setResults(res.data.map(item => item._tags))
-                setLoading(false)
-            })
-        }
-        else {
-            console.log(tags);
-            ItemServices.getByQuery("tags", tags).then(res => {
-                // setResults(res.data.map(item => item._tags))
-                setResults(res.data.filter
-                ((item) => {
-                   return item.tags === tags
-                }).map(item => item._id))
-                setLoading(false)
-            })
-        }
+        // Get real-time info of products of specific tag
+        const q = query(collection(db, "products"), where("categoryTag", "==", tags));
+        const getTags = () => {
+            const unsub = onSnapshot(q, (querySnapshot) => {
+                const products = [];
+                querySnapshot.forEach((doc) => {
+                    products.push(doc.data().pid)
+                });
+                console.log("Current products of ", tags, ": ", products.join(", "));
+                setResults(products)
+            });
+
+            return () => {
+                unsub();
+            };
+        };
+
+        getTags();
+        setLoading(false);
+
     }, [tags])
-    // setResults(results.filter(item => item.Tags === tags));
+    
     return (
 
         loading ? <div className='mt-50px flex flex-row justify-center font-avenir-med text-300px text-gray-500'>

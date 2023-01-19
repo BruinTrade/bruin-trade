@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { Link } from "react-router-dom";
 import get_icon, { Icons } from "./icons_SVG";
-import ItemServices from "../backend_services/item_services";
-import {useAlert} from "react-alert";
+// import ItemServices from "../backend_services/item_services";
+// import UserServices from '../backend_services/user_services';
+import { useAlert } from "react-alert";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import { setSellingItemsChange } from '../redux/slices/sellingItemsChange';
 import { UserProfileSmall } from './userProfile';
 import { useStateIfMounted } from "use-state-if-mounted"
+import { AuthContext } from '../context/AuthContext';
+import { getDoc, doc, deleteDoc, onSnapshot, updateDoc, arrayRemove } from 'firebase/firestore';
+import { db } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 
 // const previewTypes = {
@@ -21,41 +26,53 @@ import { useStateIfMounted } from "use-state-if-mounted"
 //     Long : (id) => ItemDataProvider(previewTypes.long, id)
 // }
 
-function useItemDataProvider({item_id}) {
+function useItemDataProvider({ item_id }) {
 
     const token = useSelector((state) => state.loginStatus.token)
+    const user_location = useSelector((state) => state.userInfo.location)
+    const navigate = useNavigate()
+    const alert = useAlert()
 
-    const [title, setTitle] = useState("");
-    const [price, setPrice] = useState(0);
-    const [description, setDesc] = useState("");
-    const [images, setImages] = useState([])
-    const [itemOwner, setItemOwner] = useState("")
-    const [location, setLoc] = useState("")
-    const [condition, setCond] = useState("")
-    const [category, setCategory] = useState("")
+    const [title, setTitle] = useStateIfMounted("");
+    const [price, setPrice] = useStateIfMounted(0);
+    const [description, setDesc] = useStateIfMounted("");
+    const [images, setImages] = useStateIfMounted([])
+    const [itemOwner, setItemOwner] = useStateIfMounted("")
+    const [itemOwnerId, setItemOwnerId] = useStateIfMounted("")
+    const [location, setLoc] = useStateIfMounted("")
+    const [condition, setCond] = useStateIfMounted("")
+    const [category, setCategory] = useStateIfMounted("")
 
 
     useEffect(() => {
-        ItemServices.getItemDetailsById(item_id, token).then((res) => {
-            const data = res.data
-            //console.log("data", data)
-            setTitle(data.title)
-            let temp_description = data.description
-            if (temp_description && temp_description.length > 300)
-            {
-                temp_description = (temp_description.slice(0, 300)) + "..."
-            }
-            setDesc(temp_description)
-            setPrice(data.price)
-            setImages(data.images)
-            setItemOwner(data.owner)
-            setCond(data.condition)
-            setCategory(data.tags)
-            setLoc(data.location)
-        })
+        // Get RealTime Update from Firestore
+        const getItem = () => {
+            const unsub = onSnapshot(doc(db, "products", item_id), (doc) => {
+                const data = doc.data();
+                setTitle(data.title)
+                let temp_description = data.description
+                if (temp_description && temp_description.length > 300) {
+                    temp_description = (temp_description.slice(0, 300)) + "..."
+                }
+                setDesc(temp_description)
+                setPrice(data.price)
+                setImages(data.images)
+                setItemOwner(data.sellerName)
+                setItemOwnerId(data.seller)
+                setCond(data.condition)
+                setCategory(data.categoryTag)
+                setLoc(data.location)
+            });
+
+            return () => {
+                unsub();
+            };
+        };
+
+    item_id && getItem();
     }, [item_id])
 
-    return { title, price, description, images, itemOwner, location, condition, category }
+    return { title, price, description, images, itemOwner, itemOwnerId, location, condition, category }
 }
 
 function ItemPreviewLoading() {
@@ -65,11 +82,11 @@ function ItemPreviewLoading() {
 
 export function ItemPreviewShort({ item_id }) {
 
-    const { title, price, _, images, itemOwner, __, ___, ____ } = useItemDataProvider({item_id : item_id})
-    
-    if(title === null) {
+    const { title, price, _, images, itemOwner, __, ___, ____ } = useItemDataProvider({ item_id: item_id })
+
+    if (title === null) {
         return <ItemPreviewLoading />
-    } 
+    }
     return (
         <Link to={`post/${item_id}`}>
             <div className='w-258px h-288px flex flex-col item-center justify-between bg-white rounded-12px px-15px'>
@@ -82,7 +99,7 @@ export function ItemPreviewShort({ item_id }) {
                     </div>
                 </div>
                 <div className='w-full flex flex-row justify-between items-end mb-11px'>
-                    <UserProfileSmall username={itemOwner}/>
+                    <UserProfileSmall username={itemOwner} />
                     <div className="text-gold" >
                         ${price}
                     </div>
@@ -93,42 +110,44 @@ export function ItemPreviewShort({ item_id }) {
 }
 
 
-export function ItemPreviewLong({ item_id }) {
+export function ItemPreviewLong({ item_id, hasDeleteButton }) {
 
-    const { title, price, description, images, itemOwner, location, condition, _ } = useItemDataProvider({item_id : item_id})
+    const { currentUser } = useContext(AuthContext);
 
-    const hasDeleteButton = false;
+    const { title, price, description, images, itemOwner, itemOwnerId, location, condition, _ } = useItemDataProvider({ item_id: item_id })
 
     const token = useSelector((state) => state.loginStatus.token)
-    const username = useSelector((state) => state.userInfo.username)
+    const userId = currentUser ? currentUser.uid : null;
 
     const navigate = useNavigate()
     const alert = useAlert()
     const dispatch = useDispatch()
 
     function removePost() { }
-    function addToWatchList() {}
+    function addToWatchList() { }
 
-    function deleteItemHandler() {
-        ItemServices.delete(itemOwner, item_id, token).then((res) => {
-            if (res.status !== 200) {
-                alert.show(res.data.errors ? res.data.errors : res.data.error);
-                navigate("/");
-            }
-            dispatch(setSellingItemsChange())
-        })
+    async function deleteItemHandler() {
+        await deleteDoc(doc(db, "products", item_id)).then(() => {
+            alert.show(title, " has been DELETED!");
+        }).catch((err) => {
+            console.log(err)
+        });
+
+        await updateDoc(doc(db, "users", itemOwnerId), {
+            sellingItems: arrayRemove(item_id)
+        });
     }
 
     let local_hasDeleteButton
-    if (username === itemOwner)
-    {   
+    if (userId === itemOwnerId) {
         local_hasDeleteButton = hasDeleteButton
     }
-    else
-    {
+    else {
         local_hasDeleteButton = false
     }
-  
+
+
+
     return (
         <Link to={`/post/${item_id}`}>
             <div className='w-1000px h-288px flex flex-row items-center justify-start bg-white rounded-12px pl-15px pr-30px'>
@@ -140,8 +159,8 @@ export function ItemPreviewLong({ item_id }) {
                         <div id="title" className="w-auto text-18px text-gray-700 mb-5px">
                             {title}
                         </div>
-                        <UserProfileSmall username={itemOwner}/>
-                         {/*
+                        <UserProfileSmall username={itemOwner} />
+                        {/*
                         <div id="status" className="w-80px ml-10px flex flex-col space-y-2px">                          
                             <Status type="watching" num={numWatching} />
                             <Status type="likes" num={numLikes} />
@@ -167,19 +186,19 @@ export function ItemPreviewLong({ item_id }) {
                             <StatusLabel title="Description">
                                 <div className="text-12px text-gray-500">{description}</div>
                             </StatusLabel>
-                            
+
                             <div id="buttons" className="flex flex-row justify-end space-x-15px mb-5px">
-                                
+
                                 {
-                                    local_hasDeleteButton ?  <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => {e.preventDefault(); deleteItemHandler()}}>Delete Item</button>
-                                    : 
-                                    <div></div>
+                                    local_hasDeleteButton ? <button type="button" className="text-red-400 text-14px border border-1 border-red-400 rounded-6px px-2 py-1" onClick={(e) => { e.preventDefault(); deleteItemHandler() }}>Delete Item</button>
+                                        :
+                                        <div></div>
                                 }
                                 {/* {buttonsOthersPost} */}
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </Link>
@@ -198,20 +217,48 @@ function StatusLabel({ title, children }) {
 export function ItemPreviewList(props) {
     const previewType = props.type ? props.type : "long"
     const itemIds = props.itemIds ? props.itemIds : []
+    const autoScroll = props.autoScroll ?? false;
+    const refs = {}
+
+    function moveToItem(id) {
+        setTimeout(() => {
+            console.log("move to ", id)
+            refs[itemIds[id]].current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center'
+            });
+            id += 1
+            moveToItem(id % itemIds.length)
+        }, 3000)
+    }
+
+    useEffect(() => {
+        if (previewType !== "long" && autoScroll) {
+            moveToItem(0)
+        }
+    }, [])
+
     return (
         <div className={`${previewType === "long" ? "flex flex-col space-y-20px" : "w-955px h-336px pl-27px rounded-25px grid grid-rows-1 grid-flow-col-dense gap-x-17px overflow-x-auto"}`}>
-            {itemIds.length === 0 ? 
-            <div className='w-full h-200px flex flex-row justify-center items-center text-16px text-gray-300'>{ props.placeholder ? props.placeholder : "No Item Found" }</div>
-            :
-            previewType === "long" ?
-            itemIds.map((id) => {
-                return <ItemPreviewLong item_id={id} />
-             })
-             :
-            itemIds.map((id) => {
-                return <ItemPreviewShort item_id={id} />
-             })
-             }
+            {itemIds.length === 0 ?
+                <div className='w-full h-200px flex flex-row justify-center items-center text-16px text-gray-300'>{props.placeholder ? props.placeholder : "No Item Found"}</div>
+                :
+                itemIds.map((id) => {
+                    if (previewType === "long")
+                        return <ItemPreviewLong key={id} item_id={id} hasDeleteButton={props.hasDeleteButton} />
+                    else {
+                        let ref = null;
+                        if (autoScroll) {
+                            ref = React.createRef()
+                            refs[id] = ref
+                        }
+                        return <div ref={ref} key={id}>
+                            <ItemPreviewShort key={id} item_id={id} />
+                        </div>
+                    }
+                })
+            }
         </div>
     )
 }
