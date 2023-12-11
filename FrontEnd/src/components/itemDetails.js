@@ -1,11 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react";
 import CommentList from "../components/commentList.js"
 import CreateComment from "../components/createComment.js"
-import { useSelector } from 'react-redux';
-import { useAlert } from 'react-alert'
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from 'react-redux'
-import { setCartChange } from '../redux/slices/cartChangeFlag';
 import { useStateIfMounted } from "use-state-if-mounted"
 import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -88,11 +83,7 @@ function ItemDetails(props) {
   // on the big tile
   // default: 0
   const { currentUser } = useContext(AuthContext);
-  const alert = useAlert()
-  const dispatch = useDispatch()
-  const token = useSelector((state) => state.loginStatus.token)
   //const user_location = useSelector((state) => state.userInfo.location)
-  const navigate = useNavigate()
   const myRef = useRef(null)
   const executeScroll = () => {
     myRef.current.scrollIntoView();
@@ -149,8 +140,12 @@ function ItemDetails(props) {
     };
 
     getProduct();
-    currentUser.uid && getCart();
-  }, [changeFlag])
+
+    // Only call getCart if currentUser and currentUser.uid are available
+    if (currentUser && currentUser.uid) {
+      getCart();
+    }
+  }, [changeFlag, currentUser])
 
 
   useEffect(() => {
@@ -165,7 +160,7 @@ function ItemDetails(props) {
         unsub();
       };
     };
-    
+
     itemOwner && getSellerInfo();
   }, [itemOwnerId])
 
@@ -188,15 +183,15 @@ function ItemDetails(props) {
 
 
 
-  // handles the two buttons being clicked
-  function handleClick(e) {
-    e.preventDefault();
-    if (e.target.id === "contact") {
-      /* contact seller function */
-    } else if (e.target.id === "watch") {
-      /* add to cart function */
-    }
-  }
+  // // handles the two buttons being clicked
+  // function handleClick(e) {
+  //   e.preventDefault();
+  //   if (e.target.id === "contact") {
+  //     /* contact seller function */
+  //   } else if (e.target.id === "watch") {
+  //     /* add to cart function */
+  //   }
+  // }
 
   // image tile component
   // img => source of the image file to be rendered
@@ -226,8 +221,6 @@ function ItemDetails(props) {
   //     <div></div>
   // }
 
-  function handleContactSeller() {
-  }
 
   async function handleAddToCart() {
     // UserServices.addItemToCart(token, props.id).then((res) => {
@@ -255,9 +248,6 @@ function ItemDetails(props) {
       cart: arrayRemove(props.id)
     });
     setChangeFlag(!changeFlag)
-  }
-  function sellerProfile() {
-
   }
 
   //console.log(cart)
