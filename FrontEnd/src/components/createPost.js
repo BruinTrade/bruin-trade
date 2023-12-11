@@ -185,10 +185,10 @@ function PhotoPreview(props) {
     return (
         props.main ?
             <div className="w-390px h-200px rounded-8px">
-                <img src={props.imgUrl} className="w-full h-full object-contain" />
+                <img src={props.imgUrl} className="w-full h-full object-contain" alt='placeholder'/>
             </div> :
             <div className="w-112px h-80px rounded-8px">
-                <img src={props.imgUrl} className="w-full h-full object-cover" />
+                <img src={props.imgUrl} className="w-full h-full object-cover" alt='placeholder'/>
             </div>
     );
 }
@@ -204,7 +204,7 @@ function PhotoUpload(props) {
                 Photos:
             </label>
             <div className='w-390px h-200px bg-white rounded-12px border-solid border-gray-100 border-2'>
-                {props.urls.length != 0 ? <PhotoPreview imgUrl={props.urls[select]} main={true} /> : ''}
+                {props.urls.length !== 0 ? <PhotoPreview imgUrl={props.urls[select]} main={true} /> : ''}
             </div>
             <div className="grid grid-cols-3 grid-rows-2 gap-x-28px gap-y-20px mt-16px">
                 {/*images*/}

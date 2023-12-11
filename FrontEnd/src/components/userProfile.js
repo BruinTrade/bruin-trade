@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
-import UserServices from "../backend_services/user_services.js"
+// import UserServices from "../backend_services/user_services.js"
 
 
 
 export default function UserProfile(props) {
+    const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
     let username = props.username
-    const [profileImage, setProfileImage] = useState(props.photoURL ? props.photoURL : "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg")
+    let profileImage = props.photoURL || defaultPhotoURL;
+
     let rating = useSelector((state) => state.userInfo.rating);
-    // console.log("props: ", props)
-    // console.log(username, profileImage)
-
-    useEffect(() => {
-        setProfileImage(props.photoURL)
-    }, [])
-
     const navigate = useNavigate()
     
     function handleOnClick() {
@@ -26,7 +21,7 @@ export default function UserProfile(props) {
     return (
         <div onClick={() => handleOnClick()} className='flex flex-col justify-start items-center w-80px'>
             <div id="profileImg" className="w-full h-80px rounded-full overflow-hidden bg-blue-100">
-                <img src={profileImage} className="w-full h-full object-cover" />
+                <img src={profileImage} className="w-full h-full object-cover" alt='placeholder' />
             </div>
             <div id="username" className='flex flex-row justify-center text-16px text-gray-500 mt-10px'>
                 {username}
@@ -42,9 +37,9 @@ export function UserProfileSmall(props) {
 
     const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
     let username = props.username
-    const [profileImage, setProfileImage] = useState(props.photoURL ? props.photoURL : defaultPhotoURL )
-    let rating = useSelector((state) => state.userInfo.rating);
+    let profileImage = props.photoURL || defaultPhotoURL;
 
+    let rating = useSelector((state) => state.userInfo.rating);
     const navigate = useNavigate()
     
     function handleOnClick(e) {
@@ -55,7 +50,7 @@ export function UserProfileSmall(props) {
     return (
         <div onClick={(e) => handleOnClick(e)} className='flex flex-row items-center justify-center'>
             <div id="profileImg" className="w-40px h-40px rounded-full overflow-hidden bg-blue-100">
-                <img src={profileImage} className="w-full h-full object-cover" />
+                <img src={profileImage} className="w-full h-full object-cover" alt='placeholder' />
             </div>
             <div className='flex flex-col items-start justify-center ml-5px space-y-1'>
                 <div id="username" className='text-12px text-gray-400'>

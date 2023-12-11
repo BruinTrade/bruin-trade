@@ -8,16 +8,16 @@ import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
 import { useNavigate, useParams } from "react-router-dom";
 import get_icon, { Icons } from "./icons_SVG";
-import uploadImage from "../backend_services/firebase/imageUpload";
+// import uploadImage from "../backend_services/firebase/imageUpload";
 import { useDispatch } from "react-redux";
-import { setProfileImage, setLocation } from "../redux/slices/userInfo";
+// import { setProfileImage, setLocation } from "../redux/slices/userInfo";
 
-import { auth, db, storage } from "../firebase";
+import { db, storage } from "../firebase";
 import { AuthContext } from '../context/AuthContext'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updateEmail, updateProfile } from "firebase/auth"
 import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
-import { current } from "@reduxjs/toolkit";
+// import { current } from "@reduxjs/toolkit";
 
 //import commentServices from '../backend_services/comment_services';
 
@@ -150,9 +150,9 @@ function WatchList() {
 
   const { userId } = useParams()
 
-  const token = useSelector((state) => state.loginStatus.token);
+  // const token = useSelector((state) => state.loginStatus.token);
 
-  const alert = useAlert();
+  // const alert = useAlert();
 
   const [watchlistItemIDs, setWatchlistItemIDs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -201,8 +201,8 @@ function SellingItems({ userid, itemList }) {
 
 
 
-  const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
-  const alert = useAlert();
+  // const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
+  // const alert = useAlert();
   const navigate = useNavigate();
   const [myItemIds, setMyItemIds] = useState(itemList);
   const [loading, setLoading] = useState(false);
@@ -641,7 +641,7 @@ function Profile() {
         <div className='relative flex flex-col justify-start items-center w-100px h-100px'>
           <input type="file" onChange={(event) => handleUploadImage(event)} className="absolute block opacity-0 z-20 w-full h-full left-0 top-0" />
           <div id="profileImg" className="z-10 w-full h-full rounded-full overflow-hidden bg-blue-100">
-            <img src={profileImgUrl} className="w-full h-full object-cover" />
+            <img src={profileImgUrl} className="w-full h-full object-cover" alt='placeholder' />
           </div>
         </div>
       </div>

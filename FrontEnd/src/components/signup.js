@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import Form from "./form.js";
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { useNavigate } from "react-router-dom";
-import { useAlert } from 'react-alert';
+// import { useAlert } from 'react-alert';
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { db, auth } from "../firebase";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, collection, addDoc } from "firebase/firestore";
+// import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function SignUp() {
-    const alert = useAlert()
+    // const alert = useAlert()
 
     const [err, setErr] = useState(false);
 

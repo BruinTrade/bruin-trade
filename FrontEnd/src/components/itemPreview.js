@@ -92,7 +92,7 @@ export function ItemPreviewShort({ item_id }) {
             <div className='w-258px h-288px flex flex-col item-center justify-between bg-white rounded-12px px-15px'>
                 <div>
                     <div className='w-full h-137px rounded-12px mt-10px mx-auto overflow-hidden'>
-                        <img className='object-cover' src={images ? images[0] : null} />
+                        <img className='object-cover' src={images ? images[0] : null} alt='placeholder' />
                     </div>
                     <div className='w-full text-12px mx-auto mt-15px test-gray-700'>
                         {title}
@@ -152,7 +152,7 @@ export function ItemPreviewLong({ item_id, hasDeleteButton }) {
         <Link to={`/post/${item_id}`}>
             <div className='w-1000px h-288px flex flex-row items-center justify-start bg-white rounded-12px pl-15px pr-30px'>
                 <div id="image" className="flex-shrink-0 flex flex-col justify-center items-center w-260px h-260px border border-1px border-gray-100 rounded-12px object-cover overflow-hidden">
-                    <img src={images} />
+                    <img src={images} alt='placeholder' />
                 </div>
                 <div id="detail" className="grow flex flex-col justify-start ml-10px">
                     <div id="upper" className="flex flex-col items-start mb-10px">
