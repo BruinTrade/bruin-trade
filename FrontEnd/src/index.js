@@ -11,6 +11,11 @@ import { store } from "./redux/store.js";
 import { AuthContextProvider } from "./context/AuthContext";
 import { ChatContextProvider } from "./context/ChatContext";
 
+// index.js or App.js
+if (process.env.NODE_ENV !== "development") {
+  console.log = () => {};
+}
+
 const options = {
   position: positions.TOP_CENTER,
   timeout: 3000,
