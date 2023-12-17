@@ -1,16 +1,13 @@
-import React, { useEffect, useRef } from "react";
-import ItemServices from "../backend_services/item_services.js"
-import UserServices from '../backend_services/user_services.js';
+import React, { useContext, useEffect, useRef } from "react";
 import CommentList from "../components/commentList.js"
 import CreateComment from "../components/createComment.js"
-import { useSelector } from 'react-redux';
-import { useAlert } from 'react-alert'
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from 'react-redux'
-import { setCartChange } from '../redux/slices/cartChangeFlag';
 import { useStateIfMounted } from "use-state-if-mounted"
+import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
+
 
 import UserProfile from "./userProfile.js";
+import { AuthContext } from "../context/AuthContext.js";
 
 // IMPORTANT: Limit the amount of words that can be submitted as an item's name and description. Otherwise the text
 // will appear cutoff and may or may not overflow.
@@ -85,11 +82,8 @@ function ItemDetails(props) {
   // imgState keeps track of which image to show
   // on the big tile
   // default: 0
-  const alert = useAlert()
-  const dispatch = useDispatch()
-  const token = useSelector((state) => state.loginStatus.token)
+  const { currentUser } = useContext(AuthContext);
   //const user_location = useSelector((state) => state.userInfo.location)
-  const navigate = useNavigate()
   const myRef = useRef(null)
   const executeScroll = () => {
     myRef.current.scrollIntoView();
@@ -102,51 +96,73 @@ function ItemDetails(props) {
   const [imgState, setImgState] = useStateIfMounted(0);
   const [tags, setTags] = useStateIfMounted([])
   const [itemOwner, setItemOwner] = useStateIfMounted("")
+  const [itemOwnerId, setItemOwnerId] = useStateIfMounted("")
   const [loc, setLoc] = useStateIfMounted("")
   const [cond, setCond] = useStateIfMounted("")
   const [relatedComments, setRelatedComments] = useStateIfMounted([])
   const [cart, setCart] = useStateIfMounted([])
   const [changeFlag, setChangeFlag] = useStateIfMounted(true)
+  const [ownerPhotoURL, setOwnerPhotoURL] = useStateIfMounted("")
   const totTags = tags.length;
 
-  useEffect(async () => {
-    const res = await ItemServices.getItemDetailsById(props.id, token);
-    if (res.status !== 200)
-    {
-      alert.show(res.data.errors ? res.data.errors : res.data.error)
-      navigate("/")
+  useEffect(() => {
+    // Get Real-time Product Info
+    const getProduct = () => {
+      const unsub = onSnapshot(doc(db, "products", props.id), (doc) => {
+        const data = doc.data();
+        setName(data.title)
+        setDesc(data.description)
+        setPrice(data.price)
+        setImages(data.images)
+        setItemOwner(data.sellerName)
+        setItemOwnerId(data.seller)
+        setCond(data.condition)
+        // setRelatedComments(data.relatedComments)
+        setTags(data.categoryTag)
+        setLoc(data.location)
+        setLoading(false)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    // Get Cart Information of Current User
+    const getCart = () => {
+      const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
+        setCart(doc.data().cart);
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    getProduct();
+
+    // Only call getCart if currentUser and currentUser.uid are available
+    if (currentUser && currentUser.uid) {
+      getCart();
     }
-    const data = res.data
-    // console.log(data)
-    setName(data.title)
-    setDesc(data.description)
-    setPrice(data.price)
-    setImages(data.images)
-    setItemOwner(data.owner)
-    setRelatedComments(data.relatedComments)
-    setCond(data.condition)
-    setTags([data.tags])
-    UserServices.getVerbolLocationByUsername(token, data.owner).then((res) => {
-      if (res.status !== 200)
-      {
-      alert.show(res.data.errors ? res.data.errors : res.data.error)
-      navigate("/")
-      }
-      console.log(res)
-      setLoc(res.data.location)
-      setLoading(false)
-    })
-    UserServices.getItemsInCart(token).then((res) => {
-      if (res.status !== 200)
-      {
-      alert.show(res.data.errors ? res.data.errors : res.data.error)
-      navigate("/")
-      }
-      setCart(res.data.cart.map(item => item._id)) 
-      //console.log("data", data)
-    })
-    
-  }, [changeFlag])
+  }, [changeFlag, currentUser])
+
+
+  useEffect(() => {
+    // Get Seller's Profile by Seller's id
+    const getSellerInfo = () => {
+      const unsub = onSnapshot(doc(db, "users", itemOwnerId), (doc) => {
+        const data = doc.data();
+        setOwnerPhotoURL(data.photoURL);
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    itemOwner && getSellerInfo();
+  }, [itemOwnerId])
 
   // initialization function for tags and images
   function init(what) {
@@ -159,7 +175,7 @@ function ItemDetails(props) {
         //out.push(<Tag tag={tags[k]} key={k.toString()} id={k} />);
       }
       else {
-        out.push(<ImageTile img={images[k]} key={k.toString()} id={k}/>);
+        out.push(<ImageTile img={images[k]} key={k.toString()} id={k} />);
       }
     }
     return out;
@@ -167,15 +183,15 @@ function ItemDetails(props) {
 
 
 
-  // handles the two buttons being clicked
-  function handleClick(e) {
-    e.preventDefault();
-    if (e.target.id === "contact") {
-      /* contact seller function */
-    } else if (e.target.id === "watch") {
-      /* add to cart function */
-    }
-  }
+  // // handles the two buttons being clicked
+  // function handleClick(e) {
+  //   e.preventDefault();
+  //   if (e.target.id === "contact") {
+  //     /* contact seller function */
+  //   } else if (e.target.id === "watch") {
+  //     /* add to cart function */
+  //   }
+  // }
 
   // image tile component
   // img => source of the image file to be rendered
@@ -205,34 +221,33 @@ function ItemDetails(props) {
   //     <div></div>
   // }
 
-  function handleContactSeller() {
+
+  async function handleAddToCart() {
+    // UserServices.addItemToCart(token, props.id).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors)
+    //   }
+    //   dispatch(setCartChange())
+    //   setChangeFlag(!changeFlag)
+    // })
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      cart: arrayUnion(props.id)
+    });
+    setChangeFlag(!changeFlag)
   }
 
-  function handleAddToCart() {
-    UserServices.addItemToCart(token, props.id).then((res) => {
-      if (res.status !== 200)
-      {
-        alert.show(res.data.errors)
-      }
-      dispatch(setCartChange())
-      setChangeFlag(!changeFlag)
-    })
-  }
-  
-  function handleRemoveFromCart() 
-  {
-    UserServices.removeFromCart(token, props.id).then((res) => {
-      if (res.status !== 200)
-      {
-        alert.show(res.data.errors)
-      }
-      dispatch(setCartChange())
-      setChangeFlag(!changeFlag)
-    })
-  }
-  function sellerProfile()
-  {
-
+  async function handleRemoveFromCart() {
+    // UserServices.removeFromCart(token, props.id).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors)
+    //   }
+    //   dispatch(setCartChange())
+    //   setChangeFlag(!changeFlag)
+    // })
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      cart: arrayRemove(props.id)
+    });
+    setChangeFlag(!changeFlag)
   }
 
   //console.log(cart)
@@ -290,10 +305,10 @@ function ItemDetails(props) {
 
               <div className="flex flex-col items-center w-160px">
                 <div className="mb-20px">
-                  <UserProfile username={itemOwner}/>
+                  <UserProfile username={itemOwner} photoURL={ownerPhotoURL} />
                 </div>
-                
-          
+
+
                 <button
                   onClick={executeScroll}
                   id="contact"
@@ -311,28 +326,28 @@ function ItemDetails(props) {
                 </button>
                 */}
                 {
-                 
+
                   cart.includes(props.id) ? <button
-                  onClick={handleRemoveFromCart}
-                  id="watch"
-                  className="w-160px h-50px rounded-full border-red-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-red-400"
-                >
-                  Remove From Cart
-                </button>
-                :
-                <button
-                  onClick={handleAddToCart}
-                  id="watch"
-                  className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
-                >
-                  Add to Watchlist
-                </button>
+                    onClick={handleRemoveFromCart}
+                    id="watch"
+                    className="w-160px h-50px rounded-full border-red-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-red-400"
+                  >
+                    Remove From Cart
+                  </button>
+                    :
+                    <button
+                      onClick={handleAddToCart}
+                      id="watch"
+                      className="w-160px h-50px rounded-full border-blue-400 hover:bg-blue-100 border bg-white font-roboto-reg text-18px mb-10px text-blue-400"
+                    >
+                      Add to Watchlist
+                    </button>
                 }
               </div>
             </div>
           </div>
         </div>
-        <CommentList comments={relatedComments} updateState={() => setChangeFlag(!changeFlag)}/>
+        <CommentList comments={relatedComments} updateState={() => setChangeFlag(!changeFlag)} />
         <div ref={myRef}>
           <CreateComment item_id={props.id} item_owner={itemOwner} updateState={() => setChangeFlag(!changeFlag)} />
         </div>

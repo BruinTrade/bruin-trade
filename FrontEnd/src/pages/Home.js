@@ -7,10 +7,6 @@ import { Navigate } from "react-router-dom";
 import { useSelector } from 'react-redux'
 
 export default function PageHome() {
-  const login = useSelector((state) => state.loginStatus.login)
-  if (!login) {
-    return <Navigate to="/login" />;
-  }
 
   return (
     <div className="flex flex-row justify-center">
@@ -19,7 +15,7 @@ export default function PageHome() {
           <div className="pl-25px avenir-med text-gray-500 text-20px mb-10px">
             Trending Items
           </div>
-          <TradingItems autoScroll={true} />
+          <TradingItems autoScroll={false} />
         </div>
         <Categories />
         <div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import UserProfile, { UserProfileSmall } from "./userProfile";
 import Form from "./form";
 import Map from "./map";
@@ -6,11 +6,18 @@ import { ItemPreviewList } from "./itemPreview";
 import UserServices from "../backend_services/user_services";
 import { useSelector } from "react-redux";
 import { useAlert } from "react-alert";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import get_icon, { Icons } from "./icons_SVG";
-import uploadImage from "../backend_services/firebase/imageUpload";
+// import uploadImage from "../backend_services/firebase/imageUpload";
 import { useDispatch } from "react-redux";
-import { setProfileImage, setLocation } from "../redux/slices/userInfo";
+// import { setProfileImage, setLocation } from "../redux/slices/userInfo";
+
+import { db, storage } from "../firebase";
+import { AuthContext } from '../context/AuthContext'
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { updateEmail, updateProfile } from "firebase/auth"
+import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
+// import { current } from "@reduxjs/toolkit";
 
 //import commentServices from '../backend_services/comment_services';
 
@@ -19,54 +26,65 @@ import { setProfileImage, setLocation } from "../redux/slices/userInfo";
 // - implement everything else (watch list, orders, sold, location)
 
 export const InfoPages = {
-  watchList : 0,
-  sellingItems : 1,
-  orders : 2,
-  sold : 3,
-  subscriptions : 4,
+  watchList: 0,
+  sellingItems: 1,
+  orders: 2,
+  sold: 3,
+  subscriptions: 4,
   OtherUserLocation: 7,
 }
 export const SettingPages = {
-  location : 5,
-  profile : 6
+  location: 5,
+  profile: 6
 }
+
 
 export const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "User Location"];
 
-export default function ProfileDetails({ preSelect, username }) {
-  //console.log(preSelect)
+export default function ProfileDetails(props) {
 
-  // const InfoPages = {
-  //   watchList : 7,
-  //   sellingItems : 1,
-  //   orders : 2,
-  //   sold : 3,
-  //   subscriptions : 4,
-  // }
-  // const SettingPages = {
-  //   location : 5,
-  //   profile : 6
-  // }
-  // const PageNames = ["Watch List", "Selling Items", "Orders", "Sold", "Subscriptions", "Location", "Profile", "OtherUserLocation"]
-
-  const currentUsername = useSelector((state) => state.userInfo.username);
-  const user_name = username ? username : currentUsername
-  const ownerIsCurrentUser = (user_name === currentUsername)
+  const preSelect = props.preSelect;
+  const { currentUser } = useContext(AuthContext)
+  const currentUsername = currentUser ? currentUser.displayName : null
+  const userId = props.userId ? props.userId : currentUsername.uid
+  const ownerIsCurrentUser = userId === currentUser.uid ? true : false
   const [selection, setSelectionState] = useState(preSelect !== undefined ? preSelect : (ownerIsCurrentUser ? 6 : 1));
+  const [username, setUsername] = useState(currentUsername)
+  const [photoURL, setPhotoURL] = useState(currentUser.photoURL)
+  const [itemList, setItemList] = useState([])
+
 
   const avaliablePages = ownerIsCurrentUser ? [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions] : [InfoPages.sellingItems, InfoPages.sold, InfoPages.OtherUserLocation]
   const settingPages = [SettingPages.location, SettingPages.profile]
+
+  useEffect(() => {
+    // fetch that user's name, photo, and selling items
+    const getSellingItems = () => {
+      const unsub = onSnapshot(doc(db, "users", userId), (doc) => {
+        const data = doc.data();
+        setUsername(data.displayName)
+        setPhotoURL(data.photoURL)
+        setItemList(data.sellingItems)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    userId && getSellingItems();
+  }, [])
 
   function getMenu(selection) {
     switch (selection) {
       case 0: // Watch List
         return <WatchList />
       case 1: //Selling Items
-        return <SellingItems username={ user_name } />
+        return <SellingItems username={userId} itemList={itemList} />
       case 2: // Orders
         return <Orders />
       case 3: // Sold
-        return <Sold username={ user_name } />
+        return <Sold username={userId} />
       case 4: // Subscriptions
         return <Subscriptions />
       case 5: // Location
@@ -74,7 +92,7 @@ export default function ProfileDetails({ preSelect, username }) {
       case 6: // Profile
         return <Profile />
       case 7: //other user location
-        return <OtherUserLocation other_username={username}/>
+        return <OtherUserLocation other_username={userId} />
       default: // Profile
         return <Profile />
     }
@@ -84,14 +102,14 @@ export default function ProfileDetails({ preSelect, username }) {
   return (
     <div className="w-full flex flex-row justify-start mt-40px ml-40px">
       <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white drop-shadow-md flex flex-col items-center">
-        <UserProfile username={username ? username : currentUsername} />
+        <UserProfile username={username} photoURL={photoURL} />
         <div className="flex flex-col items-start mt-29px">
 
           <div className="font-roboto-reg text-18px mb-20px text-gray-600">
             My Account
           </div>
           <div className="flex flex-col justify-start space-y-5px ">
-            {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
+            {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)} />)}
           </div>
 
         </div>
@@ -101,16 +119,16 @@ export default function ProfileDetails({ preSelect, username }) {
               Settings
             </div>
             <div className="flex flex-col justify-start space-y-5px ">
-              {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)}/>)}
+              {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} selected={selection === page} selectCallBack={() => setSelectionState(page)} />)}
             </div>
           </div>
           :
-          <SubscriptionButton username={user_name} />
+          <SubscriptionButton username={userId} />
         }
       </div>
       <div className="mt-10px w-1000px">
         <div className="font-roboto-reg text-16px ml-20px text-gray-500">
-          {selection >= PageNames.length ? PageNames[PageNames.length-1] : PageNames[selection]}
+          {selection >= PageNames.length ? PageNames[PageNames.length - 1] : PageNames[selection]}
         </div>
         <div className="" />
         {getMenu(selection)}
@@ -126,29 +144,43 @@ function SelectTab({ name, selected, selectCallBack }) {
       {name}
     </div>
   );
-  }
+}
 
 function WatchList() {
 
-  const token = useSelector((state) => state.loginStatus.token);
+  const { userId } = useParams()
 
-  const alert = useAlert();
+  // const token = useSelector((state) => state.loginStatus.token);
+
+  // const alert = useAlert();
 
   const [watchlistItemIDs, setWatchlistItemIDs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    UserServices.getItemsInCart(token).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        setWatchlistItemIDs(res.data.cart.map((item) => item._id));
-      }
-      setLoading(false)
-    });
+    // UserServices.getItemsInCart(token).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors ? res.data.errors : res.data.error);
+    //   } else {
+    //     setWatchlistItemIDs(res.data.cart.map((item) => item._id));
+    //   }
+    //   setLoading(false)
+    // });
+    const getCart = () => {
+      const unsub = onSnapshot(doc(db, "users", userId), (doc) => {
+        setWatchlistItemIDs(doc.data().cart);
+        setLoading(false)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    userId && getCart();
   }, [])
 
-  if(loading) {
+  if (loading) {
     return <Loading />
   } else {
     return <ItemPreviewList itemIds={watchlistItemIDs} placeholder="Go shop around your community!" />
@@ -160,28 +192,24 @@ function Orders() {
   const [orders, setOrders] = useState([]);
   //const [loading, setLoading] = useState(true);
 
-  return <ItemPreviewList itemIds={orders} hasDeleteButton={true}/>
+  return <ItemPreviewList itemIds={orders} hasDeleteButton={true} />
 
 }
 
-function SellingItems({ username }) {
+function SellingItems({ userid, itemList }) {
 
-  const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
-  const alert = useAlert();
+
+
+
+  // const sellingItemsChange = useSelector((state) => state.sellingItemsChange.sellingItemsChange);
+  // const alert = useAlert();
   const navigate = useNavigate();
-  const [myItemIds, setMyItemIds] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [myItemIds, setMyItemIds] = useState(itemList);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    UserServices.getItemsBelongToUser(username).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        setMyItemIds(res.data.map((item) => item._id));
-      }
-      setLoading(false)
-    })
-  }, [sellingItemsChange])
+
+  }, [])
 
 
   const placeholder = (
@@ -191,9 +219,10 @@ function SellingItems({ username }) {
     </div>
   );
 
-  if(loading) {
+  if (loading) {
     return <Loading />
   } else {
+    // {console.log("My item ids", myItemIds)}
     return <ItemPreviewList itemIds={myItemIds} hasDeleteButton={true} placeholder={placeholder} />
   }
 }
@@ -202,7 +231,7 @@ function Sold() {
   const [sold, setSold] = useState([]);
   //const [loading, setLoading] = useState(true);
 
-  return <ItemPreviewList itemIds={sold} hasDeleteButton={true}/>
+  return <ItemPreviewList itemIds={sold} hasDeleteButton={true} />
 }
 
 function SubscriptionButton({ username }) {
@@ -223,7 +252,7 @@ function SubscriptionButton({ username }) {
   }, [])
 
   function handleOnClick(username) {
-    if(subscribed) {
+    if (subscribed) {
       UserServices.unfollow(token, username).then((res) => {
         if (res.status !== 200) {
           alert.show(res.data.errors ? res.data.errors : res.data.error);
@@ -241,7 +270,7 @@ function SubscriptionButton({ username }) {
       })
     }
   }
-  if(loading)
+  if (loading)
     return <div />
   else {
     return (
@@ -254,57 +283,61 @@ function SubscriptionButton({ username }) {
 
 function Subscriptions() {
 
-  const token = useSelector((state) => state.loginStatus.token);
+  const { currentUser } = useContext(AuthContext);
+
 
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   function fetchFollowing() {
-    UserServices.getAllFollowings(token).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        setSubscriptions(res.data.users_followed);
-      }
-      setLoading(false);
-    })
+    const getFollowing = () => {
+      const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
+        const data = doc.data();
+        setSubscriptions(data.users_followed)
+        setLoading(false)
+      });
+
+      return () => {
+        unsub();
+      };
+    };
+
+    currentUser && getFollowing();
   }
 
   useEffect(() => {
     fetchFollowing()
   }, [])
 
-  if(loading) {
+  if (loading) {
     return <Loading />
   } else {
     return (
       <div className="flex flex-col space-y-20px">
-        {subscriptions.length === 0 ? 
-        <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Subscribe to your friends!</div> 
-        : 
-        subscriptions.map((username) => <Subscription key={username} username={username} unsubscribeCallback={fetchFollowing}/>)}
+        {subscriptions.length === 0 ?
+          <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Subscribe to your friends!</div>
+          :
+          subscriptions.map((subscriptions) => <Subscription key={subscriptions} unsubscribeCallback={fetchFollowing} />)}
       </div>
-      );
+    );
   }
 }
 
 function Subscription({ username, unsubscribeCallback }) {
 
-  const token = useSelector((state) => state.loginStatus.token);
-
-  function unsubscribe () {
-    UserServices.unfollow(token, username).then((res) => {
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error);
-      } else {
-        unsubscribeCallback()
-      }
-    })
+  function unsubscribe() {
+    // UserServices.unfollow(token, username).then((res) => {
+    //   if (res.status !== 200) {
+    //     alert.show(res.data.errors ? res.data.errors : res.data.error);
+    //   } else {
+    //     unsubscribeCallback()
+    //   }
+    // })
   }
 
   return (
     <div className="w-1000px h-80px pl-31px pr-22px flex bg-white rounded-25px flex-row justify-between items-center ">
-       <UserProfileSmall username={username} />
+      <UserProfileSmall username={username} />
       <button
         onClick={() => unsubscribe()}
         className="font-roboto-reg text-10px bg-gray-200 text-gray-500 rounded-6px h-24px w-75px hover:bg-gray-300"
@@ -329,14 +362,12 @@ function OtherUserLocation(props) {
       if (res.status !== 200) {
         alert.show(res.data.errors ? res.data.errors : res.data.error);
       } else {
-        if (res.data.location === null)
-        {
+        if (res.data.location === null) {
           setLatitude(0)
           setLongitude(0)
           setHasLocation(false)
         }
-        else
-        {
+        else {
           setLatitude(res.data.location.latitude)
           setLongitude(res.data.location.longitude)
         }
@@ -349,30 +380,30 @@ function OtherUserLocation(props) {
     setLocationChangeFlag(!locationChangeFlag)
   }
 
-  return loading? 
-  <div/>
-  : 
-  (
-    hasLocation ? 
-      <div className="relative flex flex-col space-y-20px">
-        <div className="rounded-12px overflow-hidden">
-          <Map latitude={latitude} longitude={longitude}/>
-        </div>
-        <button
+  return loading ?
+    <div />
+    :
+    (
+      hasLocation ?
+        <div className="relative flex flex-col space-y-20px">
+          <div className="rounded-12px overflow-hidden">
+            <Map latitude={latitude} longitude={longitude} />
+          </div>
+          <button
             onClick={viewLocation}
             className="absolute right-10px top-40px p-5px bg-white rounded-2px"
           >
             <div className="w-30px h-30px">
-              { get_icon(Icons.location) }
+              {get_icon(Icons.location)}
             </div>
           </button>
-      </div>
-    :
-    <div className="flex flex-col justify-center items-center space-y-20px">
-      <div className="text-gray-500 text-16px">The user has not provided detailed location yet</div>
-    </div>
-    
-  )
+        </div>
+        :
+        <div className="flex flex-col justify-center items-center space-y-20px">
+          <div className="text-gray-500 text-16px">The user has not provided detailed location yet</div>
+        </div>
+
+    )
 }
 
 
@@ -391,13 +422,11 @@ function Location() {
       if (res.status !== 200) {
         alert.show(res.data.errors ? res.data.errors : res.data.error);
       } else {
-        if (res.data.location === null)
-        {
+        if (res.data.location === null) {
           setLatitude(0)
           setLongitude(0)
         }
-        else
-        {
+        else {
           setLatitude(res.data.location.latitude)
           setLongitude(res.data.location.longitude)
         }
@@ -409,10 +438,10 @@ function Location() {
 
   function updateLocation() {
     setFetchingLocation(true)
-    try{
+    try {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
-          function(location) {
+          function (location) {
             UserServices.updateLocation(token, location.coords.latitude, location.coords.longitude).then((res) => {
               if (res.status !== 200) {
                 alert.show(res.data.errors ? res.data.errors : res.data.error);
@@ -424,7 +453,7 @@ function Location() {
               }
             })
           },
-          function(error) {
+          function (error) {
             if (error.code == error.PERMISSION_DENIED)
               setPermissionDenied(true)
           }
@@ -433,7 +462,7 @@ function Location() {
         alert.show("Sorry, geolocation is not available")
       }
     }
-    catch{
+    catch {
       alert.show("Sorry, geolocation is not available")
       setPermissionDenied(true)
     }
@@ -444,93 +473,134 @@ function Location() {
   }
 
   return (!permissionDenied) ?
-  (loading?
-  <div/>
-  :
-  (fetchingLocation ? 
-  <div className="flex flex-col justify-center items-center space-y-20px">
-    <div className="text-gray-500 text-16px">Fetching your current location...</div>
-  </div>
-  :
-  <div className="relative flex flex-col space-y-20px">
-    <div className="rounded-12px overflow-hidden">
-      <Map latitude={latitude} longitude={longitude}/>
-    </div>
-    <div className="absolute left-10px top-40px flex flex-col justify-end space-y-10px">
-      <button
-          onClick={updateLocation}
-          className="px-12px py-10px text-16px text-gray-700 bg-white rounded-2px hover:bg-gray-100"
-        >
-          Set Location
-        </button>
-    </div>
-    <button
-        onClick={viewLocation}
-        className="absolute right-10px top-40px p-5px bg-white rounded-2px"
-      >
-        <div className="w-30px h-30px">
-          { get_icon(Icons.location) }
+    (loading ?
+      <div />
+      :
+      (fetchingLocation ?
+        <div className="flex flex-col justify-center items-center space-y-20px">
+          <div className="text-gray-500 text-16px">Fetching your current location...</div>
         </div>
-      </button>
-  </div>
-  )) : 
-  <div className="flex flex-col justify-center items-center space-y-20px">
-  <div className="text-gray-500 text-16px">Sorry, geolocation is not available right now. Please give your permission.</div>
-  </div>
+        :
+        <div className="relative flex flex-col space-y-20px">
+          <div className="rounded-12px overflow-hidden">
+            <Map latitude={latitude} longitude={longitude} />
+          </div>
+          <div className="absolute left-10px top-40px flex flex-col justify-end space-y-10px">
+            <button
+              onClick={updateLocation}
+              className="px-12px py-10px text-16px text-gray-700 bg-white rounded-2px hover:bg-gray-100"
+            >
+              Set Location
+            </button>
+          </div>
+          <button
+            onClick={viewLocation}
+            className="absolute right-10px top-40px p-5px bg-white rounded-2px"
+          >
+            <div className="w-30px h-30px">
+              {get_icon(Icons.location)}
+            </div>
+          </button>
+        </div>
+      )) :
+    <div className="flex flex-col justify-center items-center space-y-20px">
+      <div className="text-gray-500 text-16px">Sorry, geolocation is not available right now. Please give your permission.</div>
+    </div>
 }
 
 
 function Profile() {
+  const { currentUser } = useContext(AuthContext)
+
+  const location = false;
+
+
   const dispatch = useDispatch()
   const token = useSelector((state) => state.loginStatus.token)
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState(useSelector((state) => state.userInfo.email));
-  const [username, setUsername] = useState(useSelector((state) => state.userInfo.username));
-  const [userLocation, setUserLocation] = useState(useSelector((state) => state.userInfo.location));
-  const [profileImgUrl, setProfileImgUrl] = useState(useSelector((state) => state.userInfo.profileImage));
+  const [email, setEmail] = useState(currentUser.email);
+  const [username, setUsername] = useState(currentUser.displayName);
+  const [userLocation, setUserLocation] = useState(location);
+  const [profileImgUrl, setProfileImgUrl] = useState(currentUser.photoURL ? currentUser.photoURL : "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg");
   const [profileImgFile, setProfileImgFile] = useState();
   const alert = useAlert()
 
+  useEffect(() => {
+    (async () => {
+      const docRef = doc(db, "users", currentUser.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap) {
+        console.log("Document data:", docSnap.data().location);
+        const data = docSnap.data()
+        setUserLocation(data.location)
+        setUsername(data.displayName)
+        setEmail(data.email)
+        console.log(userLocation)
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    })();
+  }, [])
+
+
   async function saveChanges() {
 
-    if (userLocation === "")
-    {
+    if (userLocation === "") {
       alert.show("Must Provide a Location")
     }
-    if (email === "")
-    {
+    if (email === "") {
       alert.show("Must Provide an Email")
     }
 
-    if (profileImgFile)
-    {
-      const url = await uploadImage(profileImgFile)
-      setProfileImgUrl(url)
-      const res = await UserServices.updateUserInfo(token, email, url, userLocation)
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error)
-        setLoading(false)
-      }
-      else
-      {
-        dispatch(setLocation(userLocation))
-        dispatch(setProfileImage(url))
-        alert.show("Successfully updated user profile")
-        setLoading(false)
-      }
+    if (email != currentUser.email) {
+      updateEmail(currentUser, email).then(() => {
+        console.log("Updated Email: ", email)
+      }).catch((error) => {
+        console.log(error)
+      });
+    }
+    // If profile image has changed, update all in user profile and user on firestore
+    if (profileImgFile) {
+      // create a unique image name
+      const date = new Date().getTime();
+      const storageRef = ref(storage, `${username + date}`);
+
+      await uploadBytesResumable(storageRef, profileImgFile).then(() => {
+        getDownloadURL(storageRef).then(async (downloadURL) => {
+          try {
+            // Update profile
+            await updateProfile(currentUser, {
+              displayName: username,
+              photoURL: downloadURL,
+            })
+            // Update user on firestore
+            await setDoc(doc(db, "users", currentUser.uid), {
+              displayName: username,
+              email: email,
+              photoURL: downloadURL,
+              location: userLocation,
+            })
+          } catch (err) {
+            console.log(err)
+          }
+        })
+      })
+      // If only username is changed, onpu update username
     } else {
-      const res = await UserServices.updateUserInfo(token, email, null, userLocation)
-      if (res.status !== 200) {
-        alert.show(res.data.errors ? res.data.errors : res.data.error)
-        setLoading(false)
-      }
-      else
-      {
-        dispatch(setLocation(userLocation))
-        alert.show("Successfully updated user profile")
-        setLoading(false)
+      try {
+        await updateProfile(currentUser, {
+          displayName: username,
+        })
+        await setDoc(doc(db, "users", currentUser.uid), {
+          displayName: username,
+          location: userLocation,
+        }, { merge: true })
+      } catch (err) {
+        console.log(err)
       }
     }
+    alert.show("Successfully updated user profile")
   }
 
   function handleUploadImage(event) {
@@ -571,11 +641,11 @@ function Profile() {
         <div className='relative flex flex-col justify-start items-center w-100px h-100px'>
           <input type="file" onChange={(event) => handleUploadImage(event)} className="absolute block opacity-0 z-20 w-full h-full left-0 top-0" />
           <div id="profileImg" className="z-10 w-full h-full rounded-full overflow-hidden bg-blue-100">
-            <img src={profileImgUrl} className="w-full h-full object-cover" />
+            <img src={profileImgUrl} className="w-full h-full object-cover" alt='placeholder' />
           </div>
         </div>
       </div>
-      
+
       <button
         onClick={saveChanges}
         className="absolute text-16px font-roboto-reg text-white ml-775px mt-460px bg-blue-300 h-50px w-150px rounded-full hover:bg-blue-400"
@@ -583,12 +653,12 @@ function Profile() {
         Save Changes
       </button>
       {
-        loading ? 
-        <div className="absolute left-0 top-0 w-full h-full backdrop-opacity-10 bg-white-10 z-40">
-          <Loading />
-        </div> 
-        :
-        null
+        loading ?
+          <div className="absolute left-0 top-0 w-full h-full backdrop-opacity-10 bg-white-10 z-40">
+            <Loading />
+          </div>
+          :
+          null
       }
     </div>
   );
@@ -596,6 +666,6 @@ function Profile() {
 
 
 function Loading() {
- return <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Loading...</div>
+  return <div className="w-full h-200px flex flex-row justify-center items-center text-gray-300 text-16px">Loading...</div>
 }
 

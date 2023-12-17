@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { ItemPreviewList } from "./itemPreview";
-import ItemServices from "../backend_services/item_services";
+// import ItemServices from "../backend_services/item_services";
+import { query, orderBy, limit, getDocs, collection } from "firebase/firestore";
+import { db } from "../firebase";
+
 
 export default function TradingItems({ autoScroll }) {
 
     const [results, setResults] = useState([]);
 
     useEffect(() => {
-        ItemServices.get_all().then(res => {
-            const start = getRandomInt(res.data.length-7)
-            //console.log(start)
-            setResults(res.data.slice(start, start+7).map(item => item._id));
-        });
+        (async () => {
+            const q = query(collection(db, "products"), limit(3));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                setResults(existingResults => {return [...existingResults, doc.data().pid]})
+                console.log(doc.id, " => ", doc.data());
+            });
+        })();
+        console.log(results)
         setResults(shuffle(results))
     }, [])
 
-    //console.log(shuffle(results))
     return (
         results.length ?
             <div className='mt-20px flex flex-row justify-center'>
@@ -50,4 +56,4 @@ function shuffle(array) {
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
-  }
+}

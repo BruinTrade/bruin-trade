@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import ConcisePreview from './itemConcisePreview';
 import UserProfile from "../components/userProfile.js";
 import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { InfoPages, SettingPages, PageNames } from './profileDetails';
+
+import { AuthContext } from '../context/AuthContext';
+import { current } from '@reduxjs/toolkit';
 
 
 export default function ProfilePage(props) {
@@ -86,21 +89,24 @@ function ViewMore(props) {
 }
 
 export function NewProfilePage({ username }) {
-    const currentUsername = useSelector((state) => state.userInfo.username);
-
+    const {currentUser} = useContext(AuthContext)
+    const userId = currentUser? currentUser.uid : null
+    const currentUsername = currentUser ? currentUser.displayName: "Please Login First";
     const avaliablePages = [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions]
-    const settingPages = [SettingPages.location, SettingPages.profile]
+    const settingPages = [SettingPages.location, SettingPages.profile];
+    const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
 
     return (
         <div className="h-max w-310px mr-30px rounded-25px py-40px bg-white flex flex-col items-center">
-            <UserProfile username={username ? username : currentUsername} />
+            <UserProfile username={username != null ? username : currentUsername} photoURL={currentUser != null ? currentUser.photoURL : defaultPhotoURL} userId={userId} />
+            {console.log(defaultPhotoURL)}
             <div className="flex flex-col items-start mt-29px">
 
                 <div className="font-roboto-reg text-18px mb-20px text-gray-600">
                     My Account
                 </div>
                 <div className="flex flex-col justify-start space-y-5px ">
-                    {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} />)}
+                    {avaliablePages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} userId={userId} />)}
                 </div>
 
             </div>
@@ -109,18 +115,18 @@ export function NewProfilePage({ username }) {
                     Settings
                 </div>
                 <div className="flex flex-col justify-start space-y-5px ">
-                    {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} />)}
+                    {settingPages.map((page) => <SelectTab key={PageNames[page]} name={PageNames[page]} page={page} userId={userId}/>)}
                 </div>
             </div>
         </div>
     );
 }
 
-function SelectTab({ name, page }) {
+function SelectTab({ name, page, userId }) {
     const navigate = useNavigate();
     return (
         <div
-            onClick={() => { navigate("/profile/", { state: { page: page } }) }}
+            onClick={() => { navigate(`/profile/${userId}`, { state: { page: page } }) }}
             className={`flex items-center w-260px h-30px px-10px py-7px rounded-6px bg-white text-gray-500 hover:text-gray-400 hover:bg-blue-50 text-14px  leading-none`}
         >
             {name}

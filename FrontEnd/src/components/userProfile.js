@@ -1,38 +1,27 @@
-import React, { useState } from 'react'
+import React from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
-import UserServices from "../backend_services/user_services.js"
+// import UserServices from "../backend_services/user_services.js"
+
+
 
 export default function UserProfile(props) {
-    let username = useSelector((state) => state.userInfo.username)
-    const [profileImage, setProfileImage] = useState(useSelector((state) => state.userInfo.profileImage))
+    const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
+    let username = props.username
+    let profileImage = props.photoURL || defaultPhotoURL;
+
     let rating = useSelector((state) => state.userInfo.rating);
-
-    const token = useSelector((state) => state.loginStatus.token)
-
-    if(props.username) {
-        username = props.username
-        UserServices.getUserIconByUsername(token, username).then((res) => {
-            if (res.data.icon_url===null)
-            {
-                res.data.icon_url = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"
-            }
-            setProfileImage(res.data.icon_url)
-        })//"https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
-        rating = 5 //TODO getRating
-    }
-
     const navigate = useNavigate()
     
     function handleOnClick() {
-        navigate(`/profile/${username}`)
+        navigate(`/profile/${props.userId}`)
     }
 
     return (
         <div onClick={() => handleOnClick()} className='flex flex-col justify-start items-center w-80px'>
             <div id="profileImg" className="w-full h-80px rounded-full overflow-hidden bg-blue-100">
-                <img src={profileImage} className="w-full h-full object-cover" />
+                <img src={profileImage} className="w-full h-full object-cover" alt='placeholder' />
             </div>
             <div id="username" className='flex flex-row justify-center text-16px text-gray-500 mt-10px'>
                 {username}
@@ -46,36 +35,22 @@ export default function UserProfile(props) {
 
 export function UserProfileSmall(props) {
 
-    let username = useSelector((state) => state.userInfo.username)
-    const [profileImage, setProfileImage] = useState(useSelector((state) => state.userInfo.profileImage))
+    const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
+    let username = props.username
+    let profileImage = props.photoURL || defaultPhotoURL;
+
     let rating = useSelector((state) => state.userInfo.rating);
-
-    const token = useSelector((state) => state.loginStatus.token)
-
-    if(props.username) {
-        username = props.username
-        UserServices.getUserIconByUsername(token, username).then((res) => {
-            //console.log("res", res)
-            if (res.data.icon_url===null)
-            {
-                res.data.icon_url = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg"
-            }
-            setProfileImage(res.data.icon_url)
-        }) //"https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg" //TODO getProfileImg
-        rating = 5 //TODO getRating
-    }
-
     const navigate = useNavigate()
     
     function handleOnClick(e) {
         e.preventDefault(); 
-        navigate(`/profile/${username}`)
+        navigate(`/profile/${props.userId}`)
     }
 
     return (
         <div onClick={(e) => handleOnClick(e)} className='flex flex-row items-center justify-center'>
             <div id="profileImg" className="w-40px h-40px rounded-full overflow-hidden bg-blue-100">
-                <img src={profileImage} className="w-full h-full object-cover" />
+                <img src={profileImage} className="w-full h-full object-cover" alt='placeholder' />
             </div>
             <div className='flex flex-col items-start justify-center ml-5px space-y-1'>
                 <div id="username" className='text-12px text-gray-400'>

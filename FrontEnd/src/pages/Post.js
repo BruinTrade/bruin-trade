@@ -7,13 +7,6 @@ import { useSelector } from 'react-redux'
 
 
 export default function PagePostIndex() {
-    const login = useSelector((state) => state.loginStatus.login)
-    const alert = useAlert()
-    if (!login)
-    {
-      alert.show("You must login first to view this page")
-      return <Navigate to="/login" />;
-    }
 
     return <Routes>
             <Route path="/" element={<PagePosts />}/>

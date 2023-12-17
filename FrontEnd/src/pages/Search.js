@@ -1,23 +1,15 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ItemPreviewList } from "../components/itemPreview";
 import ItemServices from "../backend_services/item_services";
 import { Routes, Route, useParams } from 'react-router-dom';
 import { Navigate } from "react-router-dom";
 import { useAlert } from 'react-alert'
 import { useSelector } from 'react-redux'
+import { AuthContext } from "../context/AuthContext";
 //import { useSelector } from 'react-redux'
 
 export default function Search() {
-    const login = useSelector((state) => state.loginStatus.login)
-    const alert = useAlert()
-    if (!login)
-    {
-      alert.show("You must login first to search for items")
-      return <Navigate to="/login" />;
-    }
-
-
 
     return <Routes>
         <Route path=":id" element={<SearchResult />} />
@@ -34,16 +26,16 @@ function SearchResult() {
     //fetch data
     useEffect(() => {
         if (id === "get_all_items") {
-            ItemServices.get_all().then(res => {
-                setResults(res.data.map(item => item._id))
-                setLoading(false)
-            })
+            // ItemServices.get_all().then(res => {
+            //     setResults(res.data.map(item => item._id))
+            //     setLoading(false)
+            // })
         }
         else {
-            ItemServices.getByQuery("title", id).then(res => {
-                setResults(res.data.map(item => item._id))
-                setLoading(false)
-            })
+            // ItemServices.getByQuery("title", id).then(res => {
+            //     setResults(res.data.map(item => item._id))
+            //     setLoading(false)
+            // })
         }
     }, [id])
 

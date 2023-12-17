@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import Form from "./form.js";
-import UserServices from './../backend_services/user_services.js';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from "react-router-dom";
-import { useAlert } from 'react-alert'
+import { useNavigate, Link } from "react-router-dom";
+
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 export default function SignIn() {
-    const alert = useAlert();
 
-    const [username, setUsernameState] = useState("");
+    const [err, setErr] = useState(false);
+    const [email, setEmailState] = useState("");
     const [password, setPasswordState] = useState("");
 
     const dispatch = useDispatch();
@@ -17,24 +18,28 @@ export default function SignIn() {
     async function handleSubmit(event) {
         event.preventDefault();
 
-        const res = await UserServices.login(dispatch, username, password);
-
-        if(res.status !== 200) {
-            //error handle
-            alert.show(res.data.errors);
-            console.log(res.data.errors);
-        } else {
-            //console.log("login successful");
-            navigate('/')
-        }
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                console.log(user)
+                navigate("/")
+            })
+            .catch((error) => {
+                setErr(true)
+                const errorCodeF = error.code;
+                const errorMessage = error.message;
+                console.log(errorCodeF, errorMessage)
+            });
     }
 
     return (
         <div>
-            <form onSubmit = {handleSubmit} className='font-avenir-reg text-14px drop-shadow w-350px h-298px bg-white rounded-25px item-center flex flex-col px-25px pt-29px justify-between'>
-                <Form label="Username" placeholder="No more than 20 characters" value={username} onChange={(event) => setUsernameState(event.target.value)} type="text" maxLength={20} minLength={3}/>
+            <form onSubmit={handleSubmit} className='font-avenir-reg text-14px drop-shadow w-350px h-298px bg-white rounded-25px item-center flex flex-col px-25px pt-29px justify-between'>
+                <Form label="Email" placeholder="bruintrade@gmail.com" value={email} onChange={(event) => setEmailState(event.target.value)} type="email" maxLength={100} minLength={1} />
                 <Form label="Password" placeholder="At least 8 characters" value={password} onChange={(event) => setPasswordState(event.target.value)} type="password" maxLength={100} minLength={8} />
-                <input className="font-avenir-med mb-30px mt-51px text-white text-16px rounded-25px drop-shadow h-40px bg-gradient-to-r from-blue-400 to-blue-500 hover:cursor-pointer hover:drop-shadow-md" type="submit" value="Login"/>
+                <input className="font-avenir-med mb-30px mt-51px text-white text-16px rounded-25px drop-shadow h-40px bg-gradient-to-r from-blue-400 to-blue-500 hover:cursor-pointer hover:drop-shadow-md" type="submit" value="Login" />
+                <p>You don't have an account? <Link to="/signup"> Sign up</Link> </p>
             </form>
         </div>
     )
