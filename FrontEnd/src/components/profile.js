@@ -91,7 +91,7 @@ function ViewMore(props) {
 export function NewProfilePage({ username }) {
     const {currentUser} = useContext(AuthContext)
     const userId = currentUser? currentUser.uid : null
-    const currentUsername = currentUser ? currentUser.displayName: "Please Login First";
+    const currentUsername = currentUser ? currentUser.displayName: null;
     const avaliablePages = [InfoPages.watchList, InfoPages.sellingItems, InfoPages.orders, InfoPages.sold, InfoPages.subscriptions]
     const settingPages = [SettingPages.location, SettingPages.profile];
     const defaultPhotoURL = "https://cdn2.vectorstock.com/i/1000x1000/20/76/man-avatar-profile-vector-21372076.jpg";
