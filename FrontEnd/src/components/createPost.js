@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import Form from "./form.js";
 import { useAlert } from 'react-alert'
 import UploadImage from "./uploadImage.js";
@@ -54,7 +54,6 @@ export default function CreatePost() {
         }
         // create a unique image name
         const date = new Date().getTime();
-        const urls = []
         const pid = `${currentUser.uid + date}`
 
         await updateDoc(doc(db, "users", currentUser.uid), {
@@ -62,7 +61,7 @@ export default function CreatePost() {
         })
 
         const docRef = doc(db, "products", pid)
-        // Add a document
+        // Initially create the document with an empty images array
         await setDoc(docRef, {
             pid: pid,
             seller: currentUser.uid,
@@ -73,34 +72,25 @@ export default function CreatePost() {
             condition: condition,
             location: location,
             categoryTag: categoryTag,
-            images: urls,
-        }).then(() => {
-            // Add image urls one at a time
-            // TODO: Optimize from O(n) to O(1)
-            images.map(async (image, idx) => {
-                const storageRef = ref(storage, `${currentUser.uid + date + idx}`);
-                await uploadBytesResumable(storageRef, image).then(() => {
-                    console.log("Sucess! Uploaded to Storage")
-                    getDownloadURL(storageRef).then(async (downloadURL) => {
-                        console.log("url: ", downloadURL);
-                        console.log("urls: ", urls)
-                        await updateDoc(docRef, {
-                            images: arrayUnion(downloadURL)
-                        })
-                    }).catch((err) => {
-                        console.log(err)
-                    })
-                }).catch((err) => {
-                    console.log(err)
-                })
-            });
-
-            // Navigate to Home Page
-            navigate("/")
-        }).catch((err) => {
-            console.log(err)
+            images: [],
         });
 
+        // Sequentially upload images and update document
+        for (const [idx, image] of images.entries()) {
+            try {
+                const storageRef = ref(storage, `${currentUser.uid + date + idx}`);
+                await uploadBytesResumable(storageRef, image);
+                const downloadURL = await getDownloadURL(storageRef);
+                await updateDoc(docRef, {
+                    images: arrayUnion(downloadURL)
+                });
+            } catch (err) {
+                console.error("Error uploading image or updating document:", err);
+            }
+        }
+
+        // Navigate to Home Page after all operations are complete
+        navigate("/");
     }
 
     function handleUploadImage(event) {
@@ -185,10 +175,10 @@ function PhotoPreview(props) {
     return (
         props.main ?
             <div className="w-390px h-200px rounded-8px">
-                <img src={props.imgUrl} className="w-full h-full object-contain" alt='placeholder'/>
+                <img src={props.imgUrl} className="w-full h-full object-contain" alt='placeholder' />
             </div> :
             <div className="w-112px h-80px rounded-8px">
-                <img src={props.imgUrl} className="w-full h-full object-cover" alt='placeholder'/>
+                <img src={props.imgUrl} className="w-full h-full object-cover" alt='placeholder' />
             </div>
     );
 }

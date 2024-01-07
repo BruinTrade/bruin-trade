@@ -2,6 +2,7 @@ import React from 'react'
 import get_icon, { Icons } from './icons_SVG';
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
 // import UserServices from "../backend_services/user_services.js"
 
 
@@ -13,7 +14,7 @@ export default function UserProfile(props) {
 
     let rating = useSelector((state) => state.userInfo.rating);
     const navigate = useNavigate()
-    
+
     function handleOnClick() {
         navigate(`/profile/${props.userId}`)
     }
@@ -24,10 +25,13 @@ export default function UserProfile(props) {
                 <img src={profileImage} className="w-full h-full object-cover" alt='placeholder' />
             </div>
             <div id="username" className='flex flex-row justify-center text-16px text-gray-500 mt-10px'>
-                {username}
+                {username ? username :
+                    <Link to="/login">
+                        <button className="space-x-4px bg-gradient-to-r from-blue-400 to-blue-500 opacity-60 rounded-25px w-100px h-50px text-white" >Login</button>
+                    </Link>}
             </div>
             <div id="rating" className='mt-3px w-80px'>
-                <UserRating rating={rating}/>
+                <UserRating rating={rating} />
             </div>
         </div>
     );
@@ -41,9 +45,9 @@ export function UserProfileSmall(props) {
 
     let rating = useSelector((state) => state.userInfo.rating);
     const navigate = useNavigate()
-    
+
     function handleOnClick(e) {
-        e.preventDefault(); 
+        e.preventDefault();
         navigate(`/profile/${props.userId}`)
     }
 
@@ -56,7 +60,7 @@ export function UserProfileSmall(props) {
                 <div id="username" className='text-12px text-gray-400'>
                     {username}
                 </div>
-                <UserRating rating={rating} small={true}/>
+                <UserRating rating={rating} small={true} />
             </div>
         </div>
     );
@@ -72,11 +76,11 @@ function Star({ proportion }) {
         <div className={`relative w-10px h-10px`}>
             {
                 partWidth === 0 ? null :
-                <div className={`absolute z-40 left-0 h-${size}px w-${partWidth}px overflow-hidden`}>
-                    <div className={`h-${size}px w-${size}px`}>
-                        {starIcon}
+                    <div className={`absolute z-40 left-0 h-${size}px w-${partWidth}px overflow-hidden`}>
+                        <div className={`h-${size}px w-${size}px`}>
+                            {starIcon}
+                        </div>
                     </div>
-                </div>
             }
             <div className={`absolute z-10 left-0 top-0 w-${size}px h-${size}px grayscale`}>
                 {starIcon}
@@ -91,9 +95,9 @@ function UserRating(props) {
     const roundedRating = Math.round(rating)
 
     const stars = [1, 2, 3, 4, 5].map((i) => {
-        if(i < roundedRating || i === rating) return <Star key={i} proportion={1} />
-        else if(i > roundedRating) return <Star key={i} proportion={0} />
-        else return <Star key={i} proportion={rating - Math.round(rating)}/>
+        if (i < roundedRating || i === rating) return <Star key={i} proportion={1} />
+        else if (i > roundedRating) return <Star key={i} proportion={0} />
+        else return <Star key={i} proportion={rating - Math.round(rating)} />
     });
 
     return (

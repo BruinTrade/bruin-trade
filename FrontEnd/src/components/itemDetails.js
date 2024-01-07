@@ -130,21 +130,27 @@ function ItemDetails(props) {
 
     // Get Cart Information of Current User
     const getCart = () => {
+      if (!currentUser || !currentUser.uid) return; // Check if currentUser is defined
+
       const unsub = onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
-        setCart(doc.data().cart);
+        const userData = doc.data();
+        if (userData && userData.cart) {
+          setCart(userData.cart);
+        } else {
+          // Handle the case where cart data isn't available
+          setCart([]);
+        }
       });
 
       return () => {
-        unsub();
+        unsub(); // Unsubscribe when the component unmounts or dependencies change
       };
     };
 
     getProduct();
 
     // Only call getCart if currentUser and currentUser.uid are available
-    if (currentUser && currentUser.uid) {
-      getCart();
-    }
+    getCart(); // This function already checks for currentUser internally
   }, [changeFlag, currentUser])
 
 
